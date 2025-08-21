@@ -117,9 +117,14 @@ export default function AuthForm() {
       console.log('New Salon Signup:', values.salonName);
       toast({
         title: 'Signup Successful',
-        description: 'Welcome! You can now log in.',
+        description: 'Welcome! Please log in to continue.',
       });
-      router.push('/dashboard');
+       loginForm.reset({ email: values.email, password: '' });
+       // Switch to login tab after successful signup
+       const loginTab = document.querySelector('button[data-state="inactive"][value="login"]');
+        if (loginTab instanceof HTMLElement) {
+            loginTab.click();
+        }
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -295,4 +300,3 @@ export default function AuthForm() {
     </Tabs>
   );
 }
-
