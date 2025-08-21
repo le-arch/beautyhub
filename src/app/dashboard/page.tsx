@@ -22,10 +22,10 @@ export default function DashboardPage() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
+        setIsLoading(false);
       } else {
         router.push('/owner');
       }
-      setIsLoading(false);
     });
 
     return () => unsubscribe();
@@ -59,7 +59,7 @@ export default function DashboardPage() {
   }
 
   if (!user) {
-    return null; // or a redirect component
+    return null; // The useEffect hook will redirect
   }
 
   return (
