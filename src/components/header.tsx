@@ -6,7 +6,7 @@ import { Menu, Sparkles } from 'lucide-react';
 const navLinks = [
   { href: '#', label: 'Home' },
   { href: '#salons', label: 'Explore Salons' },
-  { href: '#add-salon', label: 'Add Your Salon' },
+  { href: '/owner', label: 'For Salon Owners' },
   { href: '#blog', label: 'Beauty Tips' },
 ];
 
@@ -32,9 +32,11 @@ const Header = () => {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-4">
-          <Button variant="ghost">Log In</Button>
-          <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }}>
-            Add Your Salon
+          <Button variant="ghost" asChild>
+            <Link href="/owner">Log In</Link>
+          </Button>
+          <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
+            <Link href="/owner">Add Your Salon</Link>
           </Button>
         </div>
         <div className="md:hidden">
@@ -62,9 +64,11 @@ const Header = () => {
                     ))}
                 </nav>
                 <div className="flex flex-col gap-4">
-                    <Button variant="ghost">Log In</Button>
-                    <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }}>
-                      Add Your Salon
+                    <Button variant="ghost" asChild>
+                        <Link href="/owner">Log In</Link>
+                    </Button>
+                    <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
+                      <Link href="/owner">Add Your Salon</Link>
                     </Button>
                 </div>
               </div>
