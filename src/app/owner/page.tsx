@@ -38,7 +38,7 @@ export default function OwnerPage() {
                 </CardHeader>
                 <CardContent>
                     <Button size="lg" asChild>
-                        <Link href="/">Explore Salons</Link>
+                        <Link href="/dashboard/customer">Explore Salons</Link>
                     </Button>
                 </CardContent>
             </Card>
@@ -54,7 +54,7 @@ export default function OwnerPage() {
                 </CardHeader>
                 <CardContent>
                     <Button size="lg" style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
-                       <Link href="/owner/signup">Join as a Business</Link>
+                       <Link href="/dashboard/owner">Join as a Business</Link>
                     </Button>
                 </CardContent>
             </Card>

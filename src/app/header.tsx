@@ -34,10 +34,10 @@ const Header = () => {
         </nav>
         <div className="hidden md:flex items-center gap-4">
           <Button variant="ghost" asChild>
-            <Link href="/owner/login">Log In</Link>
+            <Link href="/dashboard/customer">Log In</Link>
           </Button>
           <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
-            <Link href="/owner/signup">Add Your Salon</Link>
+            <Link href="/owner">Add Your Salon</Link>
           </Button>
         </div>
         <div className="md:hidden">
@@ -66,10 +66,10 @@ const Header = () => {
                 </nav>
                 <div className="flex flex-col gap-4">
                     <Button variant="ghost" asChild>
-                        <Link href="/owner/login">Log In</Link>
+                        <Link href="/dashboard/customer">Log In</Link>
                     </Button>
                     <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
-                      <Link href="/owner/signup">Add Your Salon</Link>
+                      <Link href="/owner">Add Your Salon</Link>
                     </Button>
                 </div>
               </div>
