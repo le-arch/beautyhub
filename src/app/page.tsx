@@ -1,3 +1,4 @@
+
 import Header from '@/components/header';
 import HeroSection from '@/components/hero-section';
 import FeaturedCategories from '@/components/featured-categories';

@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import { Button } from './ui/button';
 import Link from 'next/link';
@@ -40,7 +41,7 @@ const PromoteSalon = () => {
                         </li>
                     </ul>
                     <Button size="lg" className="mt-8" style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
-                        <Link href="/owner">List Your Beauty Business</Link>
+                        <Link href="/owner/signup">List Your Beauty Business</Link>
                     </Button>
                 </div>
                 <div className="hidden md:block">
