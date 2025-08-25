@@ -3,13 +3,11 @@ import type { Metadata } from 'next';
 import {
   SidebarProvider,
   Sidebar,
-  SidebarHeader,
   SidebarContent,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
 import CustomerDashboardHeader from '@/app/dashboard/customer/header';
@@ -28,58 +26,60 @@ export default function CustomerDashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <CustomerDashboardHeader />
-      <div className="flex min-h-screen">
-        <Sidebar>
-          <SidebarContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton href="/dashboard/customer" isActive>
-                  <Home />
-                  Dashboard
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton href="/dashboard/customer/bookings">
-                  <Calendar />
-                  Bookings
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton href="/dashboard/customer/messages">
-                  <MessageSquare />
-                  Messages
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-               <SidebarMenuItem>
-                <SidebarMenuButton href="/dashboard/customer/favorites">
-                  <Star />
-                  Favorites
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton href="/dashboard/customer/profile">
-                  <User />
-                  Profile
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarContent>
-          <SidebarFooter>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton href="/dashboard/customer/settings">
-                  <Settings />
-                  Settings
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarFooter>
-        </Sidebar>
-        <SidebarInset>
-          {children}
-          <Footer />
-        </SidebarInset>
+      <div className="flex min-h-screen flex-col">
+        <CustomerDashboardHeader />
+        <div className="flex flex-1">
+          <Sidebar>
+            <SidebarContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton href="/dashboard/customer" isSubtle>
+                    <Home />
+                    Dashboard
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton href="/dashboard/customer/bookings" isSubtle>
+                    <Calendar />
+                    Bookings
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton href="/dashboard/customer/messages" isSubtle>
+                    <MessageSquare />
+                    Messages
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                 <SidebarMenuItem>
+                  <SidebarMenuButton href="/dashboard/customer/favorites" isSubtle>
+                    <Star />
+                    Favorites
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton href="/dashboard/customer/profile" isSubtle>
+                    <User />
+                    Profile
+                  </SidebarMenuButton>
+                </Gutter>
+              </SidebarMenu>
+            </SidebarContent>
+            <SidebarFooter>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton href="/dashboard/customer/settings" isSubtle>
+                    <Settings />
+                    Settings
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarFooter>
+          </Sidebar>
+          <SidebarInset className="flex-1">
+            {children}
+            <Footer />
+          </SidebarInset>
+        </div>
       </div>
     </SidebarProvider>
   );
