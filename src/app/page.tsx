@@ -31,7 +31,6 @@ import PromoteSalon from '@/components/promote-salon';
 import AiStylist from '@/components/ai-stylist';
 import BlogTeasers from '@/components/blog-teasers';
 
-
 const quickSearchCategories = [
   { name: 'Braiding', icon: '💇🏾‍♀️', color: 'from-purple-500 to-purple-600' },
   { name: 'Nails', icon: '💅🏾', color: 'from-pink-500 to-pink-600' },
@@ -97,8 +96,8 @@ const recentlyViewed = [
 
 export default function CustomerHome() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-
+  
+  // Mock data that would come from your useApp context
   const user = { name: 'Beauty Lover', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d' };
   const userLocation = { city: 'Lagos' };
   const favoriteIds = [1, 2];

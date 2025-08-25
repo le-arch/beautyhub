@@ -1,7 +1,6 @@
 
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -66,12 +65,11 @@ const upcomingBookings = [
 
 
 export default function CustomerDashboard() {
-  const [activeTab, setActiveTab] = useState('overview');
 
   const user = { name: 'Beauty Lover' };
   const userLocation = { city: 'Lagos', country: 'Nigeria' };
   const favoriteIds = [1, 2];
-  const comparisonList = [];
+  const comparisonList: unknown[] = [];
   const notifications = [{isRead: false}];
   const unreadMessages = 2;
   const unreadNotifications = notifications.filter(n => !n.isRead).length;
