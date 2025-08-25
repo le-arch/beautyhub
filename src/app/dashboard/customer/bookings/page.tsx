@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Star, MessageSquare } from 'lucide-react';
+import { Calendar, Clock, Star } from 'lucide-react';
 import Image from 'next/image';
 
 const upcomingBookings = [
@@ -126,7 +126,7 @@ export default function BookingsPage() {
                     </div>
                      <div className="flex sm:flex-col gap-2 self-stretch sm:self-center">
                        <Button size="sm">Book Again</Button>
-                       <Button variant="outline" size="sm"><Star className="mr-2" /> Leave a Review</Button>
+                       <Button variant="outline" size="sm"><Star className="mr-2 h-4 w-4" /> Leave a Review</Button>
                     </div>
                   </Card>
                 ))}
