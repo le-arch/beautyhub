@@ -10,12 +10,8 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import CustomerDashboardHeader from '@/app/dashboard/customer/header';
-import { Home, Star, MessageSquare, Calendar, User, Settings } from 'lucide-react';
+import { Home, Star, MessageSquare, Calendar, User, Settings, Sparkles } from 'lucide-react';
 import Footer from '@/components/footer';
-import HeroSection from '@/components/hero-section';
-import FeaturedCategories from '@/components/featured-categories';
-import TopRatedSalons from '@/components/top-rated-salons';
-import AiStylist from '@/components/ai-stylist';
 
 export const metadata: Metadata = {
   title: 'Customer Dashboard - BeautyHub',
@@ -60,6 +56,12 @@ export default function CustomerDashboardLayout({
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
+                  <SidebarMenuButton href="/dashboard/customer/beauty-tips">
+                    <Sparkles />
+                    <span>Beauty Tips</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
                   <SidebarMenuButton href="/dashboard/customer/profile">
                     <User />
                     <span>Profile</span>
@@ -80,11 +82,7 @@ export default function CustomerDashboardLayout({
           </Sidebar>
           <SidebarInset className="flex flex-1 flex-col">
              <main className="flex-1">
-              <HeroSection />
               {children}
-              <FeaturedCategories />
-              <TopRatedSalons />
-              <AiStylist />
             </main>
             <Footer />
           </SidebarInset>
