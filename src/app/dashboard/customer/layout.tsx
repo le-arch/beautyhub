@@ -1,4 +1,3 @@
-
 import type { Metadata } from 'next';
 import {
   SidebarProvider,
@@ -13,6 +12,10 @@ import {
 import CustomerDashboardHeader from '@/app/dashboard/customer/header';
 import { Home, Star, MessageSquare, Calendar, User, Settings } from 'lucide-react';
 import Footer from '@/components/footer';
+import HeroSection from '@/components/hero-section';
+import FeaturedCategories from '@/components/featured-categories';
+import TopRatedSalons from '@/components/top-rated-salons';
+import AiStylist from '@/components/ai-stylist';
 
 export const metadata: Metadata = {
   title: 'Customer Dashboard - BeautyHub',
@@ -35,31 +38,31 @@ export default function CustomerDashboardLayout({
                 <SidebarMenuItem>
                   <SidebarMenuButton href="/dashboard/customer">
                     <Home />
-                    Dashboard
+                    <span>Dashboard</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton href="/dashboard/customer/bookings">
                     <Calendar />
-                    Bookings
+                    <span>Bookings</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton href="/dashboard/customer/messages">
                     <MessageSquare />
-                    Messages
+                    <span>Messages</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                  <SidebarMenuItem>
                   <SidebarMenuButton href="/dashboard/customer/favorites">
                     <Star />
-                    Favorites
+                    <span>Favorites</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton href="/dashboard/customer/profile">
                     <User />
-                    Profile
+                    <span>Profile</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
@@ -69,14 +72,20 @@ export default function CustomerDashboardLayout({
                 <SidebarMenuItem>
                   <SidebarMenuButton href="/dashboard/customer/settings">
                     <Settings />
-                    Settings
+                    <span>Settings</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarFooter>
           </Sidebar>
-          <SidebarInset className="flex-1">
-            {children}
+          <SidebarInset className="flex flex-1 flex-col">
+             <main className="flex-1">
+              <HeroSection />
+              {children}
+              <FeaturedCategories />
+              <TopRatedSalons />
+              <AiStylist />
+            </main>
             <Footer />
           </SidebarInset>
         </div>

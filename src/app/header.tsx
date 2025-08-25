@@ -1,4 +1,3 @@
-
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -7,7 +6,6 @@ import { Menu, Sparkles } from 'lucide-react';
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/#salons', label: 'Explore Salons' },
-  { href: '/owner', label: 'For Salon Owners' },
   { href: '/#blog', label: 'Beauty Tips' },
 ];
 
@@ -17,7 +15,7 @@ const Header = () => {
       <div className="container flex h-16 max-w-7xl items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <Sparkles className="h-6 w-6 text-primary" />
-          <span className="font-headline text-2xl font-bold text-foreground">
+          <span className="text-xl font-bold text-foreground">
             BeautyHub
           </span>
         </Link>
@@ -31,9 +29,15 @@ const Header = () => {
               {link.label}
             </Link>
           ))}
+           <Link
+              href="/owner"
+              className="transition-colors hover:text-primary"
+            >
+              For Salon Owners
+            </Link>
         </nav>
         <div className="hidden md:flex items-center gap-4">
-          <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
+          <Button asChild>
             <Link href="/owner">Join</Link>
           </Button>
         </div>
@@ -48,7 +52,7 @@ const Header = () => {
               <div className="flex flex-col gap-6 p-6">
                 <Link href="/" className="flex items-center gap-2">
                     <Sparkles className="h-6 w-6 text-primary" />
-                    <span className="font-headline text-xl font-bold">BeautyHub</span>
+                    <span className="text-xl font-bold">BeautyHub</span>
                 </Link>
                 <nav className="flex flex-col gap-4">
                     {navLinks.map((link) => (
@@ -60,9 +64,15 @@ const Header = () => {
                         {link.label}
                     </Link>
                     ))}
+                     <Link
+                      href="/owner"
+                      className="text-lg font-medium transition-colors hover:text-primary"
+                    >
+                      For Salon Owners
+                    </Link>
                 </nav>
                 <div className="flex flex-col gap-4">
-                    <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
+                    <Button asChild>
                       <Link href="/owner">Join</Link>
                     </Button>
                 </div>
