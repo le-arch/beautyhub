@@ -6,9 +6,9 @@ import { Menu, Sparkles } from 'lucide-react';
 
 const navLinks = [
   { href: '/', label: 'Home' },
-  { href: '#salons', label: 'Explore Salons' },
+  { href: '/#salons', label: 'Explore Salons' },
   { href: '/owner', label: 'For Salon Owners' },
-  { href: '#blog', label: 'Beauty Tips' },
+  { href: '/#blog', label: 'Beauty Tips' },
 ];
 
 const Header = () => {
@@ -18,7 +18,7 @@ const Header = () => {
         <Link href="/" className="flex items-center gap-2">
           <Sparkles className="h-6 w-6 text-primary" />
           <span className="font-headline text-2xl font-bold text-foreground">
-            SalonFind Africa
+            BeautyHub
           </span>
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
@@ -34,10 +34,10 @@ const Header = () => {
         </nav>
         <div className="hidden md:flex items-center gap-4">
           <Button variant="ghost" asChild>
-            <Link href="/owner/login">Log In</Link>
+            <Link href="/owner">Log In</Link>
           </Button>
           <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
-            <Link href="/owner/signup">Add Your Salon</Link>
+            <Link href="/owner">Add Your Salon</Link>
           </Button>
         </div>
         <div className="md:hidden">
@@ -51,7 +51,7 @@ const Header = () => {
               <div className="flex flex-col gap-6 p-6">
                 <Link href="/" className="flex items-center gap-2">
                     <Sparkles className="h-6 w-6 text-primary" />
-                    <span className="font-headline text-xl font-bold">SalonFind</span>
+                    <span className="font-headline text-xl font-bold">BeautyHub</span>
                 </Link>
                 <nav className="flex flex-col gap-4">
                     {navLinks.map((link) => (
@@ -66,10 +66,10 @@ const Header = () => {
                 </nav>
                 <div className="flex flex-col gap-4">
                     <Button variant="ghost" asChild>
-                        <Link href="/owner/login">Log In</Link>
+                        <Link href="/owner">Log In</Link>
                     </Button>
                     <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
-                      <Link href="/owner/signup">Add Your Salon</Link>
+                      <Link href="/owner">Add Your Salon</Link>
                     </Button>
                 </div>
               </div>
