@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Heart, Search, Filter } from 'lucide-react';
 import SalonCard from '@/components/salon-card';
 import type { Salon } from '@/lib/types';
+import Link from 'next/link';
 
 // Mock data, as we don't have the useApp context implemented yet.
 const favoritedSalons: (Salon & { specialties?: string[], featured?: boolean, verified?: boolean, distance?: string, responseTime?: string })[] = [
@@ -153,15 +154,17 @@ export default function FavoritesPage() {
                         size="sm"
                         variant="outline"
                         className="border-purple-200 text-purple-600 hover:bg-purple-50"
+                        asChild
                       >
-                        Discover More Salons
+                       <Link href="/">Discover More Salons</Link>
                       </Button>
                       <Button 
                         size="sm"
                         variant="outline"
                         className="border-purple-200 text-purple-600 hover:bg-purple-50"
+                        asChild
                       >
-                        View Messages
+                        <Link href="/dashboard/customer/messages">View Messages</Link>
                       </Button>
                     </div>
                   </div>
@@ -187,14 +190,16 @@ export default function FavoritesPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button 
                 className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3"
+                asChild
               >
-                Explore Salons
+                <Link href="/">Explore Salons</Link>
               </Button>
               <Button 
                 variant="outline"
                 className="border-purple-200 text-purple-600 hover:bg-purple-50 px-8 py-3"
+                 asChild
               >
-                Browse Categories
+                <Link href="/">Browse Categories</Link>
               </Button>
             </div>
             
@@ -226,8 +231,8 @@ export default function FavoritesPage() {
                 
                 <div className="text-center">
                   <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Button className="h-6 w-6 text-purple-600 bg-transparent hover:bg-transparent p-0">
-                      ↺
+                    <Button asChild className="h-6 w-6 text-purple-600 bg-transparent hover:bg-transparent p-0">
+                      <Link href="#">↺</Link>
                     </Button>
                   </div>
                   <h4 className="font-semibold text-warmgray-900 mb-2">3. Access Anytime</h4>
