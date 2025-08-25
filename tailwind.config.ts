@@ -15,11 +15,10 @@ export default {
     extend: {
       backgroundImage: {
         'gradient-beauty-primary': 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%)',
-        'gradient-beauty-secondary': 'linear-gradient(135deg, hsl(var(--primary-50)) 0%, hsl(var(--secondary-50)) 100%)',
+        'gradient-beauty-secondary': 'linear-gradient(135deg, hsl(var(--purple-50)) 0%, hsl(var(--pink-50)) 100%)',
       },
       fontFamily: {
         sans: ['var(--font-inter)', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-        headline: ['Belleza', 'serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -107,12 +106,21 @@ export default {
         'pink-700': '#be185d',
         'pink-800': '#9d174d',
         'pink-900': '#831843',
+        'indigo-600': '#4f46e5',
+        'rose-600': '#e11d48',
+        'emerald-600': '#059669',
+        'green-500': '#22c55e',
+        'green-600': '#16a34a',
+        'gray-600': '#4b5563',
+        'gray-700': '#374151',
+
       },
       borderRadius: {
         lg: '12px',
         md: '8px',
         sm: '4px',
         xl: '16px',
+        '2xl': '24px',
       },
       keyframes: {
         'accordion-down': {
