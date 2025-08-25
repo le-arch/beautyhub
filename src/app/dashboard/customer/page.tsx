@@ -7,11 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Calendar, 
-  MessageCircle, 
-  Heart, 
-  MapPin, 
+import {
+  Calendar,
+  MessageCircle,
+  Heart,
+  MapPin,
   Star,
   Settings,
   Search,
@@ -78,10 +78,10 @@ export default function CustomerDashboard() {
 
 
   const stats = [
-    { label: "Appointments", value: upcomingBookings.length, icon: Calendar, color: "text-purple-600" },
-    { label: "Favorites", value: favoriteIds.length, icon: Heart, color: "text-pink-600" },
-    { label: "Reviews", value: "12", icon: Star, color: "text-yellow-600" },
-    { label: "Comparing", value: comparisonList.length, icon: TrendingUp, color: "text-blue-600" }
+    { label: "Appointments", value: upcomingBookings.length, icon: Calendar, color: "text-purple-600", href: "/dashboard/customer/bookings" },
+    { label: "Favorites", value: favoriteIds.length, icon: Heart, color: "text-pink-600", href: "/dashboard/customer/favorites" },
+    { label: "Reviews", value: "12", icon: Star, color: "text-yellow-600", href: "#" },
+    { label: "Comparing", value: comparisonList.length, icon: TrendingUp, color: "text-blue-600", href: "#" }
   ];
 
     const quickActions = [
@@ -89,7 +89,7 @@ export default function CustomerDashboard() {
       icon: Search,
       title: "Find Salons",
       description: "Discover new salons near you",
-      href: '/dashboard/customer',
+      href: '/',
       color: "from-purple-500 to-purple-600"
     },
     {
@@ -111,7 +111,7 @@ export default function CustomerDashboard() {
       icon: MapPin,
       title: "Near Me",
       description: "Salons in your area",
-      href: '/dashboard/customer',
+      href: '/',
       color: "from-emerald-500 to-emerald-600"
     }
   ];
@@ -150,17 +150,19 @@ export default function CustomerDashboard() {
           {stats.map((stat, index) => {
             const IconComponent = stat.icon;
             return (
-              <Card key={index} className="bg-white border-purple-100">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-warmgray-600">{stat.label}</p>
-                      <p className="text-2xl font-semibold text-warmgray-900">{stat.value}</p>
+              <Link href={stat.href} key={index}>
+                <Card className="bg-white border-purple-100 hover:shadow-lg transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-warmgray-600">{stat.label}</p>
+                        <p className="text-2xl font-semibold text-warmgray-900">{stat.value}</p>
+                      </div>
+                      <IconComponent className={`h-6 w-6 ${stat.color}`} />
                     </div>
-                    <IconComponent className={`h-6 w-6 ${stat.color}`} />
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
             );
           })}
         </div>
@@ -173,7 +175,7 @@ export default function CustomerDashboard() {
               const IconComponent = action.icon;
               return (
                 <Link href={action.href} key={index}>
-                    <Card 
+                    <Card
                     className="cursor-pointer hover:shadow-lg transition-all duration-200 bg-white border-purple-100 hover:border-purple-200 h-full"
                     >
                     <CardContent className="p-4">
@@ -233,7 +235,7 @@ export default function CustomerDashboard() {
                   <Calendar className="h-12 w-12 text-warmgray-400 mx-auto mb-4" />
                   <p className="text-warmgray-600 mb-4">No bookings yet</p>
                   <Button asChild size="sm">
-                    <Link href="/dashboard/customer">
+                    <Link href="/">
                         <Plus className="mr-2 h-4 w-4" />
                         Book Your First Appointment
                     </Link>
@@ -259,11 +261,11 @@ export default function CustomerDashboard() {
             </CardHeader>
             <CardContent className="space-y-4">
               {favoritedSalons.length > 0 ? favoritedSalons.map((salon, index) => (
-                <Link href="/dashboard/customer" key={index}>
-                    <div 
+                <Link href="#" key={index}>
+                    <div
                     className="flex items-center gap-3 p-3 bg-pink-50 rounded-lg cursor-pointer hover:bg-pink-100 transition-colors"
                     >
-                    <Image 
+                    <Image
                         src={salon.image}
                         alt={salon.name}
                         width={48}
@@ -290,7 +292,7 @@ export default function CustomerDashboard() {
                   <Heart className="h-12 w-12 text-warmgray-400 mx-auto mb-4" />
                   <p className="text-warmgray-600 mb-4">No favorites yet</p>
                   <Button asChild size="sm">
-                    <Link href="/dashboard/customer">
+                    <Link href="/">
                         <Search className="mr-2 h-4 w-4" />
                         Discover Salons
                     </Link>

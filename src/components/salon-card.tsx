@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import type { Salon } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
