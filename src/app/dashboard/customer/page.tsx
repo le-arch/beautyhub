@@ -17,13 +17,14 @@ import {
   Search,
   Plus,
   ChevronRight,
-  TrendingUp
+  TrendingUp,
+  History
 } from "lucide-react";
 import ImageWithFallback from "@/components/image-with-fallback";
 import { mockSalons } from '@/lib/mock-data';
 
 export default function CustomerDashboard() {
-  const [activeTab, setActiveTab = useState('overview');
+  const [activeTab, setActiveTab] = useState('overview');
 
   const user = { name: 'Beauty Lover' };
   const userLocation = { city: 'Lagos', country: 'Nigeria' };
