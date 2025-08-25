@@ -8,14 +8,15 @@ import {
   SidebarMenuButton,
   SidebarFooter,
   SidebarInset,
+  SidebarHeader,
+  SidebarTitle,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import CustomerDashboardHeader from '@/app/dashboard/customer/header';
-import { Home, Star, MessageSquare, Calendar, User, Settings, Sparkles } from 'lucide-react';
+import { Home, Star, MessageSquare, Calendar, User, Settings, Sparkles, LogOut } from 'lucide-react';
 import Footer from '@/components/footer';
-import AiStylist from '@/components/ai-stylist';
-import HeroSection from '@/components/hero-section';
-import FeaturedCategories from '@/components/featured-categories';
-import TopRatedSalons from '@/components/top-rated-salons';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
   title: 'Customer Dashboard - BeautyHub',
@@ -36,7 +37,7 @@ export default function CustomerDashboardLayout({
             <SidebarContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton href="/dashboard/customer">
+                  <SidebarMenuButton href="/dashboard/customer" isActive>
                     <Home />
                     <span>Dashboard</span>
                   </SidebarMenuButton>
@@ -65,16 +66,17 @@ export default function CustomerDashboardLayout({
                     <span>Beauty Tips</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+              </SidebarMenu>
+
+              <SidebarSeparator />
+
+              <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton href="/dashboard/customer/profile">
                     <User />
                     <span>Profile</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarContent>
-            <SidebarFooter>
-              <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton href="/dashboard/customer/settings">
                     <Settings />
@@ -82,10 +84,22 @@ export default function CustomerDashboardLayout({
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
+            </SidebarContent>
+            <SidebarFooter>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <Button asChild variant="outline" className="w-full justify-start">
+                    <Link href="/">
+                      <LogOut className="mr-2" />
+                      Exit Dashboard
+                    </Link>
+                  </Button>
+                </SidebarMenuItem>
+              </SidebarMenu>
             </SidebarFooter>
           </Sidebar>
           <SidebarInset className="flex flex-1 flex-col">
-             <main className="flex-1">
+             <main className="flex-1 bg-gradient-beauty-secondary">
               {children}
             </main>
             <Footer />
