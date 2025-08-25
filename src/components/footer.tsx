@@ -1,64 +1,62 @@
+import { MessageCircle, Facebook, Instagram, Twitter } from "lucide-react";
 import Link from 'next/link';
-import { Sparkles, Twitter, Instagram, Facebook, Youtube } from 'lucide-react';
 
-const Footer = () => {
+export default function Footer() {
   return (
-    <footer className="bg-secondary text-foreground">
+    <footer className="bg-warmgray-900 text-white">
       <div className="container max-w-7xl py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="md:col-span-1">
-            <Link href="/" className="flex items-center gap-2">
-                <Sparkles className="h-8 w-8 text-primary" />
-                <span className="font-headline text-2xl font-bold">
-                    BeautyHub
-                </span>
-            </Link>
-            <p className="mt-4 text-sm text-muted-foreground">
-              Connecting you to the best beauty and wellness professionals across Africa.
+          {/* Brand Section */}
+          <div className="md:col-span-2">
+            <div className="text-2xl mb-4 font-bold text-purple-400">BeautyHub</div>
+            <p className="text-warmgray-300 mb-4 max-w-md">
+              Your trusted platform to discover and connect with the best beauty professionals across Africa. 
+              Find top-rated salons, nail artists, and beauty specialists near you.
             </p>
-            <div className="mt-6 flex space-x-4">
-              <Link href="#" className="text-muted-foreground hover:text-primary"><Twitter /></Link>
-              <Link href="#" className="text-muted-foreground hover:text-primary"><Instagram /></Link>
-              <Link href="#" className="text-muted-foreground hover:text-primary"><Facebook /></Link>
-              <Link href="#" className="text-muted-foreground hover:text-primary"><Youtube /></Link>
+            <div className="flex items-center space-x-4">
+                <Link href="#" className="text-warmgray-400 hover:text-white transition-colors"><Facebook className="h-5 w-5" /></Link>
+                <Link href="#" className="text-warmgray-400 hover:text-white transition-colors"><Instagram className="h-5 w-5" /></Link>
+                <Link href="#" className="text-warmgray-400 hover:text-white transition-colors"><Twitter className="h-5 w-5" /></Link>
             </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 md:col-span-3 gap-8">
-            <div>
-              <h3 className="font-headline text-lg font-semibold">For Clients</h3>
-              <ul className="mt-4 space-y-2">
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Explore Salons</Link></li>
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Find by City</Link></li>
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Find by Service</Link></li>
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Beauty Tips</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-headline text-lg font-semibold">For Businesses</h3>
-              <ul className="mt-4 space-y-2">
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Add Your Salon</Link></li>
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Pricing</Link></li>
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Business Login</Link></li>
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Help for Owners</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-headline text-lg font-semibold">Company</h3>
-              <ul className="mt-4 space-y-2">
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">About Us</Link></li>
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Contact Us</Link></li>
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Privacy Policy</Link></li>
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Terms of Use</Link></li>
-              </ul>
-            </div>
+
+          {/* Quick Links */}
+          <div>
+            <h3 className="mb-4 font-semibold text-white">Quick Links</h3>
+            <ul className="space-y-2">
+              <li><Link href="#" className="text-warmgray-300 hover:text-white transition-colors">About Us</Link></li>
+              <li><Link href="#" className="text-warmgray-300 hover:text-white transition-colors">Add Your Salon</Link></li>
+              <li><Link href="#" className="text-warmgray-300 hover:text-white transition-colors">Beauty Tips</Link></li>
+              <li><Link href="#" className="text-warmgray-300 hover:text-white transition-colors">Contact Us</Link></li>
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h3 className="mb-4 font-semibold text-white">Legal</h3>
+            <ul className="space-y-2">
+              <li><Link href="#" className="text-warmgray-300 hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link href="#" className="text-warmgray-300 hover:text-white transition-colors">Terms of Use</Link></li>
+              <li><Link href="#" className="text-warmgray-300 hover:text-white transition-colors">Cookie Policy</Link></li>
+            </ul>
           </div>
         </div>
-        <div className="mt-12 border-t pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} BeautyHub. All rights reserved.</p>
+
+        <div className="border-t border-warmgray-800 mt-8 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <p className="text-warmgray-400 text-sm">
+              &copy; {new Date().getFullYear()} BeautyHub. All rights reserved.
+            </p>
+            
+            <div className="flex items-center mt-4 md:mt-0">
+              <MessageCircle className="h-5 w-5 text-green-500 mr-2" />
+              <span className="text-warmgray-300 text-sm">
+                WhatsApp Support: +237 6XX XXX XXX
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}
