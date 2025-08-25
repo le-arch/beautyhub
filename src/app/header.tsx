@@ -18,7 +18,7 @@ const Header = () => {
         <Link href="/" className="flex items-center gap-2">
           <Sparkles className="h-6 w-6 text-primary" />
           <span className="font-headline text-2xl font-bold text-foreground">
-            SalonFind Africa
+            BeautyHub
           </span>
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
@@ -48,7 +48,7 @@ const Header = () => {
               <div className="flex flex-col gap-6 p-6">
                 <Link href="/" className="flex items-center gap-2">
                     <Sparkles className="h-6 w-6 text-primary" />
-                    <span className="font-headline text-xl font-bold">SalonFind</span>
+                    <span className="font-headline text-xl font-bold">BeautyHub</span>
                 </Link>
                 <nav className="flex flex-col gap-4">
                     {navLinks.map((link) => (

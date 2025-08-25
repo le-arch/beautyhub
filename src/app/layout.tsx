@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'SalonFind Africa',
+  title: 'BeautyHub',
   description: 'Find the Perfect Salon for Your Style in Your City',
 };
 

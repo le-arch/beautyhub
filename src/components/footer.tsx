@@ -10,7 +10,7 @@ const Footer = () => {
             <Link href="/" className="flex items-center gap-2">
                 <Sparkles className="h-8 w-8 text-primary" />
                 <span className="font-headline text-2xl font-bold">
-                    SalonFind Africa
+                    BeautyHub
                 </span>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground">
@@ -54,7 +54,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="mt-12 border-t pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} SalonFind Africa. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} BeautyHub. All rights reserved.</p>
         </div>
       </div>
     </footer>
