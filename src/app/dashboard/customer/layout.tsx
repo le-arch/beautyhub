@@ -12,6 +12,10 @@ import {
 import CustomerDashboardHeader from '@/app/dashboard/customer/header';
 import { Home, Star, MessageSquare, Calendar, User, Settings, Sparkles } from 'lucide-react';
 import Footer from '@/components/footer';
+import AiStylist from '@/components/ai-stylist';
+import HeroSection from '@/components/hero-section';
+import FeaturedCategories from '@/components/featured-categories';
+import TopRatedSalons from '@/components/top-rated-salons';
 
 export const metadata: Metadata = {
   title: 'Customer Dashboard - BeautyHub',

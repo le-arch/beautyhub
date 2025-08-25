@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, Star } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const upcomingBookings = [
   {
@@ -85,7 +86,9 @@ export default function BookingsPage() {
             ) : (
                <div className="text-center py-12 border-2 border-dashed rounded-lg">
                 <h3 className="text-lg font-medium text-muted-foreground">You have no upcoming appointments.</h3>
-                <Button className="mt-4">Book a Service</Button>
+                <Button className="mt-4" asChild>
+                  <Link href="/dashboard/customer">Book a Service</Link>
+                </Button>
               </div>
             )}
           </CardContent>
