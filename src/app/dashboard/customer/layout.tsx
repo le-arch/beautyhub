@@ -61,7 +61,7 @@ export default function CustomerDashboardLayout({
                     <User />
                     Profile
                   </SidebarMenuButton>
-                </Gutter>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarContent>
             <SidebarFooter>
