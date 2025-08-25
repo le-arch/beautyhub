@@ -37,33 +37,43 @@ export default function CustomerDashboardLayout({
             <SidebarContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton href="/dashboard/customer" isActive>
-                    <Home />
-                    <span>Dashboard</span>
+                   <SidebarMenuButton asChild>
+                    <Link href="/dashboard/customer">
+                      <Home />
+                      <span>Dashboard</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton href="/dashboard/customer/bookings">
-                    <Calendar />
-                    <span>Bookings</span>
+                   <SidebarMenuButton asChild>
+                     <Link href="/dashboard/customer/bookings">
+                      <Calendar />
+                      <span>Bookings</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton href="/dashboard/customer/messages">
-                    <MessageSquare />
-                    <span>Messages</span>
+                   <SidebarMenuButton asChild>
+                     <Link href="/dashboard/customer/messages">
+                      <MessageSquare />
+                      <span>Messages</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                  <SidebarMenuItem>
-                  <SidebarMenuButton href="/dashboard/customer/favorites">
-                    <Star />
-                    <span>Favorites</span>
+                   <SidebarMenuButton asChild>
+                     <Link href="/dashboard/customer/favorites">
+                      <Star />
+                      <span>Favorites</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton href="/dashboard/customer/beauty-tips">
-                    <Sparkles />
-                    <span>Beauty Tips</span>
+                   <SidebarMenuButton asChild>
+                     <Link href="/dashboard/customer/beauty-tips">
+                      <Sparkles />
+                      <span>Beauty Tips</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
@@ -72,15 +82,19 @@ export default function CustomerDashboardLayout({
 
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton href="/dashboard/customer/profile">
-                    <User />
-                    <span>Profile</span>
+                   <SidebarMenuButton asChild>
+                     <Link href="/dashboard/customer/profile">
+                      <User />
+                      <span>Profile</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton href="/dashboard/customer/settings">
-                    <Settings />
-                    <span>Settings</span>
+                   <SidebarMenuButton asChild>
+                     <Link href="/dashboard/customer/settings">
+                      <Settings />
+                      <span>Settings</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>

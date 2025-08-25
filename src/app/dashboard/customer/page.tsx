@@ -1,39 +1,30 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
-  Search, 
-  MapPin, 
-  Star, 
-  Heart, 
+  Calendar, 
   MessageCircle, 
-  Clock,
+  Heart, 
+  MapPin, 
+  Star,
+  Settings,
+  Search,
+  Plus,
   TrendingUp,
-  Navigation,
-  Sparkles
-} from 'lucide-react';
-import SalonCard from '@/components/salon-card';
-import ImageWithFallback from "@/components/image-with-fallback";
+  ChevronRight,
+  History
+} from "lucide-react";
+import Image from 'next/image';
 import type { Salon } from '@/lib/types';
 
 
-const quickSearchCategories = [
-  { name: 'Braiding', icon: '💇🏾‍♀️', color: 'from-purple-500 to-purple-600' },
-  { name: 'Nails', icon: '💅🏾', color: 'from-pink-500 to-pink-600' },
-  { name: 'Dreadlocks', icon: '🌀', color: 'from-purple-600 to-indigo-600' },
-  { name: 'Spa & Facials', icon: '✨', color: 'from-green-500 to-emerald-600' },
-  { name: 'Makeup', icon: '💄', color: 'from-pink-600 to-rose-600' },
-  { name: 'Barbering', icon: '✂️', color: 'from-gray-600 to-gray-700' }
-];
-
-const trendingSalons: (Salon & { specialties: string[], featured: boolean, verified: boolean, distance: string, responseTime: string })[] = [
-  {
+const favoritedSalons: Salon[] = [
+    {
     id: 1,
     name: 'Afro Chic Hair Studio',
     image: 'https://images.unsplash.com/photo-1702236240794-58dc4c6895e5?w=400',
@@ -44,11 +35,6 @@ const trendingSalons: (Salon & { specialties: string[], featured: boolean, verif
     startingPrice: 15000,
     services: [],
     gallery: [],
-    specialties: ['Braiding', 'Twists', 'Natural Hair'],
-    featured: true,
-    verified: true,
-    distance: '2.3 km',
-    responseTime: '1 hour'
   },
   {
     id: 2,
@@ -61,299 +47,300 @@ const trendingSalons: (Salon & { specialties: string[], featured: boolean, verif
     startingPrice: 8000,
     services: [],
     gallery: [],
-    specialties: ['Manicure', 'Pedicure', 'Nail Art'],
-    featured: false,
-    verified: true,
-    distance: '1.8 km',
-    responseTime: '30 mins'
   }
 ];
 
-const recentlyViewed = [
+const upcomingBookings = [
   {
-    id: 3,
-    name: 'Royal Locks Studio',
-    image: 'https://images.unsplash.com/photo-1625536658395-2bd89a631e37?w=300',
-    location: 'Accra, Ghana',
-    rating: 4.9,
-    reviewCount: 156,
-    startingPrice: '₦20,000',
-    specialties: ['Dreadlocks', 'Maintenance'],
-    lastViewed: '2 days ago'
-  }
+    id: 1,
+    salonName: 'Amber Glow Salon',
+    service: 'Knotless Braids',
+    date: 'August 28, 2024',
+    time: '10:00 AM',
+    status: 'Confirmed',
+    image: 'https://placehold.co/600x400.png',
+    imageHint: 'modern salon interior',
+  },
 ];
 
 
 export default function CustomerDashboard() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [activeTab, setActiveTab] = useState('overview');
 
-  const user = { name: 'Beauty Lover', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d' };
-  const userLocation = { city: 'Lagos, Nigeria' };
+  const user = { name: 'Beauty Lover' };
+  const userLocation = { city: 'Lagos', country: 'Nigeria' };
   const favoriteIds = [1, 2];
+  const comparisonList = [];
+  const notifications = [{isRead: false}];
+  const unreadMessages = 2;
+  const unreadNotifications = notifications.filter(n => !n.isRead).length;
 
-  const handleQuickSearch = (category: string) => {
-    setSelectedCategory(category);
-  };
 
-  const handleSearch = () => {
-    // search logic here
-  };
+  const stats = [
+    { label: "Appointments", value: upcomingBookings.length, icon: Calendar, color: "text-purple-600" },
+    { label: "Favorites", value: favoriteIds.length, icon: Heart, color: "text-pink-600" },
+    { label: "Reviews", value: "12", icon: Star, color: "text-yellow-600" },
+    { label: "Comparing", value: comparisonList.length, icon: TrendingUp, color: "text-blue-600" }
+  ];
+
+    const quickActions = [
+    {
+      icon: Search,
+      title: "Find Salons",
+      description: "Discover new salons near you",
+      href: '/dashboard/customer',
+      color: "from-purple-500 to-purple-600"
+    },
+    {
+      icon: Calendar,
+      title: "Book Appointment",
+      description: "Schedule your next beauty session",
+      href: '/dashboard/customer/bookings',
+      color: "from-pink-500 to-pink-600"
+    },
+    {
+      icon: MessageCircle,
+      title: "Messages",
+      description: `${unreadMessages} new messages`,
+      href: '/dashboard/customer/messages',
+      color: "from-purple-600 to-pink-600",
+      badge: unreadMessages > 0 ? unreadMessages : null
+    },
+    {
+      icon: MapPin,
+      title: "Near Me",
+      description: "Salons in your area",
+      href: '/dashboard/customer',
+      color: "from-emerald-500 to-emerald-600"
+    }
+  ];
 
   return (
-    <main className="flex-1">
-      {/* Welcome Header */}
-      <section className="bg-gradient-beauty-secondary py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center mb-4">
-              <Avatar className="h-16 w-16 mr-4">
-                <AvatarImage src={user?.avatar} alt={user?.name} />
-                <AvatarFallback className="bg-purple-100 text-purple-600 text-lg font-semibold">
-                  {user?.name?.split(' ').map(n => n[0]).join('') || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <div className="text-left">
-                <h1 className="text-2xl md:text-3xl font-semibold text-warmgray-900 mb-1">
-                  Welcome back, {user?.name?.split(' ')[0]}! 💜
-                </h1>
-                <p className="text-lg text-warmgray-600">
-                  {userLocation ? `📍 ${userLocation.city}` : 'Ready to find your perfect salon?'}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Search Bar */}
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-purple-100">
-              <div className="flex gap-3">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-warmgray-400 h-5 w-5" />
-                  <Input 
-                    placeholder="Search salons, services, or locations..." 
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 h-12 bg-white border-purple-200 text-warmgray-900 rounded-xl text-base"
-                  />
-                </div>
-                <Button 
-                  onClick={handleSearch}
-                  className="h-12 px-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-medium"
-                >
-                  Search
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
+    <div className="min-h-screen bg-gradient-beauty-secondary pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Quick Categories */}
-        <section className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-warmgray-900">Browse by Category</h2>
-            <Button 
-              variant="outline"
-              className="border-purple-200 text-purple-600 hover:bg-purple-50"
-            >
-              View All
+        {/* Welcome Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-semibold text-warmgray-900 mb-2">
+                Welcome back, {user?.name || 'Beauty Lover'}! ✨
+              </h1>
+              <div className="flex items-center gap-2 text-warmgray-600">
+                <MapPin className="h-4 w-4" />
+                <span>{userLocation?.city}, {userLocation?.country}</span>
+                {unreadNotifications > 0 && (
+                  <Badge variant="secondary" className="ml-4">
+                    {unreadNotifications} new notifications
+                  </Badge>
+                )}
+              </div>
+            </div>
+             <Button asChild variant="outline" size="sm" className="flex items-center gap-2">
+                <Link href="/dashboard/customer/settings">
+                    <Settings className="h-4 w-4" />
+                    Settings
+                </Link>
             </Button>
           </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {quickSearchCategories.map((category) => (
-              <Card 
-                key={category.name}
-                className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105 border-purple-100"
-                onClick={() => handleQuickSearch(category.name)}
-              >
-                <CardContent className="p-6 text-center">
-                  <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${category.color} flex items-center justify-center text-2xl mb-3 mx-auto`}>
-                    {category.icon}
+        </div>
+
+        {/* Stats Overview */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {stats.map((stat, index) => {
+            const IconComponent = stat.icon;
+            return (
+              <Card key={index} className="bg-white border-purple-100">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-warmgray-600">{stat.label}</p>
+                      <p className="text-2xl font-semibold text-warmgray-900">{stat.value}</p>
+                    </div>
+                    <IconComponent className={`h-6 w-6 ${stat.color}`} />
                   </div>
-                  <h3 className="font-medium text-warmgray-900 text-sm">{category.name}</h3>
                 </CardContent>
               </Card>
-            ))}
+            );
+          })}
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-warmgray-900 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {quickActions.map((action, index) => {
+              const IconComponent = action.icon;
+              return (
+                <Link href={action.href} key={index}>
+                    <Card 
+                    className="cursor-pointer hover:shadow-lg transition-all duration-200 bg-white border-purple-100 hover:border-purple-200 h-full"
+                    >
+                    <CardContent className="p-4">
+                        <div className="relative">
+                        <div className={`w-12 h-12 bg-gradient-to-r ${action.color} rounded-lg flex items-center justify-center mb-3`}>
+                            <IconComponent className="h-6 w-6 text-white" />
+                        </div>
+                        {action.badge && (
+                            <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs p-0 flex items-center justify-center">
+                            {action.badge}
+                            </Badge>
+                        )}
+                        </div>
+                        <h3 className="font-medium text-warmgray-900 mb-1">{action.title}</h3>
+                        <p className="text-sm text-warmgray-600">{action.description}</p>
+                    </CardContent>
+                    </Card>
+                </Link>
+              );
+            })}
           </div>
-        </section>
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Trending Salons */}
-            <section>
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center">
-                  <TrendingUp className="h-5 w-5 text-purple-600 mr-2" />
-                  <h2 className="text-2xl font-semibold text-warmgray-900">Trending Near You</h2>
-                </div>
-                <Button 
-                  variant="outline"
-                  className="border-purple-200 text-purple-600 hover:bg-purple-50"
-                >
-                  See More
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {trendingSalons.map((salon) => (
-                  <SalonCard key={salon.id} salon={salon} />
-                ))}
-              </div>
-            </section>
-
-            {/* Featured Services */}
-            <section>
-              <div className="flex items-center mb-6">
-                <Sparkles className="h-5 w-5 text-purple-600 mr-2" />
-                <h2 className="text-2xl font-semibold text-warmgray-900">Featured Services</h2>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="border-purple-100 overflow-hidden group hover:shadow-lg transition-shadow">
-                  <div className="relative">
-                    <ImageWithFallback 
-                      src="https://images.unsplash.com/photo-1702236240794-58dc4c6895e5?w=400" 
-                      alt="Box Braids Special"
-                      width={400}
-                      height={200}
-                      className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <Badge className="absolute top-3 left-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white">
-                      Limited Time
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Recent Bookings */}
+          <Card className="bg-white border-purple-100">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-purple-600" />
+                Recent Bookings
+              </CardTitle>
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/dashboard/customer/bookings">
+                    View All
+                    <ChevronRight className="ml-1 h-4 w-4" />
+                </Link>
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {upcomingBookings.length > 0 ? upcomingBookings.map((booking, index) => {
+                return (
+                  <div key={index} className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
+                    <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <Calendar className="h-6 w-6 text-purple-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-medium text-warmgray-900">{booking.salonName}</h4>
+                      <p className="text-sm text-warmgray-600">{booking.date}</p>
+                    </div>
+                    <Badge variant={booking.status === 'Confirmed' ? 'default' : 'secondary'}>
+                      {booking.status}
                     </Badge>
                   </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-warmgray-900 mb-1">Box Braids Special</h3>
-                    <p className="text-sm text-warmgray-600 mb-2">Professional box braids starting from ₦12,000</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-purple-600 font-medium">Save 20%</span>
-                      <Button size="sm" className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
-                        Book Now
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-purple-100 overflow-hidden group hover:shadow-lg transition-shadow">
-                  <div className="relative">
-                    <ImageWithFallback 
-                      src="https://images.unsplash.com/photo-1650176491728-a5e6edd08575?w=400" 
-                      alt="Nail Art Package"
-                      width={400}
-                      height={200}
-                      className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <Badge className="absolute top-3 left-3 bg-gradient-to-r from-pink-600 to-rose-600 text-white">
-                      Popular
-                    </Badge>
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-warmgray-900 mb-1">Luxury Nail Art</h3>
-                    <p className="text-sm text-warmgray-600 mb-2">Complete nail art package with gel coating</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-pink-600 font-medium">From ₦8,000</span>
-                      <Button size="sm" className="bg-gradient-to-r from-pink-600 to-rose-600 text-white">
-                        Explore
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </section>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Stats */}
-            <Card className="border-purple-100">
-              <CardHeader>
-                <CardTitle className="text-warmgray-900">Your Activity</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-warmgray-600">Favorites</span>
-                  <div className="flex items-center">
-                    <Heart className="h-4 w-4 text-red-500 mr-1 fill-current" />
-                    <span className="font-medium text-warmgray-900">{favoriteIds.length}</span>
-                  </div>
+                );
+              }) : (
+                <div className="text-center py-8">
+                  <Calendar className="h-12 w-12 text-warmgray-400 mx-auto mb-4" />
+                  <p className="text-warmgray-600 mb-4">No bookings yet</p>
+                  <Button asChild size="sm">
+                    <Link href="/dashboard/customer">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Book Your First Appointment
+                    </Link>
+                  </Button>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-warmgray-600">Messages</span>
-                  <div className="flex items-center">
-                    <MessageCircle className="h-4 w-4 text-purple-600 mr-1" />
-                    <span className="font-medium text-warmgray-900">3</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-warmgray-600">Bookings</span>
-                  <span className="font-medium text-warmgray-900">2 upcoming</span>
-                </div>
-              </CardContent>
-            </Card>
+              )}
+            </CardContent>
+          </Card>
 
-            {/* Recently Viewed */}
-            <Card className="border-purple-100">
-              <CardHeader>
-                <CardTitle className="text-warmgray-900 flex items-center">
-                  <Clock className="h-4 w-4 mr-2 text-purple-600" />
-                  Recently Viewed
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {recentlyViewed.map((salon) => (
-                  <div key={salon.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-purple-50 transition-colors cursor-pointer">
-                    <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                      <ImageWithFallback 
-                        src={salon.image} 
+          {/* Favorite Salons */}
+          <Card className="bg-white border-purple-100">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Heart className="h-5 w-5 text-pink-600" />
+                Favorite Salons
+              </CardTitle>
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/dashboard/customer/favorites">
+                    View All
+                    <ChevronRight className="ml-1 h-4 w-4" />
+                </Link>
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {favoritedSalons.length > 0 ? favoritedSalons.map((salon, index) => (
+                <Link href="/dashboard/customer" key={index}>
+                    <div 
+                    className="flex items-center gap-3 p-3 bg-pink-50 rounded-lg cursor-pointer hover:bg-pink-100 transition-colors"
+                    >
+                    <Image 
+                        src={salon.image}
                         alt={salon.name}
                         width={48}
                         height={48}
-                        className="w-full h-full object-cover"
-                      />
+                        className="w-12 h-12 rounded-lg object-cover"
+                        data-ai-hint={salon.imageHint}
+                    />
+                    <div className="flex-1">
+                        <h4 className="font-medium text-warmgray-900">{salon.name}</h4>
+                        <div className="flex items-center gap-2">
+                        <div className="flex items-center">
+                            <Star className="h-3 w-3 text-yellow-400 fill-current" />
+                            <span className="text-sm text-warmgray-600 ml-1">{salon.rating}</span>
+                        </div>
+                        <span className="text-sm text-warmgray-500">•</span>
+                        <span className="text-sm text-warmgray-600">{salon.location}</span>
+                        </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-warmgray-900 truncate">{salon.name}</p>
-                      <p className="text-xs text-warmgray-600">{salon.location}</p>
-                      <p className="text-xs text-purple-600">{salon.lastViewed}</p>
+                    <ChevronRight className="h-4 w-4 text-warmgray-400" />
                     </div>
-                    <div className="flex items-center">
-                      <Star className="h-3 w-3 text-yellow-400 fill-current mr-1" />
-                      <span className="text-xs font-medium text-warmgray-700">{salon.rating}</span>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Location Quick Access */}
-            <Card className="border-purple-100">
-              <CardHeader>
-                <CardTitle className="text-warmgray-900 flex items-center">
-                  <Navigation className="h-4 w-4 mr-2 text-purple-600" />
-                  Nearby Areas
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {['Victoria Island', 'Ikeja', 'Lekki', 'Surulere'].map((area) => (
-                  <Button 
-                    key={area}
-                    variant="ghost" 
-                    size="sm" 
-                    className="w-full justify-start text-warmgray-600 hover:text-purple-600 hover:bg-purple-50"
-                  >
-                    <MapPin className="h-3 w-3 mr-2" />
-                    {area}
+                </Link>
+              )) : (
+                <div className="text-center py-8">
+                  <Heart className="h-12 w-12 text-warmgray-400 mx-auto mb-4" />
+                  <p className="text-warmgray-600 mb-4">No favorites yet</p>
+                  <Button asChild size="sm">
+                    <Link href="/dashboard/customer">
+                        <Search className="mr-2 h-4 w-4" />
+                        Discover Salons
+                    </Link>
                   </Button>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
+
+        {/* Recent Activity */}
+        <Card className="mt-8 bg-white border-purple-100">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <History className="h-5 w-5 text-purple-600" />
+              Recent Activity
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 p-3 hover:bg-purple-50 rounded-lg transition-colors">
+                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                  <Heart className="h-4 w-4 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-warmgray-900">Added Afro Chic Hair Studio to favorites</p>
+                  <p className="text-xs text-warmgray-500">2 hours ago</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 hover:bg-purple-50 rounded-lg transition-colors">
+                <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
+                  <Star className="h-4 w-4 text-pink-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-warmgray-900">Left a 5-star review for Golden Nails Spa</p>
+                  <p className="text-xs text-warmgray-500">1 day ago</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 hover:bg-purple-50 rounded-lg transition-colors">
+                <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
+                  <Calendar className="h-4 w-4 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-warmgray-900">Booked appointment at Amara Beauty Lounge</p>
+                  <p className="text-xs text-warmgray-500">3 days ago</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </main>
+    </div>
   );
 }
