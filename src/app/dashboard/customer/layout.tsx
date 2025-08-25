@@ -14,7 +14,7 @@ import {
   SidebarSeparator,
 } from '@/components/ui/sidebar';
 import CustomerDashboardHeader from '@/app/dashboard/customer/header';
-import { Home, Star, MessageSquare, Calendar, User, Settings, Sparkles, LogOut, LayoutDashboard } from 'lucide-react';
+import { Home, Star, MessageSquare, Calendar, User, Settings, Sparkles, LogOut, LayoutDashboard, Search } from 'lucide-react';
 import Footer from '@/components/footer';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -50,6 +50,14 @@ export default function CustomerDashboardLayout({
                     <Link href="/dashboard/customer/dashboard">
                       <LayoutDashboard />
                       <span>Dashboard</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                   <SidebarMenuButton asChild>
+                     <Link href="/dashboard/customer/explore">
+                      <Search />
+                      <span>Explore</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -132,3 +140,5 @@ export default function CustomerDashboardLayout({
     </SidebarProvider>
   );
 }
+
+    
