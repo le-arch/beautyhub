@@ -33,31 +33,31 @@ export default function CustomerDashboardLayout({
             <SidebarContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton href="/dashboard/customer" isSubtle>
+                  <SidebarMenuButton href="/dashboard/customer">
                     <Home />
                     Dashboard
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton href="/dashboard/customer/bookings" isSubtle>
+                  <SidebarMenuButton href="/dashboard/customer/bookings">
                     <Calendar />
                     Bookings
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton href="/dashboard/customer/messages" isSubtle>
+                  <SidebarMenuButton href="/dashboard/customer/messages">
                     <MessageSquare />
                     Messages
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                  <SidebarMenuItem>
-                  <SidebarMenuButton href="/dashboard/customer/favorites" isSubtle>
+                  <SidebarMenuButton href="/dashboard/customer/favorites">
                     <Star />
                     Favorites
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton href="/dashboard/customer/profile" isSubtle>
+                  <SidebarMenuButton href="/dashboard/customer/profile">
                     <User />
                     Profile
                   </SidebarMenuButton>
@@ -67,7 +67,7 @@ export default function CustomerDashboardLayout({
             <SidebarFooter>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton href="/dashboard/customer/settings" isSubtle>
+                  <SidebarMenuButton href="/dashboard/customer/settings">
                     <Settings />
                     Settings
                   </SidebarMenuButton>
