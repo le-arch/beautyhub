@@ -8,7 +8,9 @@ export interface Salon {
   reviews: number;
   startingPrice: number;
   services: { name: string; price: number }[];
-  gallery: { url: string; hint: string }[];
+  gallery: { url: string; hint: string; type: 'image' | 'video' }[];
+  verified?: boolean;
+  featured?: boolean;
 }
 
 export interface BlogPost {

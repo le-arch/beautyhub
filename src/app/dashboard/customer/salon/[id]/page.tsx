@@ -31,6 +31,7 @@ export default function SalonProfilePage() {
   const salonId = params.id;
   const salon = mockSalons.find(s => s.id.toString() === salonId);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [galleryTab, setGalleryTab] = useState('photos');
 
   if (!salon) {
     return (
@@ -53,6 +54,9 @@ export default function SalonProfilePage() {
     { id: 1, name: 'Aisha Bello', avatar: '/avatars/01.png', rating: 5, text: 'Absolutely amazing braids! The best I have ever had. The stylists are so talented and professional.' },
     { id: 2, name: 'Chioma Okoro', avatar: '/avatars/02.png', rating: 4, text: 'Great service and beautiful salon. My nails look fantastic. Will definitely be coming back.' }
   ];
+
+  const photos = salon.gallery.filter(item => item.type === 'image');
+  const videos = salon.gallery.filter(item => item.type === 'video');
 
   return (
     <main className="bg-gradient-beauty-secondary">
@@ -158,24 +162,37 @@ export default function SalonProfilePage() {
                     <div className="flex justify-between items-center mb-4">
                        <h3 className="text-xl font-semibold">Gallery</h3>
                        <div className="flex gap-2">
-                        <Button variant="outline" size="sm"><ImageIcon className="mr-2 h-4 w-4"/> Photos</Button>
-                        <Button variant="ghost" size="sm"><Video className="mr-2 h-4 w-4"/> Videos</Button>
+                        <Button variant={galleryTab === 'photos' ? 'default' : 'outline'} size="sm" onClick={() => setGalleryTab('photos')}><ImageIcon className="mr-2 h-4 w-4"/> Photos</Button>
+                        <Button variant={galleryTab === 'videos' ? 'default' : 'outline'} size="sm" onClick={() => setGalleryTab('videos')}><Video className="mr-2 h-4 w-4"/> Videos</Button>
                        </div>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {salon.gallery.map((item, index) => (
-                        <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
-                           <Image
-                            src={item.url}
-                            alt={item.hint}
-                            layout="fill"
-                            objectFit="cover"
-                            className="transition-transform duration-300 group-hover:scale-110"
-                            data-ai-hint={item.hint}
-                          />
-                        </div>
-                      ))}
-                    </div>
+                    {galleryTab === 'photos' ? (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {photos.map((item, index) => (
+                          <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
+                             <Image
+                              src={item.url}
+                              alt={item.hint}
+                              layout="fill"
+                              objectFit="cover"
+                              className="transition-transform duration-300 group-hover:scale-110"
+                              data-ai-hint={item.hint}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {videos.map((item, index) => (
+                          <div key={index} className="relative aspect-video rounded-lg overflow-hidden group bg-black">
+                            <video src={item.url} className="w-full h-full object-cover" controls autoPlay={index === 0} muted loop playsInline />
+                             <div className="absolute bottom-2 left-2 text-white text-xs bg-black/50 px-2 py-1 rounded">
+                                <p>{item.hint}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -234,8 +251,8 @@ export default function SalonProfilePage() {
             <Card>
               <CardHeader><CardTitle>Location & Hours</CardTitle></CardHeader>
               <CardContent>
-                <div className="h-48 bg-muted rounded-lg mb-4 flex items-center justify-center">
-                  <p className="text-muted-foreground">Map Placeholder</p>
+                <div className="h-48 bg-muted rounded-lg mb-4 relative overflow-hidden">
+                  <Image src="https://images.unsplash.com/photo-1598638122263-633433a7d455?w=600" alt="Map of salon location" layout="fill" objectFit="cover" data-ai-hint="city map" />
                 </div>
                 <p className="flex items-start gap-2"><MapPin className="h-4 w-4 mt-1 flex-shrink-0"/>{salon.location}, No. 123 Beauty Avenue</p>
                  <Separator className="my-4"/>
@@ -249,8 +266,7 @@ export default function SalonProfilePage() {
             <Card>
               <CardHeader><CardTitle>Contact Salon</CardTitle></CardHeader>
               <CardContent className="space-y-3">
-                 <Button variant="outline" className="w-full"><Phone className="mr-2 h-4 w-4"/> Call Salon</Button>
-                 <Button className="w-full"><MessageSquare className="mr-2 h-4 w-4"/> Message Salon</Button>
+                 <Button className="w-full" asChild><Link href="/dashboard/customer/messages"><MessageSquare className="mr-2 h-4 w-4"/> Message Salon</Link></Button>
               </CardContent>
             </Card>
           </div>

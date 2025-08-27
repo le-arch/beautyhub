@@ -16,10 +16,13 @@ export const mockSalons: Salon[] = [
       { name: 'Knotless Braids', price: 200 },
     ],
     gallery: [
-      { url: 'https://placehold.co/600x400.png', hint: 'braiding hair' },
-      { url: 'https://placehold.co/600x400.png', hint: 'manicure station' },
-      { url: 'https://placehold.co/600x400.png', hint: 'pedicure chairs' },
+      { url: 'https://placehold.co/600x400.png', hint: 'braiding hair', type: 'image' },
+      { url: 'https://placehold.co/600x400.png', hint: 'manicure station', type: 'image' },
+      { url: 'https://placehold.co/600x400.png', hint: 'pedicure chairs', type: 'image' },
+      { url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4', hint: 'braiding timelapse', type: 'video' },
+      { url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', hint: 'salon tour', type: 'video' },
     ],
+    verified: true,
   },
   {
     id: 2,
@@ -36,9 +39,9 @@ export const mockSalons: Salon[] = [
       { name: 'Body Scrub', price: 90 },
     ],
     gallery: [
-      { url: 'https://placehold.co/600x400.png', hint: 'facial treatment' },
-      { url: 'https://placehold.co/600x400.png', hint: 'massage table' },
-      { url: 'https://placehold.co/600x400.png', hint: 'spa products' },
+      { url: 'https://placehold.co/600x400.png', hint: 'facial treatment', type: 'image' },
+      { url: 'https://placehold.co/600x400.png', hint: 'massage table', type: 'image' },
+      { url: 'https://placehold.co/600x400.png', hint: 'spa products', type: 'image' },
     ],
   },
   {
@@ -56,10 +59,11 @@ export const mockSalons: Salon[] = [
       { name: 'Luxury Pedicure', price: 65 },
     ],
     gallery: [
-      { url: 'https://placehold.co/600x400.png', hint: 'nail polish collection' },
-      { url: 'https://placehold.co/600x400.png', hint: 'intricate nail design' },
-      { url: 'https://placehold.co/600x400.png', hint: 'client getting nails done' },
+      { url: 'https://placehold.co/600x400.png', hint: 'nail polish collection', type: 'image' },
+      { url: 'https://placehold.co/600x400.png', hint: 'intricate nail design', type: 'image' },
+      { url: 'https://placehold.co/600x400.png', hint: 'client getting nails done', type: 'image' },
     ],
+    featured: true,
   },
    {
     id: 4,
@@ -76,10 +80,12 @@ export const mockSalons: Salon[] = [
       { name: 'Beard Trim', price: 20 },
     ],
     gallery: [
-        { url: 'https://placehold.co/600x400.png', hint: 'barber cutting hair' },
-        { url: 'https://placehold.co/600x400.png', hint: 'shaving cream' },
-        { url: 'https://placehold.co/600x400.png', hint: 'styled haircut' },
+        { url: 'https://placehold.co/600x400.png', hint: 'barber cutting hair', type: 'image' },
+        { url: 'https://placehold.co/600x400.png', hint: 'shaving cream', type: 'image' },
+        { url: 'https://placehold.co/600x400.png', hint: 'styled haircut', type: 'image' },
     ],
+    verified: true,
+    featured: true,
   },
 ];
 
