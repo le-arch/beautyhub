@@ -39,7 +39,7 @@ interface SelectedService {
 
 export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
   const [step, setStep] = useState(1);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [selectedServices, setSelectedServices] = useState<SelectedService[]>([]);
   const [notes, setNotes] = useState('');
@@ -108,6 +108,16 @@ export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
     await new Promise(resolve => setTimeout(resolve, 1000));
     const newBookingId = `BK-${Date.now()}`;
     setBookingId(newBookingId);
+
+    // In a real app, you would send this to your backend
+    console.log("Creating conversation and message for booking:", {
+      salonId: salon.id,
+      bookingId: newBookingId,
+      service: selectedServices.map(s => s.name).join(', '),
+      date: selectedDate.toLocaleDateString(),
+      time: selectedTime
+    })
+    
     setIsProcessing(false);
     setStep(5);
   };
@@ -355,7 +365,7 @@ export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
             <div>
               <h3 className="text-xl font-semibold text-warmgray-900 mb-2">Booking Created!</h3>
               <p className="text-warmgray-600">
-                Your booking has been created successfully. Please proceed with the deposit payment to confirm your appointment.
+                Your booking has been created successfully. A message has been sent to the salon. Please proceed with the deposit payment to confirm your appointment.
               </p>
             </div>
             <div className="bg-purple-50 p-4 rounded-lg">
@@ -378,7 +388,7 @@ export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
             <div>
               <h3 className="text-xl font-semibold text-warmgray-900 mb-2">Payment Successful!</h3>
               <p className="text-warmgray-600">
-                Your deposit has been paid and your appointment is confirmed. We've sent you a confirmation email with all the details.
+                Your deposit has been paid and your appointment is confirmed. We've sent you a confirmation email and a message with all the details.
               </p>
             </div>
             <div className="bg-green-50 p-4 rounded-lg">

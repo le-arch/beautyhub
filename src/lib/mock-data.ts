@@ -1,4 +1,4 @@
-import type { Salon, BlogPost } from './types';
+import type { Salon, BlogPost, Conversation } from './types';
 
 export const mockSalons: Salon[] = [
   {
@@ -104,5 +104,60 @@ export const mockBlogPosts: BlogPost[] = [
     image: 'https://placehold.co/600x400.png',
     imageHint: 'vibrant nail art',
     excerpt: 'Meet the creative minds behind the most stunning nail art in Cameroon. Get inspired for your next appointment!',
+  },
+];
+
+export const mockConversations: Conversation[] = [
+  {
+    id: 'convo-1',
+    salonId: 1,
+    salonName: 'Amber Glow Salon',
+    salonAvatar: 'https://placehold.co/100x100.png',
+    lastMessage: 'Your appointment for Knotless Braids is confirmed!',
+    timestamp: '2024-08-28T10:05:00Z',
+    unreadCount: 1,
+    messages: [
+      {
+        id: 'msg-1',
+        sender: 'salon',
+        text: 'Your appointment for Knotless Braids is confirmed for Aug 28, 2024 at 10:00 AM. We look forward to seeing you!',
+        timestamp: '2024-08-28T10:05:00Z',
+        type: 'booking',
+        bookingDetails: {
+          service: 'Knotless Braids',
+          date: 'August 28, 2024',
+          time: '10:00 AM',
+        },
+      },
+      {
+        id: 'msg-2',
+        sender: 'user',
+        text: 'Great, thank you so much!',
+        timestamp: '2024-08-28T10:06:00Z',
+      },
+    ],
+  },
+  {
+    id: 'convo-2',
+    salonId: 2,
+    salonName: 'Serene Spa & Beauty',
+    salonAvatar: 'https://placehold.co/100x100.png',
+    lastMessage: 'Yes, we do offer couple massages. It\'s one of our most popular packages.',
+    timestamp: '2024-08-27T15:30:00Z',
+    unreadCount: 0,
+    messages: [
+       {
+        id: 'msg-3',
+        sender: 'user',
+        text: 'Hello, do you offer couple massages?',
+        timestamp: '2024-08-27T15:28:00Z',
+      },
+      {
+        id: 'msg-4',
+        sender: 'salon',
+        text: 'Yes, we do offer couple massages. It\'s one of our most popular packages.',
+        timestamp: '2024-08-27T15:30:00Z',
+      },
+    ],
   },
 ];

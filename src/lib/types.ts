@@ -18,3 +18,27 @@ export interface BlogPost {
   imageHint: string;
   excerpt: string;
 }
+
+export interface Message {
+  id: string;
+  text: string;
+  timestamp: string;
+  sender: 'user' | 'salon';
+  type?: 'booking' | 'text';
+  bookingDetails?: {
+    service: string;
+    date: string;
+    time: string;
+  };
+}
+
+export interface Conversation {
+  id: string;
+  salonId: number;
+  salonName: string;
+  salonAvatar: string;
+  lastMessage: string;
+  timestamp: string;
+  unreadCount: number;
+  messages: Message[];
+}
