@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -21,44 +22,7 @@ import {
 } from "lucide-react";
 import Image from 'next/image';
 import type { Salon } from '@/lib/types';
-
-const useGeolocation = () => {
-  const [location, setLocation] = useState<{ city: string; country: string } | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!navigator.geolocation) {
-      setError('Geolocation is not supported by your browser');
-      return;
-    }
-
-    const onSuccess = async (position: GeolocationPosition) => {
-      try {
-        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`);
-        const data = await response.json();
-        if (data.address) {
-          setLocation({
-            city: data.address.city || data.address.town || data.address.village,
-            country: data.address.country
-          });
-        } else {
-          setError('Could not determine location');
-        }
-      } catch (err) {
-        setError('Failed to fetch location data');
-      }
-    };
-
-    const onError = (err: GeolocationPositionError) => {
-      setError(err.message);
-    };
-
-    navigator.geolocation.getCurrentPosition(onSuccess, onError);
-  }, []);
-
-  return { location, error };
-};
-
+import { useGeolocation } from '@/hooks/use-geolocation';
 
 const favoritedSalons: Salon[] = [
     {
@@ -102,10 +66,9 @@ const upcomingBookings = [
 
 
 export default function CustomerDashboard() {
-  const [activeTab, setActiveTab] = useState('overview');
 
   const user = { name: 'Beauty Lover' };
-  const { location: userLocation } = useGeolocation();
+  const { location: userLocation, error: locationError } = useGeolocation();
   const [favoriteIds, setFavoriteIds] = useState([1, 2]);
   const comparisonList: unknown[] = [];
   const notifications = [{isRead: false}];
@@ -125,7 +88,7 @@ export default function CustomerDashboard() {
       icon: Search,
       title: "Find Salons",
       description: "Discover new salons near you",
-      href: '/',
+      href: '/dashboard/customer/explore',
       color: "from-purple-500 to-purple-600"
     },
     {
@@ -147,7 +110,7 @@ export default function CustomerDashboard() {
       icon: MapPin,
       title: "Near Me",
       description: "Salons in your area",
-      href: '/',
+      href: '/dashboard/customer/explore',
       color: "from-emerald-500 to-emerald-600"
     }
   ];
@@ -164,7 +127,7 @@ export default function CustomerDashboard() {
               </h1>
               <div className="flex items-center gap-2 text-warmgray-600">
                 <MapPin className="h-4 w-4" />
-                <span>{userLocation ? `${userLocation.city}, ${userLocation.country}` : 'Loading location...'}</span>
+                <span>{userLocation ? `${userLocation.city}, ${userLocation.country}` : (locationError ||'Detecting location...')}</span>
                 {unreadNotifications > 0 && (
                   <Badge variant="secondary" className="ml-4">
                     {unreadNotifications} new notifications
