@@ -8,7 +8,7 @@ interface ImageWithFallbackProps extends ImageProps {
 }
 
 const ImageWithFallback = (props: ImageWithFallbackProps) => {
-  const { src, fallbackSrc = 'https://placehold.co/600x400.png', ...rest } = props;
+  const { src, fallbackSrc = 'https://placehold.co/600x400.png', alt, ...rest } = props;
   const [error, setError] = useState<React.SyntheticEvent<HTMLImageElement, Event> | null>(null);
   const [imgSrc, setImgSrc] = useState(src);
 
@@ -18,7 +18,7 @@ const ImageWithFallback = (props: ImageWithFallbackProps) => {
 
   return (
     <Image
-      alt={props.alt}
+      alt={alt}
       src={error ? fallbackSrc : imgSrc}
       onError={setError}
       {...rest}
