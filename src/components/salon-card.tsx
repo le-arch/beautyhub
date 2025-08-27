@@ -77,7 +77,9 @@ const SalonCard = ({ salon }: SalonCardProps) => {
                     <MessageSquare className="h-4 w-4" />
                 </Link>
             </Button>
-            <Button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">View</Button>
+            <Button asChild className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+              <Link href={`/dashboard/customer/salon/${salon.id}`}>View</Link>
+            </Button>
         </div>
       </CardFooter>
     </Card>
