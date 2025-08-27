@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +20,8 @@ import {
   Clock
 } from 'lucide-react';
 import type { Salon } from '@/lib/types';
+import { useGeolocation } from '@/hooks/use-geolocation';
+
 
 interface SearchAndFilterProps {
   onFiltersChange?: (filters: any) => void;
@@ -30,7 +32,7 @@ export function SearchAndFilter({ onFiltersChange, showResults = true }: SearchA
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
     const [priceRange, setPriceRange] = useState([0, 50000]);
-    const userLocation = { city: 'Lagos' };
+    const { location: userLocation } = useGeolocation();
   
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState('rating');

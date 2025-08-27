@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Sparkles } from 'lucide-react';
+import { Bell, Sparkles } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 
 const CustomerDashboardHeader = () => {
@@ -15,6 +15,12 @@ const CustomerDashboardHeader = () => {
               BeautyHub
             </span>
           </Link>
+        </div>
+         <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon">
+                <Bell className="h-5 w-5" />
+                <span className="sr-only">Notifications</span>
+            </Button>
         </div>
       </div>
     </header>

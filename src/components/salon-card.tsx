@@ -7,7 +7,7 @@ import type { Salon } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Star, Heart, Zap, CheckCircle } from 'lucide-react';
+import { MapPin, Star, Heart, Zap, CheckCircle, MessageSquare } from 'lucide-react';
 import ImageWithFallback from './image-with-fallback';
 
 interface SalonCardProps {
@@ -70,7 +70,12 @@ const SalonCard = ({ salon }: SalonCardProps) => {
         <p className="text-sm">
           From <span className="font-bold text-purple-600">₦{salon.startingPrice.toLocaleString()}</span>
         </p>
-        <Button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">View</Button>
+        <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="border-purple-200 text-purple-600 hover:bg-purple-50">
+                <MessageSquare className="h-4 w-4" />
+            </Button>
+            <Button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">View</Button>
+        </div>
       </CardFooter>
     </Card>
   );
