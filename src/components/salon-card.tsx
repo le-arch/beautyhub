@@ -1,4 +1,7 @@
 
+'use client';
+
+import { useState } from 'react';
 import Image from 'next/image';
 import type { Salon } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -12,6 +15,13 @@ interface SalonCardProps {
 }
 
 const SalonCard = ({ salon }: SalonCardProps) => {
+  const [isFavorited, setIsFavorited] = useState(false);
+
+  const toggleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsFavorited(!isFavorited);
+  };
 
   return (
     <Card className="overflow-hidden group transition-all duration-300 hover:shadow-2xl flex flex-col border-purple-100">
@@ -28,8 +38,13 @@ const SalonCard = ({ salon }: SalonCardProps) => {
             {salon.featured && <Badge variant="secondary" className="bg-pink-600 text-white border-none"><Zap className="h-3 w-3 mr-1" /> Featured</Badge>}
             {salon.verified && <Badge variant="secondary" className="bg-green-600 text-white border-none"><CheckCircle className="h-3 w-3 mr-1" /> Verified</Badge>}
         </div>
-        <Button size="icon" variant="outline" className="absolute top-3 right-3 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white">
-            <Heart className="h-4 w-4 text-red-500" />
+        <Button 
+          size="icon" 
+          variant="outline" 
+          className="absolute top-3 right-3 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white"
+          onClick={toggleFavorite}
+        >
+            <Heart className={`h-4 w-4 text-red-500 ${isFavorited ? 'fill-current' : 'fill-transparent'}`} />
         </Button>
       </CardHeader>
       <CardContent className="p-4 flex-grow">

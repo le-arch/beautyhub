@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,43 @@ import {
 } from "lucide-react";
 import Image from 'next/image';
 import type { Salon } from '@/lib/types';
+
+const useGeolocation = () => {
+  const [location, setLocation] = useState<{ city: string; country: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setError('Geolocation is not supported by your browser');
+      return;
+    }
+
+    const onSuccess = async (position: GeolocationPosition) => {
+      try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`);
+        const data = await response.json();
+        if (data.address) {
+          setLocation({
+            city: data.address.city || data.address.town || data.address.village,
+            country: data.address.country
+          });
+        } else {
+          setError('Could not determine location');
+        }
+      } catch (err) {
+        setError('Failed to fetch location data');
+      }
+    };
+
+    const onError = (err: GeolocationPositionError) => {
+      setError(err.message);
+    };
+
+    navigator.geolocation.getCurrentPosition(onSuccess, onError);
+  }, []);
+
+  return { location, error };
+};
 
 
 const favoritedSalons: Salon[] = [
@@ -68,8 +105,8 @@ export default function CustomerDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
 
   const user = { name: 'Beauty Lover' };
-  const userLocation = { city: 'Lagos', country: 'Nigeria' };
-  const favoriteIds = [1, 2];
+  const { location: userLocation } = useGeolocation();
+  const [favoriteIds, setFavoriteIds] = useState([1, 2]);
   const comparisonList: unknown[] = [];
   const notifications = [{isRead: false}];
   const unreadMessages = 2;
@@ -127,7 +164,7 @@ export default function CustomerDashboard() {
               </h1>
               <div className="flex items-center gap-2 text-warmgray-600">
                 <MapPin className="h-4 w-4" />
-                <span>{userLocation?.city}, {userLocation?.country}</span>
+                <span>{userLocation ? `${userLocation.city}, ${userLocation.country}` : 'Loading location...'}</span>
                 {unreadNotifications > 0 && (
                   <Badge variant="secondary" className="ml-4">
                     {unreadNotifications} new notifications
