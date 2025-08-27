@@ -1,52 +1,61 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Eye, MessageSquare } from 'lucide-react';
+
+import { Search, Eye, MessageCircle } from "lucide-react";
 
 const steps = [
   {
     icon: Search,
-    title: '1. Search for Salons',
-    description: 'Use our advanced search to find salons by service, city, or even what\'s nearest to you.',
+    title: "Search for a salon",
+    description: "Find salons by city or service type",
+    step: "1"
   },
   {
     icon: Eye,
-    title: '2. View Photos & Reviews',
-    description: 'Browse through salon galleries, check out their services, and read real customer reviews.',
+    title: "View photos and reviews",
+    description: "Browse galleries and read customer reviews",
+    step: "2"
   },
   {
-    icon: MessageSquare,
-    title: '3. Contact or Book',
-    description: 'Connect directly with salon owners via chat or call to ask questions and book your appointment.',
-  },
+    icon: MessageCircle,
+    title: "Contact or book",
+    description: "Connect via WhatsApp or call directly",
+    step: "3"
+  }
 ];
 
-const HowItWorks = () => {
+export default function HowItWorks() {
   return (
-    <section className="py-16 sm:py-24 bg-secondary">
-      <div className="container max-w-7xl">
-        <h2 className="text-center font-headline text-4xl font-bold">
-          Finding Your Perfect Look is Easy
-        </h2>
-        <p className="mt-4 text-center text-muted-foreground max-w-2xl mx-auto">
-          In just a few clicks, you can discover and connect with the best beauty professionals.
-        </p>
-        <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
-          {steps.map((step, index) => (
-            <Card key={index} className="text-center border-2 border-transparent hover:border-primary transition-all duration-300 shadow-lg">
-              <CardHeader>
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                  <step.icon className="h-8 w-8 text-primary" />
+    <section className="py-16 bg-gradient-to-br from-purple-100 to-pink-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl mb-4 text-warmgray-900">
+            How It Works
+          </h2>
+          <p className="text-xl text-warmgray-600">
+            Find and book your perfect beauty service in 3 easy steps
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {steps.map((step, index) => {
+            const IconComponent = step.icon;
+            return (
+              <div key={index} className="text-center">
+                <div className="relative mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <IconComponent className="h-10 w-10 text-white" />
+                  </div>
+                  <div className="absolute top-0 right-1/2 translate-x-[60px] w-8 h-8 bg-white rounded-full border-4 border-purple-200 flex items-center justify-center">
+                    <span className="text-purple-600 font-bold">{step.step}</span>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <CardTitle className="font-headline text-2xl">{step.title}</CardTitle>
-                <p className="mt-2 text-muted-foreground">{step.description}</p>
-              </CardContent>
-            </Card>
-          ))}
+                
+                <h3 className="text-xl mb-3 text-warmgray-900 font-semibold">{step.title}</h3>
+                <p className="text-warmgray-600">{step.description}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
   );
-};
-
-export default HowItWorks;
+}
