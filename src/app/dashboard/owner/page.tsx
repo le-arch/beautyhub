@@ -1,6 +1,5 @@
 
 import Header from '@/app/header';
-import Footer from '@/components/footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlusCircle } from 'lucide-react';
@@ -32,7 +31,6 @@ export default function OwnerDashboard() {
             </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

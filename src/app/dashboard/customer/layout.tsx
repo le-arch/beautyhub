@@ -15,7 +15,6 @@ import {
 } from '@/components/ui/sidebar';
 import CustomerDashboardHeader from '@/app/dashboard/customer/header';
 import { Home, Star, MessageSquare, Calendar, User, Settings, Sparkles, LogOut, LayoutDashboard, Search } from 'lucide-react';
-import Footer from '@/components/footer';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -133,7 +132,6 @@ export default function CustomerDashboardLayout({
              <main className="flex-1 bg-gradient-beauty-secondary">
               {children}
             </main>
-            <Footer />
           </SidebarInset>
         </div>
       </div>
