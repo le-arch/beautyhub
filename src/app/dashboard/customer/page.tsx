@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,9 +19,46 @@ import {
   Sparkles
 } from 'lucide-react';
 import SalonCard from '@/components/salon-card';
-import Image from 'next/image';
 import Link from 'next/link';
 import ImageWithFallback from '@/components/image-with-fallback';
+
+const useGeolocation = () => {
+  const [location, setLocation] = useState<{ city: string; country: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setError('Geolocation is not supported by your browser');
+      return;
+    }
+
+    const onSuccess = async (position: GeolocationPosition) => {
+      try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`);
+        const data = await response.json();
+        if (data.address) {
+          setLocation({
+            city: data.address.city || data.address.town || data.address.village,
+            country: data.address.country
+          });
+        } else {
+          setError('Could not determine location');
+        }
+      } catch (err) {
+        setError('Failed to fetch location data');
+      }
+    };
+
+    const onError = (err: GeolocationPositionError) => {
+      setError(err.message);
+    };
+
+    navigator.geolocation.getCurrentPosition(onSuccess, onError);
+  }, []);
+
+  return { location, error };
+};
+
 
 const quickSearchCategories = [
   { name: 'Braiding', icon: '💇🏾‍♀️', color: 'from-purple-500 to-purple-600' },
@@ -88,10 +125,10 @@ const recentlyViewed = [
 
 export default function CustomerHome() {
   const [searchQuery, setSearchQuery] = useState('');
+  const userLocation = useGeolocation().location;
   
   // Mock data that would come from your useApp context
   const user = { name: 'Beauty Lover', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d' };
-  const userLocation = { city: 'Lagos' };
   const favoriteIds = [1, 2];
 
   return (
@@ -112,7 +149,7 @@ export default function CustomerHome() {
                   Welcome back, {user?.name?.split(' ')[0]}! 💜
                 </h1>
                 <p className="text-lg text-warmgray-600">
-                  {userLocation ? `📍 ${userLocation.city}` : 'Ready to find your perfect salon?'}
+                  {userLocation ? `📍 ${userLocation.city}, ${userLocation.country}` : 'Ready to find your perfect salon?'}
                 </p>
               </div>
             </div>
@@ -131,10 +168,11 @@ export default function CustomerHome() {
                     className="pl-10 h-12 bg-white border-purple-200 text-warmgray-900 rounded-xl text-base"
                   />
                 </div>
-                <Button
+                 <Button
                   className="h-12 px-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-medium"
+                  asChild
                 >
-                  Search
+                  <Link href="/dashboard/customer/explore">Search</Link>
                 </Button>
               </div>
             </div>
@@ -150,24 +188,26 @@ export default function CustomerHome() {
             <Button
               variant="outline"
               className="border-purple-200 text-purple-600 hover:bg-purple-50"
+              asChild
             >
-              View All
+              <Link href="/dashboard/customer/explore">View All</Link>
             </Button>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {quickSearchCategories.map((category) => (
-              <Card
-                key={category.name}
-                className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105 border-purple-100"
-              >
-                <CardContent className="p-6 text-center">
-                  <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${category.color} flex items-center justify-center text-2xl mb-3 mx-auto`}>
-                    {category.icon}
-                  </div>
-                  <h3 className="font-medium text-warmgray-900 text-sm">{category.name}</h3>
-                </CardContent>
-              </Card>
+              <Link href="/dashboard/customer/explore" key={category.name}>
+                <Card
+                  className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105 border-purple-100 h-full"
+                >
+                  <CardContent className="p-6 text-center">
+                    <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${category.color} flex items-center justify-center text-2xl mb-3 mx-auto`}>
+                      {category.icon}
+                    </div>
+                    <h3 className="font-medium text-warmgray-900 text-sm">{category.name}</h3>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </section>
@@ -182,17 +222,18 @@ export default function CustomerHome() {
                   <TrendingUp className="h-5 w-5 text-purple-600 mr-2" />
                   <h2 className="text-2xl font-semibold text-warmgray-900">Trending Near You</h2>
                 </div>
-                <Button
+                 <Button
                   variant="outline"
                   className="border-purple-200 text-purple-600 hover:bg-purple-50"
+                  asChild
                 >
-                  See More
+                  <Link href="/dashboard/customer/explore">See More</Link>
                 </Button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {trendingSalons.map((salon) => (
-                  <SalonCard key={salon.id} salon={salon} />
+                  <SalonCard key={salon.id} salon={salon as any} />
                 ))}
               </div>
             </section>

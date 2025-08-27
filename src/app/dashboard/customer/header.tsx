@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Sparkles, LogOut } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 
 const CustomerDashboardHeader = () => {
@@ -16,12 +16,6 @@ const CustomerDashboardHeader = () => {
             </span>
           </Link>
         </div>
-        <Button asChild variant="outline">
-          <Link href="/">
-            <LogOut className="mr-2" />
-            Exit
-          </Link>
-        </Button>
       </div>
     </header>
   );
