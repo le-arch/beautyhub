@@ -37,7 +37,7 @@ export default function OwnerPage() {
                 </CardHeader>
                 <CardContent>
                     <Button size="lg" asChild>
-                        <Link href="/dashboard/customer">Explore Salons</Link>
+                        <Link href="/signup">Explore Salons</Link>
                     </Button>
                 </CardContent>
             </Card>
@@ -53,7 +53,7 @@ export default function OwnerPage() {
                 </CardHeader>
                 <CardContent>
                     <Button size="lg" variant="secondary" asChild>
-                       <Link href="/dashboard/owner">Join as a Business</Link>
+                       <Link href="/signup">Join as a Business</Link>
                     </Button>
                 </CardContent>
             </Card>

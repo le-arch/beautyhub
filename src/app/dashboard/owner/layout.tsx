@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { signOut } from '@/app/auth/actions';
 
 export const metadata: Metadata = {
   title: 'Salon Owner Dashboard - BeautyHub',
@@ -157,12 +158,12 @@ export default function OwnerDashboardLayout({
                   </Button>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <Button asChild variant="outline" className="w-full justify-start">
-                    <Link href="/">
-                      <LogOut className="mr-2" />
-                      Exit Dashboard
-                    </Link>
-                  </Button>
+                  <form action={signOut} className="w-full">
+                    <Button type="submit" variant="outline" className="w-full justify-start">
+                        <LogOut className="mr-2" />
+                        Sign Out
+                    </Button>
+                  </form>
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarFooter>
