@@ -68,16 +68,26 @@ export default function LoginPage({
               >
                 Sign In
               </SubmitButton>
-              <form>
-                <Button formAction={signInWithGoogle} variant="outline" className="w-full">
-                    Login with Google
-                </Button>
-              </form>
               {searchParams?.message && (
                 <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
                   {searchParams.message}
                 </p>
               )}
+            </form>
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                  </span>
+              </div>
+            </div>
+            <form>
+              <Button formAction={signInWithGoogle} variant="outline" className="w-full">
+                  Login with Google
+              </Button>
             </form>
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
