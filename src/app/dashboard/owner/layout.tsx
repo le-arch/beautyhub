@@ -26,7 +26,8 @@ import {
     User,
     LogOut,
     Plus,
-    Building
+    Building,
+    Map
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -62,7 +63,7 @@ export default function OwnerDashboardLayout({
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                    <SidebarMenuButton asChild>
-                     <Link href="#">
+                     <Link href="/dashboard/owner/bookings">
                       <Calendar />
                       <span>Bookings</span>
                     </Link>
@@ -78,7 +79,7 @@ export default function OwnerDashboardLayout({
                 </SidebarMenuItem>
                  <SidebarMenuItem>
                    <SidebarMenuButton asChild>
-                     <Link href="#">
+                     <Link href="/dashboard/owner/reviews">
                       <Star />
                       <span>Reviews</span>
                     </Link>
@@ -110,6 +111,14 @@ export default function OwnerDashboardLayout({
                      <Link href="/dashboard/owner/analytics">
                       <BarChart3 />
                       <span>Analytics</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                   <SidebarMenuButton asChild>
+                     <Link href="/dashboard/owner/map">
+                      <Map />
+                      <span>Map View</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
