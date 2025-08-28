@@ -13,17 +13,30 @@ import {
   SidebarTitle,
   SidebarSeparator,
 } from '@/components/ui/sidebar';
-import CustomerDashboardHeader from '@/app/dashboard/customer/header';
-import { Home, Star, MessageSquare, Calendar, User, Settings, Sparkles, LogOut, LayoutDashboard, Search, Map } from 'lucide-react';
+import OwnerDashboardHeader from '@/app/dashboard/owner/header';
+import { 
+    LayoutDashboard,
+    Calendar,
+    MessageSquare,
+    Star,
+    Scissors,
+    ImageIcon,
+    BarChart3,
+    Settings,
+    User,
+    LogOut,
+    Plus,
+    Building
+} from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
-  title: 'Customer Dashboard - BeautyHub',
-  description: 'Manage your appointments and favorites.',
+  title: 'Salon Owner Dashboard - BeautyHub',
+  description: 'Manage your salon, bookings, and services.',
 };
 
-export default function CustomerDashboardLayout({
+export default function OwnerDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -31,22 +44,17 @@ export default function CustomerDashboardLayout({
   return (
     <SidebarProvider>
       <div className="flex min-h-screen flex-col">
-        <CustomerDashboardHeader />
+        <OwnerDashboardHeader />
         <div className="flex flex-1">
           <Sidebar>
             <SidebarContent>
+              <SidebarHeader>
+                <SidebarTitle>Amber Glow Salon</SidebarTitle>
+              </SidebarHeader>
               <SidebarMenu>
                  <SidebarMenuItem>
                    <SidebarMenuButton asChild>
-                    <Link href="/dashboard/customer">
-                      <Home />
-                      <span>Home</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                 <SidebarMenuItem>
-                   <SidebarMenuButton asChild>
-                    <Link href="/dashboard/customer/dashboard">
+                    <Link href="/dashboard/owner">
                       <LayoutDashboard />
                       <span>Dashboard</span>
                     </Link>
@@ -54,23 +62,7 @@ export default function CustomerDashboardLayout({
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                    <SidebarMenuButton asChild>
-                     <Link href="/dashboard/customer/explore">
-                      <Search />
-                      <span>Explore</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                 <SidebarMenuItem>
-                   <SidebarMenuButton asChild>
-                     <Link href="/dashboard/customer/map">
-                      <Map />
-                      <span>Map View</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                   <SidebarMenuButton asChild>
-                     <Link href="/dashboard/customer/bookings">
+                     <Link href="#">
                       <Calendar />
                       <span>Bookings</span>
                     </Link>
@@ -78,7 +70,7 @@ export default function CustomerDashboardLayout({
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                    <SidebarMenuButton asChild>
-                     <Link href="/dashboard/customer/messages">
+                     <Link href="/dashboard/owner/messages">
                       <MessageSquare />
                       <span>Messages</span>
                     </Link>
@@ -86,17 +78,9 @@ export default function CustomerDashboardLayout({
                 </SidebarMenuItem>
                  <SidebarMenuItem>
                    <SidebarMenuButton asChild>
-                     <Link href="/dashboard/customer/favorites">
+                     <Link href="#">
                       <Star />
-                      <span>Favorites</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                   <SidebarMenuButton asChild>
-                     <Link href="/dashboard/customer/beauty-tips">
-                      <Sparkles />
-                      <span>Beauty Tips</span>
+                      <span>Reviews</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -105,26 +89,64 @@ export default function CustomerDashboardLayout({
               <SidebarSeparator />
 
               <SidebarMenu>
-                <SidebarMenuItem>
+                 <SidebarMenuItem>
                    <SidebarMenuButton asChild>
-                     <Link href="/dashboard/customer/profile">
-                      <User />
-                      <span>Profile</span>
+                     <Link href="/dashboard/owner/services">
+                      <Scissors />
+                      <span>Services</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                    <SidebarMenuButton asChild>
-                     <Link href="/dashboard/customer/settings">
+                     <Link href="/dashboard/owner/gallery">
+                      <ImageIcon />
+                      <span>Gallery</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                 <SidebarMenuItem>
+                   <SidebarMenuButton asChild>
+                     <Link href="/dashboard/owner/analytics">
+                      <BarChart3 />
+                      <span>Analytics</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+              
+              <SidebarSeparator />
+
+              <SidebarMenu>
+                <SidebarMenuItem>
+                   <SidebarMenuButton asChild>
+                     <Link href="/dashboard/owner/profile">
+                      <Building />
+                      <span>Salon Profile</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                   <SidebarMenuButton asChild>
+                     <Link href="/dashboard/owner/settings">
                       <Settings />
                       <span>Settings</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
+
             </SidebarContent>
             <SidebarFooter>
               <SidebarMenu>
+                 <SidebarMenuItem>
+                  <Button asChild variant="default" className="w-full justify-start bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+                    <Link href="/dashboard/owner/services">
+                      <Plus className="mr-2" />
+                      Add New Service
+                    </Link>
+                  </Button>
+                </SidebarMenuItem>
                 <SidebarMenuItem>
                   <Button asChild variant="outline" className="w-full justify-start">
                     <Link href="/">
@@ -146,5 +168,3 @@ export default function CustomerDashboardLayout({
     </SidebarProvider>
   );
 }
-
-    
