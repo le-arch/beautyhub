@@ -8,16 +8,18 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
-  Calendar, 
+  Calendar as CalendarIcon, 
   Check, 
   X,
   Clock,
   User,
   Scissors,
   MessageCircle,
-  Phone
+  Phone,
+  Info
 } from 'lucide-react';
-import Link from 'next/link';
+import { Calendar } from '@/components/ui/calendar';
+import { parseISO, isSameDay } from 'date-fns';
 
 const mockBookings = {
   requests: [
@@ -64,9 +66,20 @@ const mockBookings = {
   ]
 };
 
+const allBookings = [
+    ...mockBookings.requests,
+    ...mockBookings.upcoming
+];
+
+const bookedDays = allBookings.map(booking => parseISO(booking.date));
 
 export default function OwnerBookingsPage() {
   const [activeTab, setActiveTab] = useState('requests');
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  
+  const selectedDayBookings = selectedDate 
+    ? allBookings.filter(booking => isSameDay(parseISO(booking.date), selectedDate))
+    : [];
 
   return (
     <main className="flex-1 p-4 sm:p-6 lg:p-8">
@@ -112,8 +125,8 @@ export default function OwnerBookingsPage() {
                         <span>{booking.service}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-4 w-4 text-purple-600" />
-                        <span>{booking.date} at {booking.time}</span>
+                        <CalendarIcon className="h-4 w-4 text-purple-600" />
+                        <span>{new Date(booking.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} at {booking.time}</span>
                     </div>
                     {booking.notes && (
                       <p className="text-xs text-warmgray-500 bg-warmgray-50 p-2 rounded-md">Note: "{booking.notes}"</p>
@@ -162,8 +175,8 @@ export default function OwnerBookingsPage() {
                         <span>{booking.service}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-4 w-4 text-purple-600" />
-                        <span>{booking.date} at {booking.time}</span>
+                        <CalendarIcon className="h-4 w-4 text-purple-600" />
+                        <span>{new Date(booking.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} at {booking.time}</span>
                     </div>
                      <Badge className="bg-green-100 text-green-700">{booking.status}</Badge>
                   </div>
@@ -190,7 +203,7 @@ export default function OwnerBookingsPage() {
                         <p className="text-sm text-warmgray-600">{booking.service}</p>
                     </div>
                     <div className="text-sm text-warmgray-500">
-                        {booking.date}
+                        {new Date(booking.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </div>
                     <Badge variant="outline">{booking.status}</Badge>
                     <p className="font-semibold text-green-600">₦{booking.revenue.toLocaleString()}</p>
@@ -199,14 +212,56 @@ export default function OwnerBookingsPage() {
             ))}
           </TabsContent>
           
-           {/* Calendar View Placeholder */}
+           {/* Calendar View */}
           <TabsContent value="calendar">
             <Card className="border-purple-100">
                 <CardHeader>
                     <CardTitle>Booking Calendar</CardTitle>
                 </CardHeader>
-                <CardContent className="h-96 flex items-center justify-center">
-                    <p className="text-warmgray-500">Full calendar view coming soon.</p>
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="flex justify-center">
+                        <Calendar
+                            mode="single"
+                            selected={selectedDate}
+                            onSelect={setSelectedDate}
+                            modifiers={{ booked: bookedDays }}
+                            modifiersClassNames={{
+                                booked: 'bg-purple-500 text-white rounded-full'
+                            }}
+                            className="rounded-md border p-4"
+                        />
+                    </div>
+                    <div className="space-y-4">
+                        <h3 className="font-semibold text-warmgray-900 text-lg">
+                           Appointments for {selectedDate ? selectedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '...'}
+                        </h3>
+                        {selectedDayBookings.length > 0 ? (
+                            <div className="space-y-4">
+                                {selectedDayBookings.map(booking => (
+                                    <div key={booking.id} className="flex items-start gap-4 p-4 bg-purple-50 rounded-lg">
+                                        <Avatar>
+                                            <AvatarImage src={booking.avatar} />
+                                            <AvatarFallback>{booking.customerName.charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex-1">
+                                            <h4 className="font-semibold text-warmgray-800">{booking.customerName}</h4>
+                                            <p className="text-sm text-warmgray-600">{booking.service}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-sm font-medium text-purple-600">{booking.time}</p>
+                                            <Badge variant={booking.status ? "outline" : "default"} className={booking.status ? "border-green-300 text-green-700 bg-green-50" : ""}>
+                                              {booking.status || 'Requested'}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-12 border-2 border-dashed rounded-lg">
+                                <p className="text-warmgray-500">No appointments for this day.</p>
+                            </div>
+                        )}
+                    </div>
                 </CardContent>
             </Card>
           </TabsContent>
