@@ -239,22 +239,67 @@ export default function SalonMapPage() {
 
           {/* Map Display */}
           <div className="lg:col-span-2">
-            <Card className="border-purple-100 h-[600px] lg:h-full">
+             <Card className="border-purple-100 h-[600px] lg:h-full">
               <CardContent className="p-0 h-full">
-                <div className="relative w-full h-full bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg overflow-hidden">
-                  <div className="flex items-center justify-center h-full">
-                    <div className="text-center space-y-4 p-8">
-                       <div className="w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto">
-                        <MapPin className="h-12 w-12 text-purple-600" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-warmgray-900 mb-2">
-                          Interactive Map Placeholder
-                        </h3>
-                        <p className="text-warmgray-600 max-w-md">
-                          In a production app, this would display an interactive map using a service like Google Maps or Mapbox, showing salon locations with custom markers and pop-ups.
-                        </p>
-                      </div>
+                <div className="relative w-full h-full bg-warmgray-200 rounded-lg overflow-hidden">
+                  <img src="https://placehold.co/1000x800/e2e8f0/64748b?text=Map+View" alt="Map of salons" className="w-full h-full object-cover"/>
+                  
+                  {/* Map Header */}
+                  <div className="absolute top-4 left-4 right-4 z-10">
+                    <Card className="border-white shadow-lg bg-white/80 backdrop-blur-sm">
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <MapPin className="h-4 w-4 text-purple-600" />
+                            <span className="text-sm font-medium">
+                              {userLocation?.city || 'Lagos, Nigeria'}
+                            </span>
+                          </div>
+                          <Badge className="bg-purple-100 text-purple-700">
+                            {filteredSalons.length} salon{filteredSalons.length !== 1 ? 's' : ''}
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Mock Map markers */}
+                  <div className="absolute top-1/3 left-1/4">
+                    <div className="p-1 bg-purple-600 text-white text-xs rounded-md shadow-lg">Amber Glow</div>
+                    <div className="w-2 h-2 bg-purple-600 rounded-full mx-auto mt-1"></div>
+                  </div>
+                   <div className="absolute top-1/2 right-1/4">
+                    <div className="p-1 bg-pink-600 text-white text-xs rounded-md shadow-lg">Serene Spa</div>
+                     <div className="w-2 h-2 bg-pink-600 rounded-full mx-auto mt-1"></div>
+                  </div>
+                  <div className="absolute bottom-1/4 left-1/2">
+                    <div className="p-1 bg-green-600 text-white text-xs rounded-md shadow-lg">Nairobi Nail Bar</div>
+                     <div className="w-2 h-2 bg-green-600 rounded-full mx-auto mt-1"></div>
+                  </div>
+
+                   {/* Map Features Overlay */}
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      {filteredSalons.slice(0, 3).map((salon, index) => (
+                        <Card key={salon.id} className="bg-white/95 backdrop-blur-sm border-purple-100">
+                          <CardContent className="p-3">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-medium">
+                                {index + 1}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-medium text-warmgray-900 truncate">
+                                  {salon.name}
+                                </p>
+                                <div className="flex items-center gap-1 text-xs text-warmgray-600">
+                                  <Star className="h-2 w-2 text-yellow-400 fill-current" />
+                                  <span>{salon.rating}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
                     </div>
                   </div>
                 </div>

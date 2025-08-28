@@ -133,21 +133,27 @@ export default function OwnerMapPage() {
           <div className="lg:col-span-2">
             <Card className="border-purple-100 h-[600px] lg:h-full">
               <CardContent className="p-0 h-full">
-                <div className="relative w-full h-full bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg overflow-hidden">
-                  <div className="flex items-center justify-center h-full">
-                    <div className="text-center space-y-4 p-8">
-                       <div className="w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto">
-                        <MapPin className="h-12 w-12 text-purple-600" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-warmgray-900 mb-2">
-                          Your Salon's Pinned Location
-                        </h3>
-                        <p className="text-warmgray-600 max-w-md">
-                          In a production app, this map would be interactive, allowing you to drag and drop the pin to update your precise coordinates.
-                        </p>
-                      </div>
-                    </div>
+                <div className="relative w-full h-full bg-warmgray-200 rounded-lg overflow-hidden">
+                   <img src="https://placehold.co/1000x800/e2e8f0/64748b?text=Map+View" alt="Map of salon location" className="w-full h-full object-cover"/>
+                  
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+                     <div className="p-2 bg-purple-600 text-white text-sm rounded-md shadow-lg inline-block">
+                       {ownerSalon.name}
+                     </div>
+                     <div className="w-3 h-3 bg-purple-600 rounded-full mx-auto mt-1 border-2 border-white shadow-lg"></div>
+                  </div>
+
+                   <div className="absolute top-4 left-4 z-10">
+                    <Card className="border-white shadow-lg bg-white/80 backdrop-blur-sm">
+                      <CardContent className="p-3">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-purple-600" />
+                          <span className="text-sm font-medium">
+                            Your Pinned Location
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
                 </div>
               </CardContent>
