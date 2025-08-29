@@ -1,6 +1,5 @@
 
 import Link from 'next/link'
-import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { SubmitButton } from './submit-button'
@@ -8,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Sparkles, User, Building } from 'lucide-react'
 import { login, signInWithGoogle } from '../auth/actions'
 import Header from '../header'
 

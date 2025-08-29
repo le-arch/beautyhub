@@ -1,51 +1,50 @@
 
-import { NextResponse, type NextRequest } from 'next/server'
-import { createClient } from '@/lib/supabase/middleware'
+import { type NextRequest } from 'next/server';
+import { updateSession } from '@/lib/supabase/middleware';
 
 export async function middleware(request: NextRequest) {
-  const { supabase, response } = createClient(request)
+  // This will refresh the session cookie if it's expired.
+  const response = await updateSession(request);
 
-  // Refresh session if expired - required for Server Components
-  // https://supabase.com/docs/guides/auth/auth-helpers/nextjs#managing-session-with-middleware
-  const { data: { session } } = await supabase.auth.getSession()
-
-  const { pathname } = request.nextUrl
+  const { data: { user } } = await response.supabase.auth.getUser();
+  const { pathname } = request.nextUrl;
 
   // Define public paths that do not require authentication
-  const publicPaths = ['/login', '/signup', '/owner', '/']
-  
+  const publicPaths = ['/login', '/signup', '/owner', '/'];
+
   const isPublicPath = publicPaths.some(p => {
     if (p === '/') return pathname === '/';
     return pathname.startsWith(p);
   });
+  
+  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/signup');
 
-  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/signup')
+  // If the user is logged in
+  if (user) {
+    const role = user.user_metadata?.role;
 
-  // If user is logged in
-  if (session) {
-    const role = session.user.user_metadata.role
-    
-    // If user is on an auth page (login/signup), redirect to their dashboard
+    // If user is on an auth page, redirect them to their dashboard
     if (isAuthRoute) {
       const redirectUrl = role === 'owner' ? '/dashboard/owner' : '/dashboard/customer';
-      return NextResponse.redirect(new URL(redirectUrl, request.url));
+      return Response.redirect(new URL(redirectUrl, request.url));
     }
-    
+
     // Role-based access control for dashboard routes
     if (pathname.startsWith('/dashboard/owner') && role !== 'owner') {
-      return NextResponse.redirect(new URL('/dashboard/customer', request.url))
+      return Response.redirect(new URL('/dashboard/customer', request.url));
     }
     if (pathname.startsWith('/dashboard/customer') && role !== 'customer') {
-      return NextResponse.redirect(new URL('/dashboard/owner', request.url))
+      return Response.redirect(new URL('/dashboard/owner', request.url));
     }
+    
   } else {
-    // If user is not logged in and is trying to access a protected route
-    if (!isPublicPath) {
-      return NextResponse.redirect(new URL('/login', request.url))
+    // If user is not logged in and trying to access a protected route
+    if (pathname.startsWith('/dashboard')) {
+        return Response.redirect(new URL('/login', request.url));
     }
   }
 
-  return response
+  return response;
 }
 
 export const config = {
@@ -59,4 +58,4 @@ export const config = {
      */
     '/((?!_next/static|_next/image|favicon.ico|auth/callback).*)',
   ],
-}
+};

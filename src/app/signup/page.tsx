@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { SubmitButton } from '../login/submit-button'
@@ -7,16 +6,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Sparkles } from 'lucide-react'
 import { signup, signInWithGoogle } from '../auth/actions'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import Header from '../header'
 
-export default function SignupPage({
+export default async function SignupPage({
   searchParams,
 }: {
   searchParams: { message: string }
 }) {
+
+  const supabase = createClient()
+  const { data: { session } } = await supabase.auth.getSession()
+
+  if (session) {
+    const role = session.user.user_metadata.role
+    if (role === 'owner') {
+      return redirect('/dashboard/owner')
+    }
+    return redirect('/dashboard/customer')
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -31,7 +40,7 @@ export default function SignupPage({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form className="grid gap-4">
+            <form className="grid gap-4" action={signup}>
                <div className="grid gap-2">
                   <Label htmlFor="full_name">Full Name</Label>
                   <Input id="full_name" name="full_name" placeholder="Your Name" required />
@@ -66,7 +75,6 @@ export default function SignupPage({
                 </div>
 
               <SubmitButton
-                formAction={signup}
                 className="w-full"
                 pendingText="Signing Up..."
               >
@@ -89,8 +97,8 @@ export default function SignupPage({
                   </span>
               </div>
             </div>
-            <form>
-              <Button formAction={signInWithGoogle} variant="outline" className="w-full">
+            <form action={signInWithGoogle}>
+              <Button variant="outline" className="w-full">
                   Sign Up with Google
               </Button>
             </form>
