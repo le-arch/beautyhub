@@ -1,6 +1,5 @@
 
 import Link from 'next/link'
-import { headers } from 'next/headers'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -8,33 +7,15 @@ import { Button } from '@/components/ui/button'
 import Header from '../header'
 import { login } from '../auth/actions'
 import { SubmitButton } from './submit-button'
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 
-export default async function LoginPage({
+export default function LoginPage({
   searchParams,
 }: {
   searchParams: { message: string }
 }) {
-
-  const supabase = createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (user) {
-    const role = user.user_metadata.role || 'customer';
-    if (role === 'owner') {
-        return redirect('/dashboard/owner');
-    }
-    return redirect('/dashboard/customer');
-  }
-
-
   return (
     <div className="flex min-h-screen flex-col bg-background">
-       <Header user={user}/>
+       <Header />
 
       <main className="flex-1 flex items-center justify-center p-4">
         <Card className="mx-auto max-w-sm w-full">

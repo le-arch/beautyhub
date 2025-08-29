@@ -1,8 +1,13 @@
+
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Menu, Sparkles } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -10,7 +15,18 @@ const navLinks = [
   { href: '/#blog', label: 'Beauty Tips' },
 ];
 
-const Header = ({ user }: { user: User | null }) => {
+const Header = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+  }, []);
+
   const dashboardHref = user?.user_metadata?.role === 'owner' ? '/dashboard/owner' : '/dashboard/customer';
 
   return (

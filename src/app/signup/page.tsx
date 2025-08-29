@@ -8,8 +8,7 @@ import Header from '../header'
 import { signup } from '../auth/actions'
 import { SubmitButton } from '../login/submit-button'
 
-
-export default async function SignupPage({
+export default function SignupPage({
   searchParams,
 }: {
   searchParams: { message: string }

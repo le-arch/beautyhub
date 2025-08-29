@@ -8,15 +8,11 @@ import PromoteSalon from '@/components/promote-salon';
 import AiStylist from '@/components/ai-stylist';
 import BlogTeasers from '@/components/blog-teasers';
 import HeroSection from '@/components/hero-section';
-import { createClient } from '@/lib/supabase/server';
 
-export default async function Home() {
-  const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
+export default function Home() {
   return (
     <div className="min-h-screen bg-background">
-      <Header user={user}/>
+      <Header />
       <main>
         <HeroSection />
         <FeaturedCategories />

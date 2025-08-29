@@ -3,15 +3,17 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Menu, Sparkles } from 'lucide-react';
+import type { User } from '@supabase/supabase-js';
 
 const navLinks = [
   { href: '/', label: 'Home' },
-  { href: '/#salons', label: 'Explore Salons' },
-  { href: '/owner', label: 'For Salon Owners' },
+  { href: '/explore', label: 'Explore Salons' },
   { href: '/#blog', label: 'Beauty Tips' },
 ];
 
-const Header = () => {
+const Header = ({ user }: { user: User | null }) => {
+  const dashboardHref = user?.user_metadata?.role === 'owner' ? '/dashboard/owner' : '/dashboard/customer';
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-7xl items-center justify-between">
@@ -31,14 +33,28 @@ const Header = () => {
               {link.label}
             </Link>
           ))}
+           <Link
+              href="/owner"
+              className="transition-colors hover:text-primary"
+            >
+              For Salon Owners
+            </Link>
         </nav>
         <div className="hidden md:flex items-center gap-4">
-          <Button variant="ghost" asChild>
-            <Link href="/owner">Log In</Link>
-          </Button>
-          <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
-            <Link href="/owner">Add Your Salon</Link>
-          </Button>
+          {user ? (
+             <Button asChild>
+                <Link href={dashboardHref}>Dashboard</Link>
+             </Button>
+          ) : (
+            <>
+              <Button variant="ghost" asChild>
+                <Link href="/login">Log In</Link>
+              </Button>
+              <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
+                <Link href="/signup">Sign Up</Link>
+              </Button>
+            </>
+          )}
         </div>
         <div className="md:hidden">
           <Sheet>
@@ -48,7 +64,7 @@ const Header = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
-              <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
+               <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
               <div className="flex flex-col gap-6 p-6">
                 <Link href="/" className="flex items-center gap-2">
                     <Sparkles className="h-6 w-6 text-primary" />
@@ -64,14 +80,28 @@ const Header = () => {
                         {link.label}
                     </Link>
                     ))}
+                     <Link
+                      href="/owner"
+                      className="text-lg font-medium transition-colors hover:text-primary"
+                    >
+                      For Salon Owners
+                    </Link>
                 </nav>
                 <div className="flex flex-col gap-4">
-                    <Button variant="ghost" asChild>
-                        <Link href="/owner">Log In</Link>
-                    </Button>
-                    <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
-                      <Link href="/owner">Add Your Salon</Link>
-                    </Button>
+                    {user ? (
+                        <Button asChild>
+                          <Link href={dashboardHref}>Dashboard</Link>
+                        </Button>
+                    ) : (
+                    <>
+                      <Button variant="ghost" asChild>
+                          <Link href="/login">Log In</Link>
+                      </Button>
+                      <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
+                        <Link href="/signup">Sign Up</Link>
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </SheetContent>
