@@ -1,16 +1,17 @@
-
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Menu, Sparkles } from 'lucide-react';
+import type { User } from '@supabase/supabase-js';
 
 const navLinks = [
   { href: '/', label: 'Home' },
-  { href: '/#salons', label: 'Explore Salons' },
+  { href: '/explore', label: 'Explore Salons' },
   { href: '/#blog', label: 'Beauty Tips' },
 ];
 
-const Header = async () => {
+const Header = ({ user }: { user: User | null }) => {
+  const dashboardHref = user?.user_metadata?.role === 'owner' ? '/dashboard/owner' : '/dashboard/customer';
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -39,6 +40,11 @@ const Header = async () => {
             </Link>
         </nav>
         <div className="hidden md:flex items-center gap-4">
+          {user ? (
+             <Button asChild>
+                <Link href={dashboardHref}>Dashboard</Link>
+             </Button>
+          ) : (
             <>
               <Button variant="ghost" asChild>
                 <Link href="/login">Log In</Link>
@@ -47,6 +53,7 @@ const Header = async () => {
                 <Link href="/signup">Sign Up</Link>
               </Button>
             </>
+          )}
         </div>
         <div className="md:hidden">
           <Sheet>
@@ -80,6 +87,11 @@ const Header = async () => {
                     </Link>
                 </nav>
                 <div className="flex flex-col gap-4">
+                    {user ? (
+                        <Button asChild>
+                          <Link href={dashboardHref}>Dashboard</Link>
+                        </Button>
+                    ) : (
                     <>
                       <Button variant="ghost" asChild>
                           <Link href="/login">Log In</Link>
@@ -88,6 +100,7 @@ const Header = async () => {
                         <Link href="/signup">Sign Up</Link>
                       </Button>
                     </>
+                  )}
                 </div>
               </div>
             </SheetContent>

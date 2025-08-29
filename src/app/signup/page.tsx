@@ -3,11 +3,17 @@ import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import Header from '../header'
+import { signup } from '../auth/actions'
+import { SubmitButton } from '../login/submit-button'
 
-export default async function SignupPage() {
+
+export default async function SignupPage({
+  searchParams,
+}: {
+  searchParams: { message: string }
+}) {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -22,7 +28,7 @@ export default async function SignupPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4">
+            <form className="grid gap-4">
                <div className="grid gap-2">
                   <Label htmlFor="full_name">Full Name</Label>
                   <Input id="full_name" name="full_name" placeholder="Your Name" required />
@@ -55,27 +61,21 @@ export default async function SignupPage() {
                     </div>
                   </RadioGroup>
                 </div>
+                {searchParams?.message && (
+                    <div className="text-sm font-medium text-destructive">
+                        {searchParams.message}
+                    </div>
+                )}
 
-              <Button
+              <SubmitButton
+                formAction={signup}
                 className="w-full"
+                pendingText="Signing Up..."
               >
                 Sign Up
-              </Button>
+              </SubmitButton>
 
-            </div>
-             <div className="relative my-4">
-              <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
-                  </span>
-              </div>
-            </div>
-            <Button variant="outline" className="w-full">
-                Sign Up with Google
-            </Button>
+            </form>
             <div className="mt-4 text-center text-sm">
               Already have an account?{' '}
               <Link href="/login" className="underline">

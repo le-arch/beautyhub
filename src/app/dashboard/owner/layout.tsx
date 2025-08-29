@@ -31,6 +31,9 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import { logout } from '@/app/auth/actions';
 
 export const metadata: Metadata = {
   title: 'Salon Owner Dashboard - BeautyHub',
@@ -42,16 +45,28 @@ export default async function OwnerDashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return redirect('/login');
+  }
+
+  const { data: salon } = await supabase
+    .from('salons')
+    .select('name')
+    .eq('owner_id', user.id)
+    .single();
 
   return (
     <SidebarProvider>
       <div className="flex min-h-screen flex-col">
-        <OwnerDashboardHeader />
+        <OwnerDashboardHeader user={user} />
         <div className="flex flex-1">
           <Sidebar>
             <SidebarContent>
               <SidebarHeader>
-                <SidebarTitle>Amber Glow Salon</SidebarTitle>
+                <SidebarTitle>{salon?.name || 'My Salon'}</SidebarTitle>
               </SidebarHeader>
               <SidebarMenu>
                  <SidebarMenuItem>
@@ -158,7 +173,7 @@ export default async function OwnerDashboardLayout({
                   </Button>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <form action={'/'} className="w-full">
+                  <form action={logout} className="w-full">
                     <Button type="submit" variant="outline" className="w-full justify-start">
                         <LogOut className="mr-2" />
                         Sign Out

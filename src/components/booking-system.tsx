@@ -22,12 +22,13 @@ import {
   MapPin,
   Star
 } from "lucide-react";
-import { mockSalons } from '@/lib/mock-data';
+import type { Salon } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-
+import { createClient } from '@/lib/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface BookingSystemProps {
-  salonId: number;
+  salon: Salon;
   onClose?: () => void;
 }
 
@@ -37,7 +38,7 @@ interface SelectedService {
   price: number;
 }
 
-export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
+export function BookingSystem({ salon, onClose }: BookingSystemProps) {
   const [step, setStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string>('');
@@ -45,24 +46,9 @@ export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
   const [notes, setNotes] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [bookingId, setBookingId] = useState<string>('');
+  const supabase = createClient();
+  const { toast } = useToast();
 
-  const salon = mockSalons.find(s => s.id === salonId);
-  const user = { id: 'user123' }; // Mock user
-
-  if (!salon) {
-    return (
-      <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-        <Card className="bg-white border-purple-100 w-full max-w-md">
-            <CardContent className="p-8 text-center">
-              <h2 className="text-xl font-semibold text-warmgray-900 mb-4">Salon Not Found</h2>
-              <p className="text-warmgray-600 mb-6">The selected salon could not be found.</p>
-              <Button onClick={onClose}>Close</Button>
-            </CardContent>
-        </Card>
-      </div>
-    );
-  }
-  
   const generateTimeSlots = (date: Date) => {
     const slots = [];
     const startHour = 9;
@@ -84,7 +70,7 @@ export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
   const totalPrice = selectedServices.reduce((sum, item) => sum + item.price, 0);
   const depositAmount = Math.round(totalPrice * 0.3); // 30% deposit
 
-  const handleServiceToggle = (service: { name: string; price: number }) => {
+  const handleServiceToggle = (service: { name: string; price: number, duration: number }) => {
     const isSelected = selectedServices.find(s => s.name === service.name);
     
     if (isSelected) {
@@ -92,7 +78,7 @@ export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
     } else {
       setSelectedServices(prev => [...prev, {
         name: service.name,
-        duration: 60, // Mock duration
+        duration: service.duration || 60,
         price: service.price
       }]);
     }
@@ -100,34 +86,81 @@ export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
 
   const handleBooking = async () => {
     if (!selectedDate || !selectedTime || selectedServices.length === 0) {
-      alert('Please select date, time, and at least one service');
+      toast({
+        variant: 'destructive',
+        title: 'Missing Information',
+        description: 'Please select date, time, and at least one service',
+      });
       return;
     }
-    setIsProcessing(true);
-    // Mock booking creation
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    const newBookingId = `BK-${Date.now()}`;
-    setBookingId(newBookingId);
 
-    // In a real app, you would send this to your backend
-    console.log("Creating conversation and message for booking:", {
-      salonId: salon.id,
-      bookingId: newBookingId,
-      service: selectedServices.map(s => s.name).join(', '),
-      date: selectedDate.toLocaleDateString(),
-      time: selectedTime
-    })
+    setIsProcessing(true);
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        toast({
+            variant: 'destructive',
+            title: 'Not authenticated',
+            description: 'You must be logged in to book an appointment.',
+        });
+        setIsProcessing(false);
+        return;
+    }
+
+    const bookingTime = new Date(selectedDate);
+    const [hours, minutes] = selectedTime.split(':').map(Number);
+    bookingTime.setHours(hours, minutes);
+
+    const { data, error } = await supabase.from('bookings').insert({
+        user_id: user.id,
+        salon_id: salon.id,
+        service_name: selectedServices.map(s => s.name).join(', '),
+        booking_time: bookingTime.toISOString(),
+        total_price: totalPrice,
+        deposit_paid: false,
+        notes: notes,
+        status: 'Pending'
+    }).select().single();
+
+    if (error) {
+        console.error('Booking error:', error);
+        toast({
+            variant: 'destructive',
+            title: 'Booking Failed',
+            description: 'Could not create your booking. Please try again.',
+        });
+        setIsProcessing(false);
+        return;
+    }
     
+    setBookingId(data.id);
     setIsProcessing(false);
-    setStep(5);
+    setStep(4); // Move to confirm/payment step
   };
 
   const handlePayment = async () => {
     setIsProcessing(true);
     // Mock payment processing
     await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const { error } = await supabase
+      .from('bookings')
+      .update({ status: 'Confirmed', deposit_paid: true })
+      .eq('id', bookingId);
+      
+    if (error) {
+      console.error('Payment confirmation error:', error);
+       toast({
+            variant: 'destructive',
+            title: 'Payment Failed',
+            description: 'Could not confirm your payment. Please contact support.',
+        });
+        setIsProcessing(false);
+        return;
+    }
+
     setIsProcessing(false);
-    setStep(6);
+    setStep(5);
   };
 
   const renderStepContent = () => {
@@ -177,8 +210,8 @@ export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
                 <h4 className="font-medium text-warmgray-900 mb-2">Selected Services</h4>
                 <Separator className="my-2" />
                 <div className="flex justify-between font-medium">
-                  <span>Total: {totalDuration / 60}h {totalDuration % 60}m</span>
-                  <span>₦{totalPrice.toLocaleString()}</span>
+                  <span>Total Duration: {totalDuration > 0 ? `${Math.floor(totalDuration / 60)}h ${totalDuration % 60}m` : 'N/A'}</span>
+                  <span>Total Price: ₦{totalPrice.toLocaleString()}</span>
                 </div>
               </div>
             )}
@@ -228,11 +261,11 @@ export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
           </div>
         );
       
-      case 3: // Add Notes
+      case 3: // Add Notes & Confirm
         return (
            <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-warmgray-900 mb-4">Additional Notes</h3>
+              <h3 className="text-lg font-semibold text-warmgray-900 mb-4">Additional Notes & Confirmation</h3>
               <Textarea
                 placeholder="Any special requests or notes for the salon..."
                 value={notes}
@@ -257,7 +290,7 @@ export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
                 </div>
                 <div className="flex justify-between">
                   <span>Duration:</span>
-                  <span>{Math.round(totalDuration / 60)}h {totalDuration % 60}m</span>
+                  <span>{totalDuration > 0 ? `${Math.floor(totalDuration / 60)}h ${totalDuration % 60}m` : 'N/A'}</span>
                 </div>
                 <Separator className="my-2" />
                 <div className="space-y-1">
@@ -277,109 +310,39 @@ export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
                   <span>Deposit (30%):</span>
                   <span>₦{depositAmount.toLocaleString()}</span>
                 </div>
+                 <div className="flex justify-between text-xs text-warmgray-500">
+                    <span>Remaining Balance:</span>
+                    <span>₦{(totalPrice - depositAmount).toLocaleString()} (Pay at salon)</span>
+                  </div>
               </div>
             </div>
           </div>
         );
 
-      case 4: // Confirm Booking
-        return (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-semibold text-warmgray-900 mb-4">Confirm Booking</h3>
-              <p className="text-warmgray-600 mb-6">
-                Please review your booking details and confirm to proceed with payment.
-              </p>
-            </div>
-            <Card className="border-purple-100">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4 mb-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage src={salon.image} alt={salon.name} />
-                    <AvatarFallback className="bg-gradient-to-br from-purple-100 to-pink-100 text-purple-700">
-                      {salon.name.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-warmgray-900">{salon.name}</h4>
-                    <div className="flex items-center gap-1 text-sm text-warmgray-600 mb-1">
-                      <MapPin className="h-3 w-3" />
-                      <span>{salon.location}</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-sm text-warmgray-600">
-                      <Star className="h-3 w-3 text-yellow-400 fill-current" />
-                      <span>{salon.rating} ({salon.reviews} reviews)</span>
-                    </div>
-                  </div>
-                </div>
-                <Separator className="my-4" />
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center gap-2">
-                    <CalendarIcon className="h-4 w-4 text-purple-600" />
-                    <span>{selectedDate?.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-purple-600" />
-                    <span>{selectedTime} ({Math.round(totalDuration / 60)}h {totalDuration % 60}m)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-purple-600" />
-                    <span>{selectedServices.map(s => s.name).join(', ')}</span>
-                  </div>
-                </div>
-                {notes && (
-                  <>
-                    <Separator className="my-4" />
-                    <div>
-                      <h5 className="font-medium text-warmgray-900 mb-1">Notes:</h5>
-                      <p className="text-sm text-warmgray-600">{notes}</p>
-                    </div>
-                  </>
-                )}
-                <Separator className="my-4" />
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Subtotal:</span>
-                    <span>₦{totalPrice.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-sm font-medium text-purple-600">
-                    <span>Deposit Required:</span>
-                    <span>₦{depositAmount.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-xs text-warmgray-500">
-                    <span>Remaining Balance:</span>
-                    <span>₦{(totalPrice - depositAmount).toLocaleString()} (Pay at salon)</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        );
-
-      case 5: // Payment
+      case 4: // Payment
         return (
           <div className="text-center space-y-6">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-              <CheckCircle className="h-8 w-8 text-green-600" />
+            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto">
+              <CreditCard className="h-8 w-8 text-purple-600" />
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-warmgray-900 mb-2">Booking Created!</h3>
+              <h3 className="text-xl font-semibold text-warmgray-900 mb-2">Confirm Your Appointment</h3>
               <p className="text-warmgray-600">
-                Your booking has been created successfully. A message has been sent to the salon. Please proceed with the deposit payment to confirm your appointment.
+                A deposit is required to confirm your booking. Please proceed with the payment to secure your spot.
               </p>
             </div>
             <div className="bg-purple-50 p-4 rounded-lg">
               <p className="text-sm text-purple-700">
                 <strong>Booking ID:</strong> {bookingId}
               </p>
-              <p className="text-sm text-purple-700 mt-1">
+              <p className="text-lg font-bold text-purple-700 mt-1">
                 <strong>Deposit Amount:</strong> ₦{depositAmount.toLocaleString()}
               </p>
             </div>
           </div>
         );
 
-      case 6: // Success
+      case 5: // Success
         return (
           <div className="text-center space-y-6">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
@@ -420,7 +383,6 @@ export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
       case 1: return selectedServices.length > 0;
       case 2: return selectedDate && selectedTime;
       case 3: return true;
-      case 4: return true;
       default: return false;
     }
   };
@@ -428,7 +390,6 @@ export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
   const stepTitles = [
     'Select Services',
     'Choose Date & Time',
-    'Add Notes',
     'Confirm Booking',
     'Payment',
     'Complete'
@@ -481,7 +442,7 @@ export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
             </div>
             {renderStepContent()}
         </CardContent>
-         {step < 6 && (
+         {step < 5 && (
           <div className="p-6 border-t">
             <div className="flex justify-between">
                 <Button
@@ -494,7 +455,7 @@ export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
                 Previous
                 </Button>
 
-                {step < 4 && (
+                {step < 3 && (
                 <Button
                     onClick={() => setStep(step + 1)}
                     disabled={!canProceed()}
@@ -504,18 +465,18 @@ export function BookingSystem({ salonId, onClose }: BookingSystemProps) {
                     <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
                 )}
-
-                {step === 4 && (
+                
+                {step === 3 && (
                 <Button
                     onClick={handleBooking}
                     disabled={!canProceed() || isProcessing}
                     className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                 >
-                    {isProcessing ? 'Creating...' : 'Confirm Booking'}
+                    {isProcessing ? 'Creating...' : 'Create Booking'}
                 </Button>
                 )}
 
-                {step === 5 && (
+                {step === 4 && (
                 <Button
                     onClick={handlePayment}
                     disabled={isProcessing}

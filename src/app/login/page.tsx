@@ -1,16 +1,40 @@
 
 import Link from 'next/link'
+import { headers } from 'next/headers'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Header from '../header'
+import { login } from '../auth/actions'
+import { SubmitButton } from './submit-button'
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: { message: string }
+}) {
+
+  const supabase = createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (user) {
+    const role = user.user_metadata.role || 'customer';
+    if (role === 'owner') {
+        return redirect('/dashboard/owner');
+    }
+    return redirect('/dashboard/customer');
+  }
+
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-       <Header />
+       <Header user={user}/>
 
       <main className="flex-1 flex items-center justify-center p-4">
         <Card className="mx-auto max-w-sm w-full">
@@ -21,7 +45,7 @@ export default async function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4">
+            <form className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -41,25 +65,19 @@ export default async function LoginPage() {
                 </div>
                 <Input id="password" name="password" type="password" required />
               </div>
-              <Button
+              {searchParams.message && (
+                <div className="text-sm font-medium text-destructive">
+                    {searchParams.message}
+                </div>
+              )}
+              <SubmitButton
+                formAction={login}
                 className="w-full"
+                pendingText="Signing In..."
               >
                 Sign In
-              </Button>
-            </div>
-            <div className="relative my-4">
-              <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
-                  </span>
-              </div>
-            </div>
-            <Button variant="outline" className="w-full">
-                Login with Google
-            </Button>
+              </SubmitButton>
+            </form>
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
               <Link href="/signup" className="underline">

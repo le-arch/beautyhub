@@ -7,8 +7,8 @@ export interface Salon {
   rating: number;
   reviews: number;
   startingPrice: number;
-  services: { name: string; price: number }[];
-  gallery: { url: string; hint: string; type: 'image' | 'video' }[];
+  services: { id: number; name: string; price: number, duration: number }[];
+  gallery: { id: number; url: string; hint: string; type: 'image' | 'video' }[];
   verified?: boolean;
   featured?: boolean;
 }

@@ -13,9 +13,10 @@ import Link from 'next/link';
 
 interface SalonCardProps {
   salon: Salon & { specialties?: string[], featured?: boolean, verified?: boolean, distance?: string, responseTime?: string };
+  onBookNow: (salon: Salon) => void;
 }
 
-const SalonCard = ({ salon }: SalonCardProps) => {
+const SalonCard = ({ salon, onBookNow }: SalonCardProps) => {
   const [isFavorited, setIsFavorited] = useState(false);
 
   const toggleFavorite = (e: React.MouseEvent) => {
@@ -27,14 +28,16 @@ const SalonCard = ({ salon }: SalonCardProps) => {
   return (
     <Card className="overflow-hidden group transition-all duration-300 hover:shadow-2xl flex flex-col border-purple-100">
       <CardHeader className="p-0 relative">
-        <ImageWithFallback
-          src={salon.image}
-          alt={salon.name}
-          width={600}
-          height={400}
-          className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-500"
-          data-ai-hint={salon.imageHint}
-        />
+        <Link href={`/dashboard/customer/salon/${salon.id}`}>
+          <ImageWithFallback
+            src={salon.image}
+            alt={salon.name}
+            width={600}
+            height={400}
+            className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-500"
+            data-ai-hint={salon.imageHint}
+          />
+        </Link>
         <div className="absolute top-3 left-3 flex gap-2">
             {salon.featured && <Badge variant="secondary" className="bg-pink-600 text-white border-none"><Zap className="h-3 w-3 mr-1" /> Featured</Badge>}
             {salon.verified && <Badge variant="secondary" className="bg-green-600 text-white border-none"><CheckCircle className="h-3 w-3 mr-1" /> Verified</Badge>}
@@ -77,8 +80,8 @@ const SalonCard = ({ salon }: SalonCardProps) => {
                     <MessageSquare className="h-4 w-4" />
                 </Link>
             </Button>
-            <Button asChild className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
-              <Link href={`/dashboard/customer/salon/${salon.id}`}>View</Link>
+            <Button onClick={() => onBookNow(salon)} className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+              Book Now
             </Button>
         </div>
       </CardFooter>
