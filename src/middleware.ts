@@ -11,22 +11,24 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // Define public and protected paths
-  const publicPaths = ['/login', '/signup', '/owner', '/'];
-  const isPublicPath = publicPaths.some(p => pathname.startsWith(p) && p !== '/') || pathname === '/';
+  // Define public paths that do not require authentication
+  const publicPaths = ['/login', '/signup', '/owner', '/']
   
-  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/signup');
+  const isPublicPath = publicPaths.some(p => {
+    if (p === '/') return pathname === '/';
+    return pathname.startsWith(p);
+  });
 
+  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/signup')
+
+  // If user is logged in
   if (session) {
-     const { data: { user } } = await supabase.auth.getUser();
-     const role = user?.user_metadata?.role;
-
-    // If user is logged in and tries to access login/signup, redirect to their dashboard
+    const role = session.user.user_metadata.role
+    
+    // If user is on an auth page (login/signup), redirect to their dashboard
     if (isAuthRoute) {
-        if (role === 'owner') {
-            return NextResponse.redirect(new URL('/dashboard/owner', request.url))
-        }
-        return NextResponse.redirect(new URL('/dashboard/customer', request.url))
+      const redirectUrl = role === 'owner' ? '/dashboard/owner' : '/dashboard/customer';
+      return NextResponse.redirect(new URL(redirectUrl, request.url));
     }
     
     // Role-based access control for dashboard routes
@@ -36,11 +38,10 @@ export async function middleware(request: NextRequest) {
     if (pathname.startsWith('/dashboard/customer') && role !== 'customer') {
       return NextResponse.redirect(new URL('/dashboard/owner', request.url))
     }
-
   } else {
-    // If there's no session and the user is trying to access a protected route
+    // If user is not logged in and is trying to access a protected route
     if (!isPublicPath) {
-       return NextResponse.redirect(new URL('/login', request.url))
+      return NextResponse.redirect(new URL('/login', request.url))
     }
   }
 
@@ -56,6 +57,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * Feel free to modify this pattern to include more paths.
      */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|auth/callback).*)',
   ],
 }

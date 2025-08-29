@@ -9,12 +9,12 @@ export async function GET(request: Request) {
   
   if (code) {
     const supabase = createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
-       const { data: { user } } = await supabase.auth.getUser();
+    const { error, data: { session } } = await supabase.auth.exchangeCodeForSession(code)
+    
+    if (!error && session) {
+       const role = session.user?.user_metadata?.role;
        revalidatePath('/', 'layout');
        
-       const role = user?.user_metadata?.role;
        if (role === 'owner') {
          return NextResponse.redirect(`${origin}/dashboard/owner`);
        }
