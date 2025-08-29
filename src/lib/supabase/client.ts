@@ -2,11 +2,11 @@
 "use client";
 
 import { createBrowserClient } from "@supabase/ssr";
-import { supabaseUrl, supabaseAnonKey } from "./config";
+import { supabasePublicUrl, supabasePublicAnonKey } from "./config";
 
 export function createClient() {
   return createBrowserClient(
-    supabaseUrl,
-    supabaseAnonKey
+    supabasePublicUrl,
+    supabasePublicAnonKey
   );
 }
