@@ -17,10 +17,6 @@ import CustomerDashboardHeader from '@/app/dashboard/customer/header';
 import { Home, Star, MessageSquare, Calendar, User, Settings, Sparkles, LogOut, LayoutDashboard, Search, Map } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { signOut } from '@/app/auth/actions';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
 
 export const metadata: Metadata = {
   title: 'Customer Dashboard - BeautyHub',
@@ -32,17 +28,6 @@ export default async function CustomerDashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore);
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return redirect('/login');
-  }
-
   return (
     <SidebarProvider>
       <div className="flex min-h-screen flex-col">
@@ -141,7 +126,7 @@ export default async function CustomerDashboardLayout({
             <SidebarFooter>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <form action={signOut} className="w-full">
+                  <form action={'/'} className="w-full">
                     <Button type="submit" variant="outline" className="w-full justify-start">
                         <LogOut className="mr-2" />
                         Sign Out

@@ -31,10 +31,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { signOut } from '@/app/auth/actions';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
 
 export const metadata: Metadata = {
   title: 'Salon Owner Dashboard - BeautyHub',
@@ -46,16 +42,6 @@ export default async function OwnerDashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore);
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return redirect('/login');
-  }
 
   return (
     <SidebarProvider>
@@ -172,7 +158,7 @@ export default async function OwnerDashboardLayout({
                   </Button>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <form action={signOut} className="w-full">
+                  <form action={'/'} className="w-full">
                     <Button type="submit" variant="outline" className="w-full justify-start">
                         <LogOut className="mr-2" />
                         Sign Out

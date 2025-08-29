@@ -7,7 +7,6 @@ import SalonCard from '@/components/salon-card';
 import { mockSalons } from '@/lib/mock-data';
 import { BookingSystem } from '@/components/booking-system';
 import type { Salon } from '@/lib/types';
-import { createClient } from '@/lib/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ExplorePage() {
@@ -16,28 +15,9 @@ export default function ExplorePage() {
     const [isBooking, setIsBooking] = useState(false);
     const [selectedSalonId, setSelectedSalonId] = useState<number | null>(null);
 
-    // Initialize Supabase client
-    const supabase = createClient();
-
     useEffect(() => {
       const fetchSalons = async () => {
         setLoading(true);
-        // In a real app, you would fetch from Supabase like this:
-        /*
-        const { data, error } = await supabase
-          .from('salons') // Assuming you have a 'salons' table
-          .select('*');
-
-        if (error) {
-          console.error('Error fetching salons:', error);
-          // For now, fall back to mock data on error
-          setSalons(mockSalons);
-        } else {
-          // You might need to map the data from Supabase to your Salon type
-          setSalons(data as Salon[]);
-        }
-        */
-        
         // Using mock data for now
         await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
         setSalons(mockSalons);
@@ -45,11 +25,11 @@ export default function ExplorePage() {
       };
 
       fetchSalons();
-    }, [supabase]);
+    }, []);
 
     const handleFilterChange = (filters: any) => {
         console.log('Applying filters:', filters);
-        // Filtering logic would be applied to the Supabase query in a real app
+        // Filtering logic would be applied in a real app
         setSalons(mockSalons);
     };
 

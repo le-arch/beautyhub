@@ -3,8 +3,6 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Menu, Sparkles } from 'lucide-react';
-import { createClient } from '@/lib/supabase/server';
-import { cookies } from 'next/headers';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -13,9 +11,6 @@ const navLinks = [
 ];
 
 const Header = async () => {
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
-  const { data: { session } } = await supabase.auth.getSession();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -44,11 +39,6 @@ const Header = async () => {
             </Link>
         </nav>
         <div className="hidden md:flex items-center gap-4">
-          {session ? (
-            <Button asChild>
-              <Link href="/dashboard/customer">Go to Dashboard</Link>
-            </Button>
-          ) : (
             <>
               <Button variant="ghost" asChild>
                 <Link href="/login">Log In</Link>
@@ -57,7 +47,6 @@ const Header = async () => {
                 <Link href="/signup">Sign Up</Link>
               </Button>
             </>
-          )}
         </div>
         <div className="md:hidden">
           <Sheet>
@@ -91,11 +80,6 @@ const Header = async () => {
                     </Link>
                 </nav>
                 <div className="flex flex-col gap-4">
-                  {session ? (
-                     <Button asChild>
-                      <Link href="/dashboard/customer">Go to Dashboard</Link>
-                    </Button>
-                  ) : (
                     <>
                       <Button variant="ghost" asChild>
                           <Link href="/login">Log In</Link>
@@ -104,7 +88,6 @@ const Header = async () => {
                         <Link href="/signup">Sign Up</Link>
                       </Button>
                     </>
-                  )}
                 </div>
               </div>
             </SheetContent>

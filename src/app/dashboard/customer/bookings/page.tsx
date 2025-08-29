@@ -8,12 +8,10 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, Star, AlertTriangle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function BookingsPage() {
-  const supabase = createClient();
   const [upcomingBookings, setUpcomingBookings] = useState<any[]>([]);
   const [pastBookings, setPastBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,48 +19,12 @@ export default function BookingsPage() {
 
   useEffect(() => {
     const fetchBookings = async () => {
-      setLoading(true);
-      setError(null);
-
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        setError("You must be logged in to view your bookings.");
-        setLoading(false);
-        return;
-      }
-
-      const { data, error: bookingsError } = await supabase
-        .from('bookings')
-        .select(`
-          id,
-          booking_time,
-          status,
-          service_name,
-          salons (
-            id,
-            name,
-            image
-          )
-        `)
-        .eq('user_id', user.id)
-        .order('booking_time', { ascending: false });
-
-      if (bookingsError) {
-        console.error('Error fetching bookings:', bookingsError);
-        setError('Could not fetch your bookings. Please try again later.');
-      } else {
-        const now = new Date();
-        const upcoming = data.filter(b => new Date(b.booking_time) >= now);
-        const past = data.filter(b => new Date(b.booking_time) < now);
-        setUpcomingBookings(upcoming);
-        setPastBookings(past);
-      }
       setLoading(false);
+      setError("Authentication is currently disabled. Booking data cannot be fetched.");
     };
 
     fetchBookings();
-  }, [supabase]);
+  }, []);
 
   const renderBookingCard = (booking: any) => (
     <Card key={booking.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4">
@@ -134,7 +96,7 @@ export default function BookingsPage() {
       {error && (
         <Alert variant="destructive" className="mb-8">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
+          <AlertTitle>Feature Disabled</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}

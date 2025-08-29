@@ -8,92 +8,22 @@ import { Heart, Search, Filter, AlertTriangle } from 'lucide-react';
 import SalonCard from '@/components/salon-card';
 import type { Salon } from '@/lib/types';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function FavoritesPage() {
-  const supabase = createClient();
   const [favoritedSalons, setFavoritedSalons] = useState<Salon[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<any | null>(null);
 
   useEffect(() => {
     const getFavorites = async () => {
-      setLoading(true);
-      setError(null);
-
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      setUser(authUser);
-
-      if (!authUser) {
-        setLoading(false);
-        return;
-      }
-
-      const { data: favoriteIds, error: favError } = await supabase
-        .from('favorites')
-        .select('salon_id')
-        .eq('user_id', authUser.id);
-
-      if (favError) {
-        console.error("Error fetching favorite IDs:", favError);
-        setError("Could not load your favorite salons.");
-        setLoading(false);
-        return;
-      }
-      
-      const salonIds = favoriteIds.map(f => f.salon_id);
-
-      if (salonIds.length === 0) {
-        setFavoritedSalons([]);
-        setLoading(false);
-        return;
-      }
-
-      const { data: salons, error: salonsError } = await supabase
-        .from('salons')
-        .select('*')
-        .in('id', salonIds);
-      
-      if (salonsError) {
-        console.error("Error fetching salons:", salonsError);
-        setError("Could not load your favorite salons' details.");
-      } else {
-        setFavoritedSalons(salons as Salon[]);
-      }
-
       setLoading(false);
+      setError("Authentication is currently disabled. Favorites cannot be fetched.");
     };
 
     getFavorites();
-  }, [supabase]);
-
-  if (!user && !loading) {
-    return (
-      <main className="flex-1 p-8 bg-gradient-beauty-secondary pt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-32">
-            <div className="w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Heart className="h-12 w-12 text-purple-600" />
-            </div>
-            <h1 className="text-3xl font-semibold text-warmgray-900 mb-4">
-              Sign in to view your favorites
-            </h1>
-            <p className="text-lg text-warmgray-600 mb-8 max-w-md mx-auto">
-              Create an account to save your favorite salons and access them anytime.
-            </p>
-            <Button 
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3"
-            >
-              Get Started
-            </Button>
-          </div>
-        </div>
-      </main>
-    );
-  }
+  }, []);
   
   return (
     <main className="flex-1 p-8 bg-gradient-beauty-secondary pt-16">
@@ -118,7 +48,7 @@ export default function FavoritesPage() {
         {error && (
             <Alert variant="destructive" className="mb-8">
                 <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>Feature Disabled</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
             </Alert>
         )}

@@ -9,12 +9,10 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User, Mail, Phone, MapPin, Camera, Edit, Save, Loader2, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { createClient } from '@/lib/supabase/client';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 export default function ProfilePage() {
   const { toast } = useToast();
-  const supabase = createClient();
 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -23,8 +21,8 @@ export default function ProfilePage() {
 
   const [user, setUser] = useState({
     id: '',
-    full_name: '',
-    email: '',
+    full_name: 'Beauty Lover',
+    email: 'beauty@example.com',
     phone: '',
     location: '',
     avatar_url: '',
@@ -32,41 +30,12 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      setLoading(true);
-      setError(null);
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-
-      if (authUser) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', authUser.id)
-          .single();
-
-        if (profileError && profileError.code !== 'PGRST116') { // Ignore "No rows found"
-          console.error("Error fetching profile:", profileError);
-          setError("Could not load your profile. Please try again later.");
-        } else if (profile) {
-          setUser({
-            id: profile.id,
-            full_name: profile.full_name || '',
-            email: authUser.email || '',
-            phone: profile.phone || '',
-            location: profile.location || '',
-            avatar_url: profile.avatar_url || '',
-          });
-        } else {
-            // Initialize with auth user data if no profile exists
-            setUser(prev => ({ ...prev, id: authUser.id, email: authUser.email || '' }));
-        }
-      } else {
-        setError("You need to be logged in to view your profile.");
-      }
       setLoading(false);
+      setError("Authentication is currently disabled. Profile data cannot be loaded or saved.");
     };
 
     fetchProfile();
-  }, [supabase]);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -76,41 +45,16 @@ export default function ProfilePage() {
   const handleSave = async () => {
     setSaving(true);
     setError(null);
-
-    const { data: { user: authUser } } = await supabase.auth.getUser();
-    if (!authUser) {
-        setError("Authentication error. Please log in again.");
-        setSaving(false);
-        return;
-    }
-
-    const { error: saveError } = await supabase
-      .from('profiles')
-      .upsert({
-        id: authUser.id,
-        full_name: user.full_name,
-        phone: user.phone,
-        location: user.location,
-        avatar_url: user.avatar_url,
-        updated_at: new Date().toISOString(),
-      });
     
-    setSaving(false);
+    // Mock save
+    await new Promise(resolve => setTimeout(resolve, 500));
 
-    if (saveError) {
-        console.error("Error saving profile:", saveError);
-        toast({
-            variant: 'destructive',
-            title: 'Update Failed',
-            description: 'Could not save your profile. Please try again.',
-        });
-    } else {
-        setIsEditing(false);
-        toast({
-            title: 'Profile Updated',
-            description: 'Your information has been successfully saved.',
-        });
-    }
+    setSaving(false);
+    setIsEditing(false);
+    toast({
+        title: 'Profile Updated',
+        description: 'Your information has been successfully saved.',
+    });
   };
 
   if (loading) {
@@ -128,7 +72,7 @@ export default function ProfilePage() {
         {error && (
             <Alert variant="destructive" className="mb-6">
                 <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>Feature Disabled</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
             </Alert>
         )}
