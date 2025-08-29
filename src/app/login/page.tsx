@@ -24,7 +24,8 @@ export default async function LoginPage({
   } = await supabase.auth.getSession()
 
   if (session) {
-    const role = session.user.user_metadata.role
+    const { data: { user } } = await supabase.auth.getUser()
+    const role = user?.user_metadata?.role
     if (role === 'owner') {
       return redirect('/dashboard/owner')
     }

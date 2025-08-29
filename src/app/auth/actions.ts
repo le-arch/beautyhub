@@ -12,13 +12,12 @@ export async function login(formData: FormData) {
 
   const data = Object.fromEntries(formData)
 
-  const { error } = await supabase.auth.signInWithPassword(data as any)
+  const { error, data: { user } } = await supabase.auth.signInWithPassword(data as any)
 
   if (error) {
     return redirect('/login?message=Could not authenticate user')
   }
 
-  const { data: { user } } = await supabase.auth.getUser();
   const role = user?.user_metadata?.role;
   
   revalidatePath('/', 'layout')
