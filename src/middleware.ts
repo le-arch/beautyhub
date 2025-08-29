@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(request: NextRequest) {
+  // This is a pass-through middleware. 
+  // It is not performing any session management to avoid runtime errors.
   return NextResponse.next({
     request: {
       headers: request.headers,
