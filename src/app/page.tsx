@@ -1,27 +1,5 @@
 
-'use client';
-
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import {
-  Search,
-  MapPin,
-  Star,
-  Heart,
-  MessageCircle,
-  Clock,
-  TrendingUp,
-  Navigation,
-  Sparkles
-} from 'lucide-react';
-import SalonCard from '@/components/salon-card';
-import Link from 'next/link';
-import Header from '@/components/header';
+import Header from '@/app/header';
 import Footer from '@/components/footer';
 import FeaturedCategories from '@/components/featured-categories';
 import TopRatedSalons from '@/components/top-rated-salons';

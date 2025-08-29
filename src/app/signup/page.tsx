@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Sparkles } from 'lucide-react'
 import { signup, signInWithGoogle } from '../auth/actions'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import Header from '../header'
 
 export default function SignupPage({
   searchParams,
@@ -19,19 +20,7 @@ export default function SignupPage({
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 max-w-7xl items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold text-foreground">
-              BeautyHub
-            </span>
-          </Link>
-          <Button asChild variant="outline">
-            <Link href="/login">Login</Link>
-          </Button>
-        </div>
-      </header>
+       <Header />
 
       <main className="flex-1 flex items-center justify-center p-4">
         <Card className="mx-auto max-w-sm w-full">
