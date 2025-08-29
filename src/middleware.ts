@@ -1,49 +1,41 @@
 
-import { type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 
 export async function middleware(request: NextRequest) {
   // This will refresh the session cookie if it's expired.
-  const response = await updateSession(request);
+  const { supabase, response } = await updateSession(request);
 
-  const { data: { user } } = await response.supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   const { pathname } = request.nextUrl;
 
-  // Define public paths that do not require authentication
-  const publicPaths = ['/login', '/signup', '/owner', '/'];
-
-  const isPublicPath = publicPaths.some(p => {
-    if (p === '/') return pathname === '/';
-    return pathname.startsWith(p);
-  });
-  
   const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/signup');
+  const isDashboardRoute = pathname.startsWith('/dashboard');
 
-  // If the user is logged in
   if (user) {
     const role = user.user_metadata?.role;
-
-    // If user is on an auth page, redirect them to their dashboard
+    
+    // If user is logged in and tries to access login/signup, redirect to their dashboard
     if (isAuthRoute) {
       const redirectUrl = role === 'owner' ? '/dashboard/owner' : '/dashboard/customer';
-      return Response.redirect(new URL(redirectUrl, request.url));
+      return NextResponse.redirect(new URL(redirectUrl, request.url));
     }
 
     // Role-based access control for dashboard routes
     if (pathname.startsWith('/dashboard/owner') && role !== 'owner') {
-      return Response.redirect(new URL('/dashboard/customer', request.url));
+      return NextResponse.redirect(new URL('/dashboard/customer', request.url));
     }
     if (pathname.startsWith('/dashboard/customer') && role !== 'customer') {
-      return Response.redirect(new URL('/dashboard/owner', request.url));
+      return NextResponse.redirect(new URL('/dashboard/owner', request.url));
     }
-    
   } else {
-    // If user is not logged in and trying to access a protected route
-    if (pathname.startsWith('/dashboard')) {
-        return Response.redirect(new URL('/login', request.url));
+    // If user is not logged in and tries to access a protected dashboard route
+    if (isDashboardRoute) {
+      return NextResponse.redirect(new URL('/login', request.url));
     }
   }
 
+  // If no other condition is met, continue the request chain
   return response;
 }
 
@@ -54,6 +46,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - auth/callback (Supabase auth callback)
      * Feel free to modify this pattern to include more paths.
      */
     '/((?!_next/static|_next/image|favicon.ico|auth/callback).*)',
