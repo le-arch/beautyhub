@@ -7,16 +7,19 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import Header from '../header'
 import { signup } from '../auth/actions'
 import { SubmitButton } from '../login/submit-button'
+import { createClient } from '@/lib/supabase/server'
 
-export default function SignupPage({
+export default async function SignupPage({
   searchParams,
 }: {
   searchParams: { message: string }
 }) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-       <Header />
+       <Header user={user}/>
 
       <main className="flex-1 flex items-center justify-center p-4">
         <Card className="mx-auto max-w-sm w-full">

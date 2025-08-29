@@ -7,15 +7,19 @@ import { Button } from '@/components/ui/button'
 import Header from '../header'
 import { login } from '../auth/actions'
 import { SubmitButton } from './submit-button'
+import { createClient } from '@/lib/supabase/server'
 
-export default function LoginPage({
+export default async function LoginPage({
   searchParams,
 }: {
   searchParams: { message: string }
 }) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
-       <Header />
+       <Header user={user} />
 
       <main className="flex-1 flex items-center justify-center p-4">
         <Card className="mx-auto max-w-sm w-full">
