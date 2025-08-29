@@ -1,3 +1,4 @@
+
 'use server'
 
 import { revalidatePath } from 'next/cache'
@@ -18,7 +19,15 @@ export async function login(formData: FormData) {
     return redirect('/login?message=Could not authenticate user')
   }
 
+  const { data: { user } } = await supabase.auth.getUser();
+  const role = user?.user_metadata?.role;
+  
   revalidatePath('/', 'layout')
+
+  if (role === 'owner') {
+    return redirect('/dashboard/owner');
+  }
+
   return redirect('/dashboard/customer')
 }
 
@@ -47,10 +56,10 @@ export async function signup(formData: FormData) {
   
   revalidatePath('/', 'layout')
 
-  if (role === 'owner') {
-    return redirect('/dashboard/owner?message=Check email to continue sign in process');
-  }
-  return redirect('/dashboard/customer?message=Check email to continue sign in process');
+  // After signup, Supabase sends a confirmation email. 
+  // The user will be redirected upon clicking the link in the email.
+  // We can redirect them to a page informing them to check their email.
+  return redirect('/login?message=Check your email to complete the signup process');
 }
 
 export async function signInWithGoogle() {
@@ -59,6 +68,13 @@ export async function signInWithGoogle() {
         provider: 'google',
         options: {
             redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+            // You can add user metadata here if needed, but role selection
+            // is best handled in a multi-step signup or a profile setup page
+            // after the initial OAuth. For now, we'll assign a default role
+            // or let them choose on first login. Let's assume 'customer' for now.
+             queryParams: {
+                prompt: 'consent',
+             }
         },
     });
 

@@ -1,3 +1,4 @@
+
 import Link from 'next/link'
 import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
@@ -10,11 +11,24 @@ import { Button } from '@/components/ui/button'
 import { Sparkles, User, Building } from 'lucide-react'
 import { login, signInWithGoogle } from '../auth/actions'
 
-export default function LoginPage({
+export default async function LoginPage({
   searchParams,
 }: {
   searchParams: { message: string }
 }) {
+  const supabase = createClient()
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (session) {
+    const role = session.user.user_metadata.role
+    if (role === 'owner') {
+      return redirect('/dashboard/owner')
+    }
+    return redirect('/dashboard/customer')
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -41,7 +55,7 @@ export default function LoginPage({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form className="grid gap-4">
+            <form className="grid gap-4" action={login}>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -62,7 +76,6 @@ export default function LoginPage({
                 <Input id="password" name="password" type="password" required />
               </div>
               <SubmitButton
-                formAction={login}
                 className="w-full"
                 pendingText="Signing In..."
               >
@@ -84,8 +97,8 @@ export default function LoginPage({
                   </span>
               </div>
             </div>
-            <form>
-              <Button formAction={signInWithGoogle} variant="outline" className="w-full">
+            <form action={signInWithGoogle}>
+              <Button variant="outline" className="w-full">
                   Login with Google
               </Button>
             </form>

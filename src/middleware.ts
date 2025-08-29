@@ -1,3 +1,4 @@
+
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/middleware'
 
@@ -10,8 +11,20 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // Protected routes
-  if (pathname.startsWith('/dashboard')) {
+  const protectedPaths = ['/dashboard', '/owner']
+
+  // Redirect logged-in users from auth pages to their respective dashboards
+  if (session && (pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname === '/owner')) {
+     const { data: { user } } = await supabase.auth.getUser();
+     const role = user?.user_metadata?.role;
+     if (role === 'owner') {
+       return NextResponse.redirect(new URL('/dashboard/owner', request.url))
+     }
+     return NextResponse.redirect(new URL('/dashboard/customer', request.url))
+  }
+  
+  // Protect dashboard routes
+  if (protectedPaths.some(path => pathname.startsWith(path))) {
     if (!session) {
       // Redirect to login if no session
       return NextResponse.redirect(new URL('/login', request.url))
@@ -27,11 +40,6 @@ export async function middleware(request: NextRequest) {
     if (pathname.startsWith('/dashboard/customer') && role !== 'customer') {
       return NextResponse.redirect(new URL('/dashboard/owner', request.url))
     }
-  }
-
-  // Redirect logged-in users from auth pages
-  if (session && (pathname.startsWith('/login') || pathname.startsWith('/signup'))) {
-     return NextResponse.redirect(new URL('/dashboard/customer', request.url))
   }
 
 
