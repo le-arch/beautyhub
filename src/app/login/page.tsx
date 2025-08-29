@@ -1,5 +1,6 @@
 
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { SubmitButton } from './submit-button'
@@ -15,7 +16,8 @@ export default async function LoginPage({
 }: {
   searchParams: { message: string }
 }) {
-  const supabase = createClient()
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
 
   const {
     data: { session },

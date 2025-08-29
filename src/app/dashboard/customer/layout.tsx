@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { signOut } from '@/app/auth/actions';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 export const metadata: Metadata = {
   title: 'Customer Dashboard - BeautyHub',
@@ -31,7 +32,8 @@ export default async function CustomerDashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createClient();
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore);
 
   const {
     data: { user },

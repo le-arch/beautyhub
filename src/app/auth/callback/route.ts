@@ -1,5 +1,6 @@
 
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache';
 
@@ -8,7 +9,8 @@ export async function GET(request: Request) {
   const code = searchParams.get('code')
   
   if (code) {
-    const supabase = createClient()
+    const cookieStore = cookies()
+    const supabase = createClient(cookieStore)
     const { error, data: { session } } = await supabase.auth.exchangeCodeForSession(code)
     
     if (!error && session) {
