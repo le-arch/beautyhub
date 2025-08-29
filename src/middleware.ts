@@ -9,86 +9,64 @@ export async function middleware(request: NextRequest) {
     },
   })
 
+  // IMPORTANT: The Supabase client is created with placeholder credentials.
+  // You must replace them with your actual Supabase URL and Anon Key for Google OAuth to work.
+  // These are placeholders to resolve the "Invalid URL" error during development.
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL || "YOUR_SUPABASE_URL_HERE",
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! || "YOUR_SUPABASE_ANON_KEY_HERE",
     {
       cookies: {
         get(name: string) {
           return request.cookies.get(name)?.value
         },
         set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          })
+          request.cookies.set({ name, value, ...options })
           response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
+            request: { headers: request.headers },
           })
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          })
+          response.cookies.set({ name, value, ...options })
         },
         remove(name: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
+          request.cookies.set({ name, value: '', ...options })
           response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
+            request: { headers: request.headers },
           })
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
+          response.cookies.set({ name, value: '', ...options })
         },
       },
     }
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  const { pathname } = request.nextUrl
+  const { data: { session } } = await supabase.auth.getSession();
+  const { pathname } = request.nextUrl;
 
-  // Define protected routes
   const protectedRoutes = ['/dashboard'];
+  const authRoutes = ['/login', '/signup'];
 
   const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
+  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
 
-  if (!user && isProtectedRoute) {
-    // If no user and trying to access a protected route, redirect to login
-    return NextResponse.redirect(new URL('/login', request.url))
+  if (!session && isProtectedRoute) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
-  
-  if (user) {
-    const role = user.user_metadata?.role;
-    const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/signup');
 
+  if (session) {
+    const role = session.user.user_metadata?.role;
+    const redirectUrl = role === 'owner' ? '/dashboard/owner' : '/dashboard/customer';
+    
     if (isAuthRoute) {
-      // If user is logged in and tries to access login/signup, redirect to their dashboard
-      const redirectUrl = role === 'owner' ? '/dashboard/owner' : '/dashboard/customer';
       return NextResponse.redirect(new URL(redirectUrl, request.url));
     }
     
-    // Role-based access control for dashboard routes
     if (pathname.startsWith('/dashboard/owner') && role !== 'owner') {
       return NextResponse.redirect(new URL('/dashboard/customer', request.url));
     }
+    
     if (pathname.startsWith('/dashboard/customer') && role !== 'customer') {
-      return NextResponse.redirect(new URL('/dashboard/owner', request.url));
+       return NextResponse.redirect(new URL('/dashboard/owner', request.url));
     }
   }
-
 
   return response
 }
