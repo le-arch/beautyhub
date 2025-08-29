@@ -11,37 +11,38 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  const protectedPaths = ['/dashboard', '/owner']
+  // Define public and protected paths
+  const publicPaths = ['/login', '/signup', '/owner', '/'];
+  const isPublicPath = publicPaths.some(p => pathname.startsWith(p) && p !== '/') || pathname === '/';
+  
+  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/signup');
 
-  // Redirect logged-in users from auth pages to their respective dashboards
-  if (session && (pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname === '/owner')) {
+  if (session) {
      const { data: { user } } = await supabase.auth.getUser();
      const role = user?.user_metadata?.role;
-     if (role === 'owner') {
-       return NextResponse.redirect(new URL('/dashboard/owner', request.url))
-     }
-     return NextResponse.redirect(new URL('/dashboard/customer', request.url))
-  }
-  
-  // Protect dashboard routes
-  if (protectedPaths.some(path => pathname.startsWith(path))) {
-    if (!session) {
-      // Redirect to login if no session
-      return NextResponse.redirect(new URL('/login', request.url))
+
+    // If user is logged in and tries to access login/signup, redirect to their dashboard
+    if (isAuthRoute) {
+        if (role === 'owner') {
+            return NextResponse.redirect(new URL('/dashboard/owner', request.url))
+        }
+        return NextResponse.redirect(new URL('/dashboard/customer', request.url))
     }
-
-    const { data: { user } } = await supabase.auth.getUser();
-    const role = user?.user_metadata?.role;
-
-    // Role-based access control
+    
+    // Role-based access control for dashboard routes
     if (pathname.startsWith('/dashboard/owner') && role !== 'owner') {
       return NextResponse.redirect(new URL('/dashboard/customer', request.url))
     }
     if (pathname.startsWith('/dashboard/customer') && role !== 'customer') {
       return NextResponse.redirect(new URL('/dashboard/owner', request.url))
     }
-  }
 
+  } else {
+    // If there's no session and the user is trying to access a protected route
+    if (!isPublicPath) {
+       return NextResponse.redirect(new URL('/login', request.url))
+    }
+  }
 
   return response
 }

@@ -9,11 +9,9 @@ import { createClient } from '@/lib/supabase/server'
 export async function login(formData: FormData) {
   const supabase = createClient()
 
-  // type-casting here for convenience
-  // in a real app you should validate requests
   const data = Object.fromEntries(formData)
 
-  const { error } = await supabase.auth.signInWithPassword(data)
+  const { error } = await supabase.auth.signInWithPassword(data as any)
 
   if (error) {
     return redirect('/login?message=Could not authenticate user')
@@ -54,10 +52,27 @@ export async function signup(formData: FormData) {
     return redirect('/signup?message=Could not authenticate user. Please try again.')
   }
   
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Create a profile entry
+  if (user) {
+      const { error: profileError } = await supabase.from('profiles').insert({
+          id: user.id,
+          full_name: data.full_name as string,
+          email: user.email,
+          role: role,
+      });
+
+      if (profileError) {
+          console.error('Error creating profile:', profileError);
+          // Optional: handle profile creation error, maybe delete the user
+          // or redirect to an error page. For now, we'll proceed.
+      }
+  }
+  
   revalidatePath('/', 'layout')
 
   // After signup, Supabase sends a confirmation email. 
-  // The user will be redirected upon clicking the link in the email.
   // We can redirect them to a page informing them to check their email.
   return redirect('/login?message=Check your email to complete the signup process');
 }
@@ -67,14 +82,11 @@ export async function signInWithGoogle() {
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-            // You can add user metadata here if needed, but role selection
-            // is best handled in a multi-step signup or a profile setup page
-            // after the initial OAuth. For now, we'll assign a default role
-            // or let them choose on first login. Let's assume 'customer' for now.
-             queryParams: {
+            redirectTo: `http://localhost:9002/auth/callback`, // Make sure this is the correct URL for local dev
+            queryParams: {
                 prompt: 'consent',
-             }
+                access_type: 'offline'
+            }
         },
     });
 
