@@ -32,17 +32,29 @@ import {
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { signOut } from '@/app/auth/actions';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'Salon Owner Dashboard - BeautyHub',
   description: 'Manage your salon, bookings, and services.',
 };
 
-export default function OwnerDashboardLayout({
+export default async function OwnerDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return redirect('/login');
+  }
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen flex-col">

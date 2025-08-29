@@ -18,17 +18,29 @@ import { Home, Star, MessageSquare, Calendar, User, Settings, Sparkles, LogOut, 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { signOut } from '@/app/auth/actions';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'Customer Dashboard - BeautyHub',
   description: 'Manage your appointments and favorites.',
 };
 
-export default function CustomerDashboardLayout({
+export default async function CustomerDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return redirect('/login');
+  }
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen flex-col">
