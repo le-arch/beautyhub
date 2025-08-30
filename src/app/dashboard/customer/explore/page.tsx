@@ -14,36 +14,63 @@ export default function ExplorePage() {
     const [salons, setSalons] = useState<Salon[]>([]);
     const [loading, setLoading] = useState(true);
     const [isBooking, setIsBooking] = useState(false);
-    const [selectedSalonId, setSelectedSalonId] = useState<number | null>(null);
+    const [selectedSalon, setSelectedSalon] = useState<Salon | null>(null);
     const supabase = createClient();
 
     useEffect(() => {
       const fetchSalons = async () => {
         setLoading(true);
-        // In a real app, you'd fetch from your DB
-        // For now, we use mock data but simulate a fetch
-        await new Promise(resolve => setTimeout(resolve, 500)); 
-        setSalons(mockSalons);
+        const { data, error } = await supabase.from('salons').select(`
+          *,
+          services (*),
+          gallery (*)
+        `);
+        
+        if (error) {
+          console.error('Error fetching salons:', error);
+        } else {
+          setSalons(data as Salon[]);
+        }
         setLoading(false);
       };
 
       fetchSalons();
     }, []);
 
-    const handleFilterChange = (filters: any) => {
-        console.log('Applying filters:', filters);
-        // Filtering logic would be applied in a real app
-        setSalons(mockSalons);
+    const handleFilterChange = async (filters: any) => {
+        setLoading(true);
+        let query = supabase.from('salons').select(`
+            *,
+            services (*),
+            gallery (*)
+        `);
+
+        if (filters.query) {
+            query = query.ilike('name', `%${filters.query}%`);
+        }
+
+        if (filters.category && filters.category !== 'All') {
+            query = query.filter('services.name', 'ilike', `%${filters.category}%`);
+        }
+        
+        const { data, error } = await query;
+        
+        if (error) {
+            console.error('Error filtering salons:', error);
+        } else {
+            setSalons(data as Salon[]);
+        }
+        setLoading(false);
     };
 
     const handleBookNow = (salon: Salon) => {
-        setSelectedSalonId(salon.id);
+        setSelectedSalon(salon);
         setIsBooking(true);
     };
 
     const handleCloseBooking = () => {
         setIsBooking(false);
-        setSelectedSalonId(null);
+        setSelectedSalon(null);
     };
 
     return (
@@ -66,8 +93,8 @@ export default function ExplorePage() {
                     )}
                 </div>
             </main>
-            {isBooking && selectedSalonId && (
-                <BookingSystem salonId={selectedSalonId} onClose={handleCloseBooking} />
+            {isBooking && selectedSalon && (
+                <BookingSystem salon={selectedSalon} onClose={handleCloseBooking} />
             )}
         </>
     );
