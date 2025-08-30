@@ -19,7 +19,7 @@ export default async function SignupPage({
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-       <Header user={user}/>
+       <Header />
 
       <main className="flex-1 flex items-center justify-center p-4">
         <Card className="mx-auto max-w-sm w-full">

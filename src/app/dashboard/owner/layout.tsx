@@ -61,7 +61,7 @@ export default async function OwnerDashboardLayout({
   return (
     <SidebarProvider>
       <div className="flex min-h-screen flex-col">
-        <OwnerDashboardHeader user={user} />
+        <OwnerDashboardHeader />
         <div className="flex flex-1">
           <Sidebar>
             <SidebarContent>
