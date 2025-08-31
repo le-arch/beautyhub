@@ -36,7 +36,7 @@ export async function signup(formData: FormData) {
   const fullName = formData.get('full_name') as string;
   const supabase = createClient()
 
-  const { error } = await supabase.auth.signUp({
+  const { error, data: { user } } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -44,14 +44,33 @@ export async function signup(formData: FormData) {
       data: {
         full_name: fullName,
         role: role,
+        avatar_url: `https://i.pravatar.cc/150?u=${email}`
       }
     },
-  })
+  });
 
   if (error) {
     console.error('Signup error:', error);
     return redirect(`/signup?message=${error.message}`)
   }
+
+  if (user && role === 'owner') {
+    const { error: salonError } = await supabase.from('salons').insert({
+        owner_id: user.id,
+        name: `${fullName}'s Salon`,
+        location: 'Please update your location',
+        image: 'https://placehold.co/600x400.png',
+        imageHint: 'modern salon interior',
+        rating: 0,
+        reviews: 0,
+        startingPrice: 0,
+    });
+    if (salonError) {
+        console.error('Error creating salon:', salonError);
+        return redirect(`/signup?message=Could not create salon profile. Please contact support.`);
+    }
+  }
+
 
   return redirect('/login?message=Check email to continue sign in process')
 }

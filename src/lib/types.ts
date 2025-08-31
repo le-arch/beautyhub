@@ -1,3 +1,20 @@
+
+import type { User } from "@supabase/supabase-js";
+
+export interface Service {
+  id: number;
+  name: string;
+  price: number;
+  duration: number; // in minutes
+}
+
+export interface GalleryItem {
+  id: number;
+  url: string;
+  hint: string;
+  type: 'image' | 'video';
+}
+
 export interface Salon {
   id: number;
   name: string;
@@ -7,10 +24,14 @@ export interface Salon {
   rating: number;
   reviews: number;
   startingPrice: number;
-  services: { id: number; name: string; price: number, duration: number }[];
-  gallery: { id: number; url: string; hint: string; type: 'image' | 'video' }[];
+  services: Service[];
+  gallery: GalleryItem[];
   verified?: boolean;
   featured?: boolean;
+  owner_id?: string;
+  specialties?: string[];
+  distance?: string;
+  responseTime?: string;
 }
 
 export interface BlogPost {
@@ -43,4 +64,27 @@ export interface Conversation {
   timestamp: string;
   unreadCount: number;
   messages: Message[];
+}
+
+export interface Booking {
+    id: string;
+    created_at: string;
+    user_id: string;
+    salon_id: number;
+    service_name: string;
+    booking_time: string;
+    total_price: number;
+    deposit_paid: boolean;
+    notes: string | null;
+    status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled';
+    salons: Pick<Salon, 'name' | 'image'> | null;
+}
+
+export interface Profile {
+  id: string;
+  full_name: string;
+  avatar_url: string | null;
+  phone: string | null;
+  location: string | null;
+  email?: string;
 }

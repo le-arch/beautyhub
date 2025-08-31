@@ -17,6 +17,7 @@ import CustomerDashboardHeader from '@/app/dashboard/customer/header';
 import { Home, Star, MessageSquare, Calendar, User, Settings, Sparkles, LogOut, LayoutDashboard, Search, Map } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { logout } from '@/app/auth/actions';
 
 export const metadata: Metadata = {
   title: 'Customer Dashboard - BeautyHub',
@@ -126,7 +127,7 @@ export default async function CustomerDashboardLayout({
             <SidebarFooter>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <form action={'/'} className="w-full">
+                  <form action={logout} className="w-full">
                     <Button type="submit" variant="outline" className="w-full justify-start">
                         <LogOut className="mr-2" />
                         Sign Out
