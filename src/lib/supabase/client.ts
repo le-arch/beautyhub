@@ -26,12 +26,15 @@ export function createClient() {
             insert: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
             update: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
             delete: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
-            filter: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
-            ilike: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
+            filter: () => ({ data: null, error: { message: 'Supabase not configured' } }),
+            ilike: () => ({ data: null, error: { message: 'Supabase not configured' } }),
         }),
         auth: {
             onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
             getUser: async () => ({ data: { user: null }, error: null }),
+            signInWithPassword: async () => ({ data: { user: null }, error: { message: 'Supabase not configured' } }),
+            signUp: async () => ({ data: { user: null }, error: { message: 'Supabase not configured' } }),
+            signOut: async () => ({ error: null }),
         },
     } as any;
   }
