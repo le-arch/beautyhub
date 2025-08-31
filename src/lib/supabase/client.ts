@@ -18,7 +18,7 @@ export function createClient() {
   ) {
     // Return a mock client or throw an error if you want to handle this case explicitly
     // For now, we'll return a minimal object to avoid crashing the app.
-    console.error("Supabase environment variables are not set.");
+    console.error("Supabase environment variables are not set. Please check your .env file.");
     // A mock client to prevent app crash
     return {
         from: () => ({
@@ -26,6 +26,8 @@ export function createClient() {
             insert: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
             update: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
             delete: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
+            filter: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
+            ilike: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
         }),
         auth: {
             onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
