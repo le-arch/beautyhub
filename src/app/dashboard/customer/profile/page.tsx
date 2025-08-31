@@ -13,6 +13,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/lib/types';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ProfilePage() {
   const { toast } = useToast();
@@ -26,11 +27,11 @@ export default function ProfilePage() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
 
-  const fetchProfile = useCallback(async (user: SupabaseUser) => {
+  const fetchProfileData = useCallback(async (userId: string) => {
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
-      .eq('id', user.id)
+      .eq('id', userId)
       .single();
 
     if (error) {
@@ -43,18 +44,19 @@ export default function ProfilePage() {
   }, [supabase]);
 
   useEffect(() => {
-    const getUserAndProfile = async () => {
+    const fetchUser = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (authUser) {
         setUser(authUser);
-        fetchProfile(authUser);
+        fetchProfileData(authUser.id);
       } else {
-        setError("You are not logged in.");
+        setError("You must be logged in to view your profile.");
         setLoading(false);
       }
     };
-    getUserAndProfile();
-  }, [supabase, fetchProfile]);
+    fetchUser();
+  }, [supabase.auth, fetchProfileData]);
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -97,9 +99,44 @@ export default function ProfilePage() {
     setSaving(false);
   };
   
-  if (loading) {
-    return <div className="p-8">Loading profile...</div>;
-  }
+  const renderSkeleton = () => (
+    <Card className="border-purple-100 shadow-lg">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <Skeleton className="h-8 w-48 mb-2" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+        <Skeleton className="h-10 w-28" />
+      </CardHeader>
+      <CardContent className="space-y-8">
+        <div className="flex items-center gap-6">
+          <Skeleton className="h-24 w-24 rounded-full" />
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-40" />
+            <Skeleton className="h-5 w-52" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+           <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-gradient-beauty-secondary">
@@ -109,7 +146,7 @@ export default function ProfilePage() {
           <p className="text-lg text-warmgray-600">View and manage your personal details.</p>
         </div>
         
-        {error && (
+        {error && !loading && (
             <Alert variant="destructive" className="mb-6">
                 <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>Error</AlertTitle>
@@ -117,7 +154,7 @@ export default function ProfilePage() {
             </Alert>
         )}
         
-        {profile && user && (
+        {loading ? renderSkeleton() : profile && user && (
           <Card className="border-purple-100 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
@@ -166,7 +203,7 @@ export default function ProfilePage() {
                   </Label>
                   <Input 
                     id="full_name" 
-                    value={profile.full_name}
+                    value={profile.full_name || ''}
                     onChange={handleInputChange}
                     disabled={!isEditing || saving}
                     className="bg-warmgray-50 border-purple-200 disabled:opacity-70"

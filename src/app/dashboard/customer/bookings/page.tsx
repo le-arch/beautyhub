@@ -12,6 +12,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { createClient } from '@/lib/supabase/client';
 import type { Booking } from '@/lib/types';
+import type { User } from '@supabase/supabase-js';
 
 export default function BookingsPage() {
   const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
@@ -19,19 +20,9 @@ export default function BookingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
+  const [user, setUser] = useState<User | null>(null);
 
-  const fetchBookings = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      setError("You must be logged in to view your bookings.");
-      setLoading(false);
-      return;
-    }
-
+  const fetchBookingsForUser = useCallback(async (userId: string) => {
     const { data, error: fetchError } = await supabase
       .from('bookings')
       .select(`
@@ -41,7 +32,7 @@ export default function BookingsPage() {
           image
         )
       `)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .order('booking_time', { ascending: false });
 
     if (fetchError) {
@@ -58,8 +49,22 @@ export default function BookingsPage() {
   }, [supabase]);
 
   useEffect(() => {
-    fetchBookings();
-  }, [fetchBookings]);
+    const getUserAndBookings = async () => {
+      setLoading(true);
+      setError(null);
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+
+      if (authUser) {
+        setUser(authUser);
+        await fetchBookingsForUser(authUser.id);
+      } else {
+        setError("You must be logged in to view your bookings.");
+        setLoading(false);
+      }
+    };
+    getUserAndBookings();
+  }, [supabase.auth, fetchBookingsForUser]);
+
 
   const renderBookingCard = (booking: Booking) => (
     <Card key={booking.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4">
@@ -128,7 +133,7 @@ export default function BookingsPage() {
     <main className="flex-1 p-4 sm:p-6 lg:p-8">
       <h1 className="text-3xl font-bold mb-8">My Bookings</h1>
       
-      {error && (
+      {error && !loading && (
         <Alert variant="destructive" className="mb-8">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>

@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import type { User } from '@supabase/supabase-js';
 
 export default function FavoritesPage() {
   const [favoritedSalons, setFavoritedSalons] = useState<Salon[]>([]);
@@ -18,18 +19,9 @@ export default function FavoritesPage() {
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
   const { toast } = useToast();
+  const [user, setUser] = useState<User | null>(null);
 
-  const getFavorites = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      setError("You must be logged in to view your favorites.");
-      setLoading(false);
-      return;
-    }
-
+  const fetchFavoritesForUser = useCallback(async (userId: string) => {
     const { data, error: fetchError } = await supabase
       .from('favorites')
       .select(`
@@ -49,7 +41,7 @@ export default function FavoritesPage() {
           gallery:gallery (id, url, hint, type)
         )
       `)
-      .eq('user_id', user.id);
+      .eq('user_id', userId);
 
     if (fetchError) {
       console.error("Error fetching favorites:", fetchError);
@@ -62,8 +54,21 @@ export default function FavoritesPage() {
   }, [supabase]);
 
   useEffect(() => {
-    getFavorites();
-  }, [getFavorites]);
+    const getUserAndFavorites = async () => {
+      setLoading(true);
+      setError(null);
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+
+      if (authUser) {
+        setUser(authUser);
+        await fetchFavoritesForUser(authUser.id);
+      } else {
+        setError("You must be logged in to view your favorites.");
+        setLoading(false);
+      }
+    };
+    getUserAndFavorites();
+  }, [supabase.auth, fetchFavoritesForUser]);
 
   const handleBookNow = (salon: Salon) => {
     // This would typically open a booking modal or navigate to the salon's booking page
@@ -91,7 +96,7 @@ export default function FavoritesPage() {
           </div>
         </div>
 
-        {error && (
+        {error && !loading && (
             <Alert variant="destructive" className="mb-8">
                 <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>Error</AlertTitle>
