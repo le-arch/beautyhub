@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,23 +10,58 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
+import { createClient } from '@/lib/supabase/client';
+import type { Booking } from '@/lib/types';
 
 export default function BookingsPage() {
-  const [upcomingBookings, setUpcomingBookings] = useState<any[]>([]);
-  const [pastBookings, setPastBookings] = useState<any[]>([]);
+  const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
+  const [pastBookings, setPastBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const supabase = createClient();
+
+  const fetchBookings = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      setError("You must be logged in to view your bookings.");
+      setLoading(false);
+      return;
+    }
+
+    const { data, error: fetchError } = await supabase
+      .from('bookings')
+      .select(`
+        *,
+        salons (
+          name,
+          image
+        )
+      `)
+      .eq('user_id', user.id)
+      .order('booking_time', { ascending: false });
+
+    if (fetchError) {
+      console.error('Error fetching bookings:', fetchError);
+      setError('Could not fetch your bookings. Please try again later.');
+    } else {
+      const now = new Date();
+      const upcoming = data.filter(b => new Date(b.booking_time) >= now);
+      const past = data.filter(b => new Date(b.booking_time) < now);
+      setUpcomingBookings(upcoming);
+      setPastBookings(past);
+    }
+    setLoading(false);
+  }, [supabase]);
 
   useEffect(() => {
-    const fetchBookings = async () => {
-      setLoading(false);
-      setError("Authentication is currently disabled. Booking data cannot be fetched.");
-    };
-
     fetchBookings();
-  }, []);
+  }, [fetchBookings]);
 
-  const renderBookingCard = (booking: any) => (
+  const renderBookingCard = (booking: Booking) => (
     <Card key={booking.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4">
       <Image 
         src={booking.salons?.image || 'https://placehold.co/100x100.png'}
@@ -96,7 +131,7 @@ export default function BookingsPage() {
       {error && (
         <Alert variant="destructive" className="mb-8">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Feature Disabled</AlertTitle>
+          <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
@@ -121,7 +156,7 @@ export default function BookingsPage() {
                <div className="text-center py-12 border-2 border-dashed rounded-lg">
                 <h3 className="text-lg font-medium text-muted-foreground">You have no upcoming appointments.</h3>
                 <Button className="mt-4" asChild>
-                  <Link href="/dashboard/customer">Book a Service</Link>
+                  <Link href="/dashboard/customer/explore">Book a Service</Link>
                 </Button>
               </div>
             )}
@@ -143,7 +178,7 @@ export default function BookingsPage() {
                 {pastBookings.map(renderBookingCard)}
               </div>
             ) : (
-              <p className="text-center text-muted-foreground py-12">Your past appointments will appear here.</p>
+              !error && <p className="text-center text-muted-foreground py-12">Your past appointments will appear here.</p>
             )}
           </CardContent>
         </Card>

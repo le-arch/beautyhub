@@ -1,15 +1,16 @@
 
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
+import { useState, useEffect, useCallback } from 'react';
 import type { Salon } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Star, Heart, Zap, CheckCircle, MessageSquare } from 'lucide-react';
+import { MapPin, Star, Heart, Zap, CheckCircle, MessageSquare, Loader2 } from 'lucide-react';
 import ImageWithFallback from './image-with-fallback';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface SalonCardProps {
   salon: Salon & { specialties?: string[], featured?: boolean, verified?: boolean, distance?: string, responseTime?: string };
@@ -18,11 +19,82 @@ interface SalonCardProps {
 
 const SalonCard = ({ salon, onBookNow }: SalonCardProps) => {
   const [isFavorited, setIsFavorited] = useState(false);
+  const [isFavoriteLoading, setIsFavoriteLoading] = useState(true);
+  const supabase = createClient();
+  const { toast } = useToast();
 
-  const toggleFavorite = (e: React.MouseEvent) => {
+  const checkFavoriteStatus = useCallback(async () => {
+    setIsFavoriteLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setIsFavoriteLoading(false);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('favorites')
+      .select('salon_id')
+      .eq('user_id', user.id)
+      .eq('salon_id', salon.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error checking favorite status:', error.message);
+    } else {
+      setIsFavorited(!!data);
+    }
+    setIsFavoriteLoading(false);
+  }, [supabase, salon.id]);
+
+  useEffect(() => {
+    checkFavoriteStatus();
+  }, [checkFavoriteStatus]);
+
+
+  const toggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsFavorited(!isFavorited);
+    setIsFavoriteLoading(true);
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Not logged in",
+        description: "You need to be logged in to favorite a salon.",
+      });
+      setIsFavoriteLoading(false);
+      return;
+    }
+
+    if (isFavorited) {
+      // Remove from favorites
+      const { error } = await supabase
+        .from('favorites')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('salon_id', salon.id);
+      
+      if (error) {
+        toast({ variant: "destructive", title: "Error", description: "Could not remove from favorites." });
+      } else {
+        setIsFavorited(false);
+        toast({ title: "Removed from favorites." });
+      }
+    } else {
+      // Add to favorites
+      const { error } = await supabase
+        .from('favorites')
+        .insert({ user_id: user.id, salon_id: salon.id });
+        
+      if (error) {
+        toast({ variant: "destructive", title: "Error", description: "Could not add to favorites." });
+      } else {
+        setIsFavorited(true);
+        toast({ title: "Added to favorites!" });
+      }
+    }
+    setIsFavoriteLoading(false);
   };
 
   return (
@@ -47,8 +119,13 @@ const SalonCard = ({ salon, onBookNow }: SalonCardProps) => {
           variant="outline" 
           className="absolute top-3 right-3 h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white"
           onClick={toggleFavorite}
+          disabled={isFavoriteLoading}
         >
-            <Heart className={`h-4 w-4 text-red-500 ${isFavorited ? 'fill-current' : 'fill-transparent'}`} />
+            {isFavoriteLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Heart className={`h-4 w-4 text-red-500 ${isFavorited ? 'fill-current' : 'fill-transparent'}`} />
+            )}
         </Button>
       </CardHeader>
       <CardContent className="p-4 flex-grow">
