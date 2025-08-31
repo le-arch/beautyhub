@@ -11,16 +11,43 @@ export const mockSalons: Salon[] = [
     reviews: 120,
     startingPrice: 50,
     services: [
-      { name: 'Classic Manicure', price: 50 },
-      { name: 'Gel Pedicure', price: 75 },
-      { name: 'Knotless Braids', price: 200 },
+      {
+        name: 'Classic Manicure', price: 50,
+        id: 0,
+        duration: 0
+      },
+      {
+        name: 'Gel Pedicure', price: 75,
+        id: 0,
+        duration: 0
+      },
+      {
+        name: 'Knotless Braids', price: 200,
+        id: 0,
+        duration: 0
+      },
     ],
     gallery: [
-      { url: 'https://placehold.co/600x400.png', hint: 'braiding hair', type: 'image' },
-      { url: 'https://placehold.co/600x400.png', hint: 'manicure station', type: 'image' },
-      { url: 'https://placehold.co/600x400.png', hint: 'pedicure chairs', type: 'image' },
-      { url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4', hint: 'braiding timelapse', type: 'video' },
-      { url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', hint: 'salon tour', type: 'video' },
+      {
+        url: 'https://placehold.co/600x400.png', hint: 'braiding hair', type: 'image',
+        id: 0
+      },
+      {
+        url: 'https://placehold.co/600x400.png', hint: 'manicure station', type: 'image',
+        id: 0
+      },
+      {
+        url: 'https://placehold.co/600x400.png', hint: 'pedicure chairs', type: 'image',
+        id: 0
+      },
+      {
+        url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4', hint: 'braiding timelapse', type: 'video',
+        id: 0
+      },
+      {
+        url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', hint: 'salon tour', type: 'video',
+        id: 0
+      },
     ],
     verified: true,
   },
@@ -34,14 +61,35 @@ export const mockSalons: Salon[] = [
     reviews: 88,
     startingPrice: 80,
     services: [
-      { name: 'Deep Tissue Massage', price: 100 },
-      { name: 'Hydrating Facial', price: 80 },
-      { name: 'Body Scrub', price: 90 },
+      {
+        name: 'Deep Tissue Massage', price: 100,
+        id: 0,
+        duration: 0
+      },
+      {
+        name: 'Hydrating Facial', price: 80,
+        id: 0,
+        duration: 0
+      },
+      {
+        name: 'Body Scrub', price: 90,
+        id: 0,
+        duration: 0
+      },
     ],
     gallery: [
-      { url: 'https://placehold.co/600x400.png', hint: 'facial treatment', type: 'image' },
-      { url: 'https://placehold.co/600x400.png', hint: 'massage table', type: 'image' },
-      { url: 'https://placehold.co/600x400.png', hint: 'spa products', type: 'image' },
+      {
+        url: 'https://placehold.co/600x400.png', hint: 'facial treatment', type: 'image',
+        id: 0
+      },
+      {
+        url: 'https://placehold.co/600x400.png', hint: 'massage table', type: 'image',
+        id: 0
+      },
+      {
+        url: 'https://placehold.co/600x400.png', hint: 'spa products', type: 'image',
+        id: 0
+      },
     ],
   },
   {
@@ -54,14 +102,35 @@ export const mockSalons: Salon[] = [
     reviews: 210,
     startingPrice: 30,
     services: [
-      { name: 'Acrylic Fill-in', price: 40 },
-      { name: 'Nail Art', price: 30 },
-      { name: 'Luxury Pedicure', price: 65 },
+      {
+        name: 'Acrylic Fill-in', price: 40,
+        id: 0,
+        duration: 0
+      },
+      {
+        name: 'Nail Art', price: 30,
+        id: 0,
+        duration: 0
+      },
+      {
+        name: 'Luxury Pedicure', price: 65,
+        id: 0,
+        duration: 0
+      },
     ],
     gallery: [
-      { url: 'https://placehold.co/600x400.png', hint: 'nail polish collection', type: 'image' },
-      { url: 'https://placehold.co/600x400.png', hint: 'intricate nail design', type: 'image' },
-      { url: 'https://placehold.co/600x400.png', hint: 'client getting nails done', type: 'image' },
+      {
+        url: 'https://placehold.co/600x400.png', hint: 'nail polish collection', type: 'image',
+        id: 0
+      },
+      {
+        url: 'https://placehold.co/600x400.png', hint: 'intricate nail design', type: 'image',
+        id: 0
+      },
+      {
+        url: 'https://placehold.co/600x400.png', hint: 'client getting nails done', type: 'image',
+        id: 0
+      },
     ],
     featured: true,
   },
@@ -75,14 +144,35 @@ export const mockSalons: Salon[] = [
     reviews: 300,
     startingPrice: 25,
     services: [
-      { name: 'Haircut & Style', price: 30 },
-      { name: 'Hot Towel Shave', price: 25 },
-      { name: 'Beard Trim', price: 20 },
+      {
+        name: 'Haircut & Style', price: 30,
+        id: 0,
+        duration: 0
+      },
+      {
+        name: 'Hot Towel Shave', price: 25,
+        id: 0,
+        duration: 0
+      },
+      {
+        name: 'Beard Trim', price: 20,
+        id: 0,
+        duration: 0
+      },
     ],
     gallery: [
-        { url: 'https://placehold.co/600x400.png', hint: 'barber cutting hair', type: 'image' },
-        { url: 'https://placehold.co/600x400.png', hint: 'shaving cream', type: 'image' },
-        { url: 'https://placehold.co/600x400.png', hint: 'styled haircut', type: 'image' },
+        {
+          url: 'https://placehold.co/600x400.png', hint: 'barber cutting hair', type: 'image',
+          id: 0
+        },
+        {
+          url: 'https://placehold.co/600x400.png', hint: 'shaving cream', type: 'image',
+          id: 0
+        },
+        {
+          url: 'https://placehold.co/600x400.png', hint: 'styled haircut', type: 'image',
+          id: 0
+        },
     ],
     verified: true,
     featured: true,

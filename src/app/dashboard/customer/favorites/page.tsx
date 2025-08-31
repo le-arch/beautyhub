@@ -67,7 +67,9 @@ export default function FavoritesPage() {
         ) : favoritedSalons.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {favoritedSalons.map((salon) => (
-              <SalonCard key={salon.id} salon={salon as any} />
+              <SalonCard key={salon.id} salon={salon as any} onBookNow={function (salon: Salon): void {
+                throw new Error('Function not implemented.');
+              } } />
             ))}
           </div>
         ) : (

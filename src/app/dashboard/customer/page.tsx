@@ -21,6 +21,7 @@ import {
 import SalonCard from '@/components/salon-card';
 import Link from 'next/link';
 import ImageWithFallback from '@/components/image-with-fallback';
+import { Salon } from '@/lib/types';
 
 const useGeolocation = () => {
   const [location, setLocation] = useState<{ city: string; country: string } | null>(null);
@@ -233,7 +234,9 @@ export default function CustomerHome() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {trendingSalons.map((salon) => (
-                  <SalonCard key={salon.id} salon={salon as any} />
+                  <SalonCard key={salon.id} salon={salon as any} onBookNow={function (salon: Salon): void {
+                    throw new Error('Function not implemented.');
+                  } } />
                 ))}
               </div>
             </section>

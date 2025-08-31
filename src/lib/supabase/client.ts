@@ -3,7 +3,6 @@
 
 import { createBrowserClient } from "@supabase/ssr";
 
-// To prevent creating a new client on every render
 let client: ReturnType<typeof createBrowserClient> | undefined;
 
 export function createClient() {
