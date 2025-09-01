@@ -47,10 +47,9 @@ export default function FavoritesPage() {
       console.error("Error fetching favorites:", fetchError);
       setError("Could not load your favorite salons. Please try again.");
     } else {
-      const salons = data.map(fav => fav.salons).filter(Boolean) as Salon[];
+      const salons = data.map((fav: { salons: any; }) => fav.salons).filter(Boolean) as Salon[];
       setFavoritedSalons(salons);
     }
-    setLoading(false);
   }, [supabase]);
 
   useEffect(() => {
@@ -64,8 +63,8 @@ export default function FavoritesPage() {
         await fetchFavoritesForUser(authUser.id);
       } else {
         setError("You must be logged in to view your favorites.");
-        setLoading(false);
       }
+      setLoading(false);
     };
     getUserAndFavorites();
   }, [supabase.auth, fetchFavoritesForUser]);

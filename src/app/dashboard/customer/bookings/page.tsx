@@ -40,12 +40,11 @@ export default function BookingsPage() {
       setError('Could not fetch your bookings. Please try again later.');
     } else {
       const now = new Date();
-      const upcoming = data.filter(b => new Date(b.booking_time) >= now);
-      const past = data.filter(b => new Date(b.booking_time) < now);
+      const upcoming = data.filter((b: { booking_time: string | number | Date; }) => new Date(b.booking_time) >= now);
+      const past = data.filter((b: { booking_time: string | number | Date; }) => new Date(b.booking_time) < now);
       setUpcomingBookings(upcoming);
       setPastBookings(past);
     }
-    setLoading(false);
   }, [supabase]);
 
   useEffect(() => {
@@ -59,11 +58,11 @@ export default function BookingsPage() {
         await fetchBookingsForUser(authUser.id);
       } else {
         setError("You must be logged in to view your bookings.");
-        setLoading(false);
       }
+      setLoading(false);
     };
     getUserAndBookings();
-  }, [supabase.auth, fetchBookingsForUser]);
+  }, [supabase, fetchBookingsForUser]);
 
 
   const renderBookingCard = (booking: Booking) => (

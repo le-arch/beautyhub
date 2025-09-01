@@ -34,34 +34,43 @@ export default function ProfilePage() {
       .eq('id', userId)
       .single();
 
-    if (error) {
+    if (error && error.code !== 'PGRST116') { // Ignore 'exact one row' error for new users
       setError('Could not load profile data. Please try again.');
       console.error('Profile fetch error:', error);
     } else {
       setProfile(data);
     }
-    setLoading(false);
   }, [supabase]);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserAndProfile = async () => {
+      setLoading(true);
+      setError(null);
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (authUser) {
         setUser(authUser);
-        fetchProfileData(authUser.id);
+        await fetchProfileData(authUser.id);
       } else {
         setError("You must be logged in to view your profile.");
-        setLoading(false);
       }
+      setLoading(false);
     };
-    fetchUser();
+    fetchUserAndProfile();
   }, [supabase.auth, fetchProfileData]);
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    if (profile) {
-      setProfile(prev => ({ ...prev!, [id]: value }));
+    if (user) {
+       setProfile(prev => ({
+           id: user.id,
+           full_name: '',
+           avatar_url: null,
+           phone: null,
+           location: null,
+           ...prev,
+           [id]: value
+       }));
     }
   };
 
@@ -73,12 +82,13 @@ export default function ProfilePage() {
 
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({
+      .upsert({
+        id: user.id,
         full_name: profile.full_name,
         phone: profile.phone,
         location: profile.location,
-      })
-      .eq('id', user.id);
+        avatar_url: user.user_metadata.avatar_url,
+      }, { onConflict: 'id' });
       
     // Also update user metadata
     const { data, error: userUpdateError } = await supabase.auth.updateUser({
@@ -154,7 +164,7 @@ export default function ProfilePage() {
             </Alert>
         )}
         
-        {loading ? renderSkeleton() : profile && user && (
+        {loading ? renderSkeleton() : user && (
           <Card className="border-purple-100 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
@@ -177,9 +187,9 @@ export default function ProfilePage() {
               <div className="flex items-center gap-6">
                 <div className="relative">
                   <Avatar className="h-24 w-24 border-4 border-white shadow-md">
-                    <AvatarImage src={user.user_metadata.avatar_url || ''} alt={profile.full_name || ''} />
+                    <AvatarImage src={user.user_metadata.avatar_url || ''} alt={profile?.full_name || ''} />
                     <AvatarFallback className="bg-gradient-to-br from-purple-100 to-pink-100 text-purple-700 text-2xl">
-                      {profile.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+                      {profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || user.email?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   {isEditing && (
@@ -190,7 +200,7 @@ export default function ProfilePage() {
                   )}
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-warmgray-900">{profile.full_name || 'New User'}</h2>
+                  <h2 className="text-2xl font-bold text-warmgray-900">{profile?.full_name || user.user_metadata.full_name || 'New User'}</h2>
                   <p className="text-warmgray-600">{user.email}</p>
                 </div>
               </div>
@@ -203,7 +213,7 @@ export default function ProfilePage() {
                   </Label>
                   <Input 
                     id="full_name" 
-                    value={profile.full_name || ''}
+                    value={profile?.full_name || ''}
                     onChange={handleInputChange}
                     disabled={!isEditing || saving}
                     className="bg-warmgray-50 border-purple-200 disabled:opacity-70"
@@ -230,7 +240,7 @@ export default function ProfilePage() {
                   <Input 
                     id="phone" 
                     type="tel"
-                    value={profile.phone || ''}
+                    value={profile?.phone || ''}
                     onChange={handleInputChange}
                     disabled={!isEditing || saving}
                     className="bg-warmgray-50 border-purple-200 disabled:opacity-70"
@@ -243,7 +253,7 @@ export default function ProfilePage() {
                   </Label>
                   <Input 
                     id="location"
-                    value={profile.location || ''}
+                    value={profile?.location || ''}
                     onChange={handleInputChange}
                     disabled={!isEditing || saving}
                     className="bg-warmgray-50 border-purple-200 disabled:opacity-70"
