@@ -1,4 +1,6 @@
 
+'use client';
+
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -7,15 +9,13 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import Header from '../header'
 import { signup } from '../auth/actions'
 import { SubmitButton } from '../login/submit-button'
-import { createClient } from '@/lib/supabase/server'
+import { PasswordInput } from '@/components/password-input'
 
-export default async function SignupPage({
+export default function SignupPage({
   searchParams,
 }: {
   searchParams: { message: string }
 }) {
-  const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -47,7 +47,7 @@ export default async function SignupPage({
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" name="password" type="password" required />
+                <PasswordInput id="password" name="password" required />
               </div>
 
                <div className="grid gap-2">

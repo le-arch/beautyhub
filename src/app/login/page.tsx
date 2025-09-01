@@ -1,12 +1,16 @@
 
-import Link from 'next/link'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import Header from '../header'
-import { login } from '../auth/actions'
-import { SubmitButton } from './submit-button'
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import Header from '../header';
+import { login } from '../auth/actions';
+import { SubmitButton } from './submit-button';
+import { PasswordInput } from '@/components/password-input';
 
 export default function LoginPage({
   searchParams,
@@ -45,7 +49,11 @@ export default function LoginPage({
                     Forgot your password?
                   </Link>
                 </div>
-                <Input id="password" name="password" type="password" required />
+                <PasswordInput
+                  id="password"
+                  name="password"
+                  required
+                />
               </div>
               {searchParams.message && (
                 <div className="text-sm font-medium text-destructive">

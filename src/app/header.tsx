@@ -20,7 +20,7 @@ const Header = () => {
   const supabase = createClient();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: any, session: { user: any; }) => {
       setUser(session?.user ?? null);
     });
 
