@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { SearchAndFilter } from '@/components/search-and-filter';
 import SalonCard from '@/components/salon-card';
 import { BookingSystem } from '@/components/booking-system';
@@ -12,6 +13,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Frown } from 'lucide-react';
 
 export default function ExplorePage() {
+    const searchParams = useSearchParams();
     const [salons, setSalons] = useState<Salon[]>([]);
     const [loading, setLoading] = useState(true);
     const [isBooking, setIsBooking] = useState(false);
@@ -42,7 +44,7 @@ export default function ExplorePage() {
         }
 
         if (filters.category && filters.category !== 'All') {
-           query = query.filter('services.name', 'ilike', `%${filters.category}%`);
+           query = query.filter('services', 'cs', `{"name":"${filters.category}"}`);
         }
         
         if(filters.priceRange) {
@@ -53,6 +55,13 @@ export default function ExplorePage() {
             query = query.gte('rating', filters.rating[0]);
         }
         
+        if(filters.sortBy) {
+            const [field, direction] = filters.sortBy.split('-');
+            query = query.order(field, { ascending: direction === 'asc' });
+        } else {
+            query = query.order('rating', { ascending: false });
+        }
+
         const { data, error } = await query;
         
         if (error) {
@@ -65,12 +74,13 @@ export default function ExplorePage() {
     }, [supabase]);
 
     useEffect(() => {
-      fetchSalons();
-    }, [fetchSalons]);
+        const initialFilters = {
+            query: searchParams.get('q') || '',
+            category: searchParams.get('category') || 'All'
+        };
+        fetchSalons(initialFilters);
+    }, [fetchSalons, searchParams]);
 
-    const handleFilterChange = (filters: any) => {
-        fetchSalons(filters);
-    };
 
     const handleBookNow = (salon: Salon) => {
         setSelectedSalon(salon);
@@ -85,7 +95,7 @@ export default function ExplorePage() {
     return (
         <>
             <main className="flex-1 p-4 sm:p-6 lg:p-8">
-                <SearchAndFilter onFiltersChange={handleFilterChange} />
+                <SearchAndFilter onFiltersChange={fetchSalons} />
 
                  {error && (
                     <Alert variant="destructive" className="mt-8">

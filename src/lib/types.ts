@@ -77,8 +77,12 @@ export interface Booking {
     deposit_paid: boolean;
     notes: string | null;
     status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled';
-    salons: Pick<Salon, 'name' | 'image'> | null;
+    salons: {
+      name: string;
+      image: string;
+    } | null;
 }
+
 
 export interface Profile {
   id: string;

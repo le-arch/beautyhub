@@ -10,7 +10,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Search,
   MapPin,
-  Star,
   Heart,
   MessageCircle,
   Clock,
@@ -21,45 +20,10 @@ import {
 import SalonCard from '@/components/salon-card';
 import Link from 'next/link';
 import ImageWithFallback from '@/components/image-with-fallback';
-import { Salon } from '@/lib/types';
-
-const useGeolocation = () => {
-  const [location, setLocation] = useState<{ city: string; country: string } | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!navigator.geolocation) {
-      setError('Geolocation is not supported by your browser');
-      return;
-    }
-
-    const onSuccess = async (position: GeolocationPosition) => {
-      try {
-        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`);
-        const data = await response.json();
-        if (data.address) {
-          setLocation({
-            city: data.address.city || data.address.town || data.address.village,
-            country: data.address.country
-          });
-        } else {
-          setError('Could not determine location');
-        }
-      } catch (err) {
-        setError('Failed to fetch location data');
-      }
-    };
-
-    const onError = (err: GeolocationPositionError) => {
-      setError(err.message);
-    };
-
-    navigator.geolocation.getCurrentPosition(onSuccess, onError);
-  }, []);
-
-  return { location, error };
-};
-
+import type { Salon, Profile } from '@/lib/types';
+import { createClient } from '@/lib/supabase/client';
+import { useGeolocation } from '@/hooks/use-geolocation';
+import type { User } from '@supabase/supabase-js';
 
 const quickSearchCategories = [
   { name: 'Braiding', icon: '💇🏾‍♀️', color: 'from-purple-500 to-purple-600' },
@@ -70,68 +34,65 @@ const quickSearchCategories = [
   { name: 'Barbering', icon: '✂️', color: 'from-gray-600 to-gray-700' }
 ];
 
-const trendingSalons = [
-    {
-    id: 1,
-    name: 'Afro Chic Hair Studio',
-    image: 'https://images.unsplash.com/photo-1702236240794-58dc4c6895e5?w=400',
-    imageHint: 'braided hairstyle',
-    location: 'Douala, Cameroon',
-    rating: 4.8,
-    reviews: 127,
-    startingPrice: 15000,
-    services: [],
-    gallery: [],
-    specialties: ['Braiding', 'Twists', 'Natural Hair'],
-    featured: true,
-    verified: true,
-    distance: '2.3 km',
-    responseTime: '1 hour'
-  },
-  {
-    id: 2,
-    name: 'Golden Nails Spa',
-    image: 'https://images.unsplash.com/photo-1650176491728-a5e6edd08575?w=400',
-    imageHint: 'nail art',
-    location: 'Lagos, Nigeria',
-    rating: 4.6,
-    reviews: 89,
-    startingPrice: 8000,
-    services: [],
-    gallery: [],
-    specialties: ['Manicure', 'Pedicure', 'Nail Art'],
-    featured: false,
-    verified: true,
-    distance: '1.8 km',
-    responseTime: '30 mins'
-  }
-];
-
-const recentlyViewed = [
-  {
-    id: 3,
-    name: 'Royal Locks Studio',
-    image: 'https://images.unsplash.com/photo-1625536658395-2bd89a631e37?w=300',
-    imageHint: 'dreadlocks style',
-    location: 'Accra, Ghana',
-    rating: 4.9,
-    reviews: 156,
-    startingPrice: 20000,
-    services: [],
-    gallery: [],
-    specialties: ['Dreadlocks', 'Maintenance'],
-    lastViewed: '2 days ago'
-  }
-];
-
 export default function CustomerHome() {
   const [searchQuery, setSearchQuery] = useState('');
-  const userLocation = useGeolocation().location;
-  
-  // Mock data that would come from your useApp context
-  const user = { name: 'Beauty Lover', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d' };
-  const favoriteIds = [1, 2];
+  const { location: userLocation } = useGeolocation();
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [trendingSalons, setTrendingSalons] = useState<Salon[]>([]);
+  const [recentlyViewed, setRecentlyViewed] = useState<Salon[]>([]);
+  const [stats, setStats] = useState({ favorites: 0, messages: 0, bookings: 0 });
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      setUser(authUser);
+
+      if (authUser) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', authUser.id)
+          .single();
+        setProfile(profileData);
+
+        const { count: favoritesCount } = await supabase
+          .from('favorites')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', authUser.id);
+
+        const { count: bookingsCount } = await supabase
+          .from('bookings')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', authUser.id)
+          .eq('status', 'Confirmed');
+
+        setStats({ favorites: favoritesCount || 0, messages: 3, bookings: bookingsCount || 0 });
+      }
+
+      const { data: salonData } = await supabase
+        .from('salons')
+        .select('*')
+        .order('rating', { ascending: false })
+        .limit(4);
+        
+      setTrendingSalons(salonData as Salon[] || []);
+      setRecentlyViewed(salonData?.slice(0, 1) as Salon[] || []);
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [supabase]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  
   return (
     <div className="min-h-screen pt-16">
       {/* Welcome Header */}
@@ -140,14 +101,14 @@ export default function CustomerHome() {
           <div className="text-center mb-8">
             <div className="flex items-center justify-center mb-4">
               <Avatar className="h-16 w-16 mr-4">
-                <AvatarImage src={user?.avatar} alt={user?.name} />
+                <AvatarImage src={profile?.avatar_url || ''} alt={profile?.full_name || 'User'} />
                 <AvatarFallback className="bg-purple-100 text-purple-600 text-lg font-semibold">
-                  {user?.name?.split(' ').map(n => n[0]).join('') || 'U'}
+                  {profile?.full_name?.split(' ').map(n => n[0]).join('') || user?.email?.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="text-left">
                 <h1 className="text-2xl md:text-3xl font-semibold text-warmgray-900 mb-1">
-                  Welcome back, {user?.name?.split(' ')[0]}! 💜
+                  Welcome back, {profile?.full_name?.split(' ')[0] || 'Beauty Lover'}! 💜
                 </h1>
                 <p className="text-lg text-warmgray-600">
                   {userLocation ? `📍 ${userLocation.city}, ${userLocation.country}` : 'Ready to find your perfect salon?'}
@@ -173,7 +134,7 @@ export default function CustomerHome() {
                   className="h-12 px-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-medium"
                   asChild
                 >
-                  <Link href="/dashboard/customer/explore">Search</Link>
+                  <Link href={`/dashboard/customer/explore?q=${searchQuery}`}>Search</Link>
                 </Button>
               </div>
             </div>
@@ -197,7 +158,7 @@ export default function CustomerHome() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {quickSearchCategories.map((category) => (
-              <Link href="/dashboard/customer/explore" key={category.name}>
+              <Link href={`/dashboard/customer/explore?category=${category.name}`} key={category.name}>
                 <Card
                   className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105 border-purple-100 h-full"
                 >
@@ -234,9 +195,7 @@ export default function CustomerHome() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {trendingSalons.map((salon) => (
-                  <SalonCard key={salon.id} salon={salon as any} onBookNow={function (salon: Salon): void {
-                    throw new Error('Function not implemented.');
-                  } } />
+                  <SalonCard key={salon.id} salon={salon} onBookNow={() => {}} />
                 ))}
               </div>
             </section>
@@ -314,19 +273,19 @@ export default function CustomerHome() {
                   <span className="text-sm text-warmgray-600">Favorites</span>
                   <div className="flex items-center">
                     <Heart className="h-4 w-4 text-red-500 mr-1 fill-current" />
-                    <span className="font-medium text-warmgray-900">{favoriteIds.length}</span>
+                    <span className="font-medium text-warmgray-900">{stats.favorites}</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-warmgray-600">Messages</span>
                   <div className="flex items-center">
                     <MessageCircle className="h-4 w-4 text-purple-600 mr-1" />
-                    <span className="font-medium text-warmgray-900">3</span>
+                    <span className="font-medium text-warmgray-900">{stats.messages}</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-warmgray-600">Bookings</span>
-                  <span className="font-medium text-warmgray-900">2 upcoming</span>
+                  <span className="font-medium text-warmgray-900">{stats.bookings} upcoming</span>
                 </div>
               </CardContent>
             </Card>
@@ -354,11 +313,6 @@ export default function CustomerHome() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-warmgray-900 truncate">{salon.name}</p>
                       <p className="text-xs text-warmgray-600">{salon.location}</p>
-                      <p className="text-xs text-purple-600">{salon.lastViewed}</p>
-                    </div>
-                    <div className="flex items-center">
-                      <Star className="h-3 w-3 text-yellow-400 fill-current mr-1" />
-                      <span className="text-xs font-medium text-warmgray-700">{salon.rating}</span>
                     </div>
                   </div>
                 ))}
