@@ -27,36 +27,37 @@ export default function ProfilePage() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
 
-  const fetchProfileData = useCallback(async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    if (error && error.code !== 'PGRST116') { // Ignore 'exact one row' error for new users
-      setError('Could not load profile data. Please try again.');
-      console.error('Profile fetch error:', error);
-    } else {
-      setProfile(data);
-    }
-  }, [supabase]);
-
   useEffect(() => {
     const fetchUserAndProfile = async () => {
       setLoading(true);
       setError(null);
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (authUser) {
-        setUser(authUser);
-        await fetchProfileData(authUser.id);
-      } else {
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !authUser) {
         setError("You must be logged in to view your profile.");
+        setUser(null);
+        setLoading(false);
+        return;
       }
+      setUser(authUser);
+      
+      const { data, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', authUser.id)
+        .single();
+
+      if (profileError && profileError.code !== 'PGRST116') { // Ignore 'exact one row' error for new users
+        setError('Could not load profile data. Please try again.');
+        console.error('Profile fetch error:', profileError);
+      } else {
+        setProfile(data);
+      }
+      
       setLoading(false);
     };
     fetchUserAndProfile();
-  }, [supabase.auth, fetchProfileData]);
+  }, [supabase]);
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,15 +81,18 @@ export default function ProfilePage() {
     setSaving(true);
     setError(null);
 
+    // Prepare data for upsert, ensuring full_name is not null
+    const profileDataToSave = {
+      id: user.id,
+      full_name: profile.full_name || user.email, // Fallback to email if name is empty
+      phone: profile.phone,
+      location: profile.location,
+      avatar_url: profile.avatar_url || user.user_metadata.avatar_url,
+    };
+
     const { error: updateError } = await supabase
       .from('profiles')
-      .upsert({
-        id: user.id,
-        full_name: profile.full_name,
-        phone: profile.phone,
-        location: profile.location,
-        avatar_url: user.user_metadata.avatar_url,
-      }, { onConflict: 'id' });
+      .upsert(profileDataToSave, { onConflict: 'id' });
       
     // Also update user metadata
     const { data, error: userUpdateError } = await supabase.auth.updateUser({
@@ -104,6 +108,12 @@ export default function ProfilePage() {
         description: 'Your information has been successfully saved.',
       });
       setIsEditing(false);
+       if (data.user) {
+          setUser(data.user);
+          if (data.user.user_metadata) {
+              setProfile(prev => ({...prev, ...data.user!.user_metadata, ...profileDataToSave}))
+          }
+      }
     }
 
     setSaving(false);
@@ -156,7 +166,7 @@ export default function ProfilePage() {
           <p className="text-lg text-warmgray-600">View and manage your personal details.</p>
         </div>
         
-        {error && !loading && (
+        {error && (
             <Alert variant="destructive" className="mb-6">
                 <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>Error</AlertTitle>
@@ -187,7 +197,7 @@ export default function ProfilePage() {
               <div className="flex items-center gap-6">
                 <div className="relative">
                   <Avatar className="h-24 w-24 border-4 border-white shadow-md">
-                    <AvatarImage src={user.user_metadata.avatar_url || ''} alt={profile?.full_name || ''} />
+                    <AvatarImage src={profile?.avatar_url || user.user_metadata.avatar_url || ''} alt={profile?.full_name || ''} />
                     <AvatarFallback className="bg-gradient-to-br from-purple-100 to-pink-100 text-purple-700 text-2xl">
                       {profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || user.email?.charAt(0).toUpperCase()}
                     </AvatarFallback>

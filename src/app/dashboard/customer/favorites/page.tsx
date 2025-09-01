@@ -21,53 +21,53 @@ export default function FavoritesPage() {
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
 
-  const fetchFavoritesForUser = useCallback(async (userId: string) => {
-    const { data, error: fetchError } = await supabase
-      .from('favorites')
-      .select(`
-        created_at,
-        salons (
-          id,
-          name,
-          image,
-          imageHint,
-          location,
-          rating,
-          reviews,
-          startingPrice,
-          verified,
-          featured,
-          services:services (id, name, price, duration),
-          gallery:gallery (id, url, hint, type)
-        )
-      `)
-      .eq('user_id', userId);
-
-    if (fetchError) {
-      console.error("Error fetching favorites:", fetchError);
-      setError("Could not load your favorite salons. Please try again.");
-    } else {
-      const salons = data.map((fav: { salons: any; }) => fav.salons).filter(Boolean) as Salon[];
-      setFavoritedSalons(salons);
-    }
-  }, [supabase]);
-
   useEffect(() => {
     const getUserAndFavorites = async () => {
-      setLoading(true);
       setError(null);
-      const { data: { user: authUser } } = await supabase.auth.getUser();
+      setLoading(true);
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
 
-      if (authUser) {
-        setUser(authUser);
-        await fetchFavoritesForUser(authUser.id);
-      } else {
+      if (authError || !authUser) {
         setError("You must be logged in to view your favorites.");
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+      
+      setUser(authUser);
+
+      const { data, error: fetchError } = await supabase
+        .from('favorites')
+        .select(`
+          created_at,
+          salons (
+            id,
+            name,
+            image,
+            imageHint,
+            location,
+            rating,
+            reviews,
+            startingPrice,
+            verified,
+            featured,
+            services:services (id, name, price, duration),
+            gallery:gallery (id, url, hint, type)
+          )
+        `)
+        .eq('user_id', authUser.id);
+
+      if (fetchError) {
+        console.error("Error fetching favorites:", fetchError);
+        setError("Could not load your favorite salons. Please try again.");
+      } else {
+        const salons = data.map((fav: { salons: any; }) => fav.salons).filter(Boolean) as Salon[];
+        setFavoritedSalons(salons);
       }
       setLoading(false);
     };
     getUserAndFavorites();
-  }, [supabase.auth, fetchFavoritesForUser]);
+  }, [supabase]);
 
   const handleBookNow = (salon: Salon) => {
     // This would typically open a booking modal or navigate to the salon's booking page
@@ -95,7 +95,7 @@ export default function FavoritesPage() {
           </div>
         </div>
 
-        {error && !loading && (
+        {error && (
             <Alert variant="destructive" className="mb-8">
                 <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>Error</AlertTitle>

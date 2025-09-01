@@ -22,47 +22,50 @@ export default function BookingsPage() {
   const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
 
-  const fetchBookingsForUser = useCallback(async (userId: string) => {
-    const { data, error: fetchError } = await supabase
-      .from('bookings')
-      .select(`
-        *,
-        salons (
-          name,
-          image
-        )
-      `)
-      .eq('user_id', userId)
-      .order('booking_time', { ascending: false });
-
-    if (fetchError) {
-      console.error('Error fetching bookings:', fetchError);
-      setError('Could not fetch your bookings. Please try again later.');
-    } else {
-      const now = new Date();
-      const upcoming = data.filter((b: { booking_time: string | number | Date; }) => new Date(b.booking_time) >= now);
-      const past = data.filter((b: { booking_time: string | number | Date; }) => new Date(b.booking_time) < now);
-      setUpcomingBookings(upcoming);
-      setPastBookings(past);
-    }
-  }, [supabase]);
-
   useEffect(() => {
     const getUserAndBookings = async () => {
-      setLoading(true);
       setError(null);
-      const { data: { user: authUser } } = await supabase.auth.getUser();
+      setLoading(true);
 
-      if (authUser) {
-        setUser(authUser);
-        await fetchBookingsForUser(authUser.id);
-      } else {
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !authUser) {
         setError("You must be logged in to view your bookings.");
+        setUser(null);
+        setLoading(false);
+        return;
       }
+      
+      setUser(authUser);
+
+      const { data, error: fetchError } = await supabase
+        .from('bookings')
+        .select(`
+          *,
+          salons (
+            name,
+            image
+          )
+        `)
+        .eq('user_id', authUser.id)
+        .order('booking_time', { ascending: false });
+
+      if (fetchError) {
+        console.error('Error fetching bookings:', fetchError);
+        setError('Could not fetch your bookings. Please try again later.');
+      } else {
+        const now = new Date();
+        const upcoming = data.filter((b: { booking_time: string | number | Date; }) => new Date(b.booking_time) >= now);
+        const past = data.filter((b: { booking_time: string | number | Date; }) => new Date(b.booking_time) < now);
+        setUpcomingBookings(upcoming);
+        setPastBookings(past);
+      }
+      
       setLoading(false);
     };
+    
     getUserAndBookings();
-  }, [supabase, fetchBookingsForUser]);
+  }, [supabase]);
 
 
   const renderBookingCard = (booking: Booking) => (
@@ -132,7 +135,7 @@ export default function BookingsPage() {
     <main className="flex-1 p-4 sm:p-6 lg:p-8">
       <h1 className="text-3xl font-bold mb-8">My Bookings</h1>
       
-      {error && !loading && (
+      {error && (
         <Alert variant="destructive" className="mb-8">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
@@ -157,7 +160,7 @@ export default function BookingsPage() {
                 {upcomingBookings.map(renderBookingCard)}
               </div>
             ) : (
-               <div className="text-center py-12 border-2 border-dashed rounded-lg">
+              !error && <div className="text-center py-12 border-2 border-dashed rounded-lg">
                 <h3 className="text-lg font-medium text-muted-foreground">You have no upcoming appointments.</h3>
                 <Button className="mt-4" asChild>
                   <Link href="/dashboard/customer/explore">Book a Service</Link>
