@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, SetStateAction } from 'react';
@@ -27,57 +28,43 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
-    let mounted = true;
-  
     const fetchUserAndProfile = async () => {
       setLoading(true);
       setError(null);
-  
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-  
-      if (sessionError) {
-        console.error("Session fetch error:", sessionError);
-        if (mounted) setError("Could not verify your session. Please try again.");
+
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !authUser) {
+        setError("You must be logged in to view your profile.");
+        setUser(null);
         setLoading(false);
         return;
       }
-  
-      if (session?.user) {
-        const authUser = session.user;
-        if (mounted) setUser(authUser);
-  
-        const { data, error: profileError } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", authUser.id)
-          .single();
-  
-        if (profileError && profileError.code !== "PGRST116") {
-          console.error("Profile fetch error:", profileError);
-          if (mounted) setError("Could not load profile data. Please try again.");
-        } else {
-          if (mounted) setProfile(data);
-        }
+      
+      setUser(authUser);
+
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", authUser.id)
+        .single();
+
+      if (profileError && profileError.code !== "PGRST116") {
+        console.error("Profile fetch error:", profileError);
+        setError("Could not load profile data. Please try again.");
+      } else {
+        setProfile(profileData);
       }
-  
       setLoading(false);
     };
-  
+
     fetchUserAndProfile();
-  
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: { user: SetStateAction<SupabaseUser | null>; }) => {
-      if (session?.user) {
-        setUser(session.user);
-        setError(null); // ✅ clear the "not logged in" error
-      } else {
-        setUser(null);
-        setProfile(null);
-        setError("You must be logged in to view your profile.");
-      }
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        setUser(session?.user ?? null);
     });
-  
+
     return () => {
-      mounted = false;
       subscription.unsubscribe();
     };
   }, [supabase]);
@@ -170,17 +157,13 @@ export default function ProfilePage() {
           <p className="text-lg text-warmgray-600">View and manage your personal details.</p>
         </div>
 
-        {error && !loading && (
+        {loading ? renderSkeleton() : error ? (
           <Alert variant="destructive" className="mb-6">
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Error</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
-        )}
-
-        {loading
-          ? renderSkeleton()
-          : user && (
+        ) : user && (
               <Card className="border-purple-100 shadow-lg">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
@@ -316,3 +299,5 @@ export default function ProfilePage() {
     </main>
   );
 }
+
+    

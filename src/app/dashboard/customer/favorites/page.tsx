@@ -23,8 +23,8 @@ export default function FavoritesPage() {
 
   useEffect(() => {
     const getUserAndFavorites = async () => {
-      setError(null);
       setLoading(true);
+      setError(null);
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
 
       if (authError || !authUser) {
@@ -85,24 +85,18 @@ export default function FavoritesPage() {
             </div>
             <div>
               <h1 className="text-3xl font-semibold text-warmgray-900">Your Favorite Salons</h1>
-              <p className="text-lg text-warmgray-600">
-                {!loading && (favoritedSalons.length > 0 
-                  ? `${favoritedSalons.length} ${favoritedSalons.length === 1 ? 'salon' : 'salons'} saved`
-                  : "Build your collection of favorite beauty destinations"
-                )}
-              </p>
+              {!loading && !error && (
+                <p className="text-lg text-warmgray-600">
+                  {favoritedSalons.length > 0 
+                    ? `${favoritedSalons.length} ${favoritedSalons.length === 1 ? 'salon' : 'salons'} saved`
+                    : "Build your collection of favorite beauty destinations"
+                  }
+                </p>
+              )}
             </div>
           </div>
         </div>
-
-        {error && (
-            <Alert variant="destructive" className="mb-8">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-            </Alert>
-        )}
-
+        
         {loading ? (
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
              {Array.from({ length: 3 }).map((_, index) => (
@@ -114,6 +108,12 @@ export default function FavoritesPage() {
                 </div>
              ))}
            </div>
+        ) : error ? (
+            <Alert variant="destructive" className="mb-8">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+            </Alert>
         ) : favoritedSalons.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {favoritedSalons.map((salon) => (
@@ -121,7 +121,7 @@ export default function FavoritesPage() {
             ))}
           </div>
         ) : (
-          !error && <div className="text-center py-24">
+          <div className="text-center py-24">
             <div className="w-32 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-8">
               <Heart className="h-16 w-16 text-purple-400" />
             </div>
@@ -146,3 +146,5 @@ export default function FavoritesPage() {
     </main>
   );
 }
+
+    

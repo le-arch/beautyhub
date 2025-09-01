@@ -24,8 +24,8 @@ export default function BookingsPage() {
 
   useEffect(() => {
     const getUserAndBookings = async () => {
-      setError(null);
       setLoading(true);
+      setError(null);
 
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
 
@@ -135,61 +135,65 @@ export default function BookingsPage() {
     <main className="flex-1 p-4 sm:p-6 lg:p-8">
       <h1 className="text-3xl font-bold mb-8">My Bookings</h1>
       
-      {error && (
+      {loading ? (
+        <div className="space-y-8">
+          <Card>
+            <CardHeader><CardTitle className="text-2xl">Upcoming Appointments</CardTitle></CardHeader>
+            <CardContent className="space-y-4">{renderSkeleton()}{renderSkeleton()}</CardContent>
+          </Card>
+          <Card>
+            <CardHeader><CardTitle className="text-2xl">Past Appointments</CardTitle></CardHeader>
+            <CardContent className="space-y-4">{renderSkeleton()}</CardContent>
+          </Card>
+        </div>
+      ) : error ? (
         <Alert variant="destructive" className="mb-8">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
+      ) : (
+        <div className="space-y-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Upcoming Appointments</CardTitle>
+              <CardDescription>Your scheduled appointments will appear here.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {upcomingBookings.length > 0 ? (
+                 <div className="space-y-4">
+                  {upcomingBookings.map(renderBookingCard)}
+                </div>
+              ) : (
+                <div className="text-center py-12 border-2 border-dashed rounded-lg">
+                  <h3 className="text-lg font-medium text-muted-foreground">You have no upcoming appointments.</h3>
+                  <Button className="mt-4" asChild>
+                    <Link href="/dashboard/customer/explore">Book a Service</Link>
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Past Appointments</CardTitle>
+               <CardDescription>Review your past visits and book again.</CardDescription>
+            </CardHeader>
+            <CardContent>
+               {pastBookings.length > 0 ? (
+                 <div className="space-y-4">
+                  {pastBookings.map(renderBookingCard)}
+                </div>
+              ) : (
+                <p className="text-center text-muted-foreground py-12">Your past appointments will appear here.</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       )}
-
-      <div className="space-y-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Upcoming Appointments</CardTitle>
-            <CardDescription>Your scheduled appointments will appear here.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="space-y-4">
-                {renderSkeleton()}
-                {renderSkeleton()}
-              </div>
-            ) : upcomingBookings.length > 0 ? (
-               <div className="space-y-4">
-                {upcomingBookings.map(renderBookingCard)}
-              </div>
-            ) : (
-              !error && <div className="text-center py-12 border-2 border-dashed rounded-lg">
-                <h3 className="text-lg font-medium text-muted-foreground">You have no upcoming appointments.</h3>
-                <Button className="mt-4" asChild>
-                  <Link href="/dashboard/customer/explore">Book a Service</Link>
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Past Appointments</CardTitle>
-             <CardDescription>Review your past visits and book again.</CardDescription>
-          </CardHeader>
-          <CardContent>
-             {loading ? (
-               <div className="space-y-4">
-                 {renderSkeleton()}
-               </div>
-             ) : pastBookings.length > 0 ? (
-               <div className="space-y-4">
-                {pastBookings.map(renderBookingCard)}
-              </div>
-            ) : (
-              !error && <p className="text-center text-muted-foreground py-12">Your past appointments will appear here.</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
     </main>
   );
 }
+
+    
