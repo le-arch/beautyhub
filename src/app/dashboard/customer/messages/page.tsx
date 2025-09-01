@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +20,21 @@ import {
 } from 'lucide-react';
 import { mockConversations } from '@/lib/mock-data';
 import type { Conversation, Message } from '@/lib/types';
+
+const ConversationTimestamp = ({ timestamp }: { timestamp: string }) => {
+  const [formattedTime, setFormattedTime] = useState('');
+
+  useEffect(() => {
+    setFormattedTime(
+      new Date(timestamp).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    );
+  }, [timestamp]);
+
+  return <p className="text-xs text-muted-foreground">{formattedTime}</p>;
+};
 
 export default function MessagesPage() {
   const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
@@ -81,7 +96,7 @@ export default function MessagesPage() {
                       <div className="flex-1">
                         <div className="flex justify-between items-center">
                           <h3 className="font-semibold">{convo.salonName}</h3>
-                          <p className="text-xs text-muted-foreground">{new Date(convo.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                          <ConversationTimestamp timestamp={convo.timestamp} />
                         </div>
                         <div className="flex justify-between items-start">
                           <p className="text-sm text-muted-foreground truncate max-w-[150px]">{convo.lastMessage}</p>
@@ -139,7 +154,7 @@ export default function MessagesPage() {
                               <p className="text-sm">{message.text}</p>
                             </div>
                           )}
-                          <p className="text-xs text-muted-foreground mt-1">{new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                           <ConversationTimestamp timestamp={message.timestamp} />
                         </div>
                       </div>
                     ))}
