@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Heart, AlertTriangle } from 'lucide-react';
 import SalonCard from '@/components/salon-card';
@@ -60,7 +60,7 @@ export default function FavoritesPage() {
       if (fetchError) {
         console.error("Error fetching favorites:", fetchError);
         setError("Could not load your favorite salons. Please try again.");
-      } else {
+      } else if (data) {
         const salons = data.map((fav: { salons: any; }) => fav.salons).filter(Boolean) as Salon[];
         setFavoritedSalons(salons);
       }
@@ -70,11 +70,53 @@ export default function FavoritesPage() {
   }, [supabase]);
 
   const handleBookNow = (salon: Salon) => {
-    // This would typically open a booking modal or navigate to the salon's booking page
     console.log('Booking for salon:', salon.name);
     toast({ title: 'Booking system not implemented in this view.' });
   };
   
+  if (loading) {
+    return (
+      <main className="flex-1 p-8 bg-gradient-beauty-secondary pt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8">
+              <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center">
+                    <Heart className="h-6 w-6 text-purple-600 fill-current" />
+                  </div>
+                  <div>
+                    <h1 className="text-3xl font-semibold text-warmgray-900">Your Favorite Salons</h1>
+                  </div>
+              </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="space-y-4">
+                  <Skeleton className="h-48 w-full rounded-xl" />
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-10 w-full" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+     return (
+        <main className="flex-1 p-8 bg-gradient-beauty-secondary pt-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <Alert variant="destructive" className="mb-8">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                </Alert>
+            </div>
+        </main>
+     );
+  }
+
   return (
     <main className="flex-1 p-8 bg-gradient-beauty-secondary pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -85,36 +127,17 @@ export default function FavoritesPage() {
             </div>
             <div>
               <h1 className="text-3xl font-semibold text-warmgray-900">Your Favorite Salons</h1>
-              {!loading && !error && (
-                <p className="text-lg text-warmgray-600">
-                  {favoritedSalons.length > 0 
-                    ? `${favoritedSalons.length} ${favoritedSalons.length === 1 ? 'salon' : 'salons'} saved`
-                    : "Build your collection of favorite beauty destinations"
-                  }
-                </p>
-              )}
+              <p className="text-lg text-warmgray-600">
+                {favoritedSalons.length > 0 
+                  ? `${favoritedSalons.length} ${favoritedSalons.length === 1 ? 'salon' : 'salons'} saved`
+                  : "Build your collection of favorite beauty destinations"
+                }
+              </p>
             </div>
           </div>
         </div>
         
-        {loading ? (
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-             {Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="space-y-4">
-                    <Skeleton className="h-48 w-full rounded-xl" />
-                    <Skeleton className="h-6 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-             ))}
-           </div>
-        ) : error ? (
-            <Alert variant="destructive" className="mb-8">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-            </Alert>
-        ) : favoritedSalons.length > 0 ? (
+        {favoritedSalons.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {favoritedSalons.map((salon) => (
               <SalonCard key={salon.id} salon={salon as any} onBookNow={handleBookNow} />
@@ -146,5 +169,3 @@ export default function FavoritesPage() {
     </main>
   );
 }
-
-    

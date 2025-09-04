@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, SetStateAction } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,7 +49,7 @@ export default function ProfilePage() {
         .eq("id", authUser.id)
         .single();
 
-      if (profileError && profileError.code !== "PGRST116") {
+      if (profileError && profileError.code !== "PGRST116") { // pgrst116 means no rows found, which is ok
         console.error("Profile fetch error:", profileError);
         setError("Could not load profile data. Please try again.");
       } else {
@@ -60,13 +60,6 @@ export default function ProfilePage() {
 
     fetchUserAndProfile();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-        setUser(session?.user ?? null);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
   }, [supabase]);
   
 
@@ -96,14 +89,15 @@ export default function ProfilePage() {
       full_name: profile.full_name || user.email,
       phone: profile.phone,
       location: profile.location,
-      avatar_url: profile.avatar_url || user.user_metadata.avatar_url,
+      avatar_url: profile.avatar_url, // Let supabase auth handle avatar
+      updated_at: new Date().toISOString(),
     };
 
     const { error: updateError } = await supabase
       .from('profiles')
       .upsert(profileDataToSave, { onConflict: 'id' });
 
-    const { data, error: userUpdateError } = await supabase.auth.updateUser({
+    const { data: userUpdateData, error: userUpdateError } = await supabase.auth.updateUser({
       data: { full_name: profile.full_name, avatar_url: profile.avatar_url },
     });
 
@@ -117,11 +111,9 @@ export default function ProfilePage() {
       });
       setIsEditing(false);
 
-      if (data?.user) {
-        setUser(data.user);
-        if (data.user.user_metadata) {
-          setProfile(prev => ({ ...prev, ...data.user!.user_metadata, ...profileDataToSave }));
-        }
+      if (userUpdateData?.user) {
+        setUser(userUpdateData.user);
+        setProfile(prev => ({ ...prev, ...userUpdateData.user!.user_metadata, ...profileDataToSave }));
       }
     }
 
@@ -137,7 +129,7 @@ export default function ProfilePage() {
         </div>
         <Skeleton className="h-10 w-28" />
       </CardHeader>
-      <CardContent className="space-y-8">
+      <CardContent className="space-y-8 pt-6">
         <div className="flex items-center gap-6">
           <Skeleton className="h-24 w-24 rounded-full" />
           <div className="space-y-2">
@@ -145,9 +137,43 @@ export default function ProfilePage() {
             <Skeleton className="h-5 w-52" />
           </div>
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2"><Skeleton className="h-4 w-20" /><Skeleton className="h-10 w-full" /></div>
+          <div className="space-y-2"><Skeleton className="h-4 w-20" /><Skeleton className="h-10 w-full" /></div>
+          <div className="space-y-2"><Skeleton className="h-4 w-20" /><Skeleton className="h-10 w-full" /></div>
+          <div className="space-y-2"><Skeleton className="h-4 w-20" /><Skeleton className="h-10 w-full" /></div>
+        </div>
       </CardContent>
     </Card>
   );
+
+  if (loading) {
+    return (
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-gradient-beauty-secondary">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-warmgray-900">My Profile</h1>
+            <p className="text-lg text-warmgray-600">View and manage your personal details.</p>
+          </div>
+          {renderSkeleton()}
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+     return (
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-gradient-beauty-secondary">
+        <div className="max-w-4xl mx-auto">
+            <Alert variant="destructive" className="mb-6">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+        </div>
+      </main>
+     )
+  }
 
   return (
     <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-gradient-beauty-secondary">
@@ -157,13 +183,7 @@ export default function ProfilePage() {
           <p className="text-lg text-warmgray-600">View and manage your personal details.</p>
         </div>
 
-        {loading ? renderSkeleton() : error ? (
-          <Alert variant="destructive" className="mb-6">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        ) : user && (
+        {user && (
               <Card className="border-purple-100 shadow-lg">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
@@ -190,7 +210,7 @@ export default function ProfilePage() {
                     </Button>
                   )}
                 </CardHeader>
-                <CardContent className="space-y-8">
+                <CardContent className="space-y-8 pt-6">
                   <div className="flex items-center gap-6">
                     <div className="relative">
                       <Avatar className="h-24 w-24 border-4 border-white shadow-md">
@@ -299,5 +319,3 @@ export default function ProfilePage() {
     </main>
   );
 }
-
-    
