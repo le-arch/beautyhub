@@ -12,61 +12,57 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { createClient } from '@/lib/supabase/client';
 import type { Booking } from '@/lib/types';
-import type { User } from '@supabase/supabase-js';
+import { useUser } from '@/context/UserContext';
 
 export default function BookingsPage() {
+  const { user, loading: userLoading } = useUser();
   const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
   const [pastBookings, setPastBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
-  const [user, setUser] = useState<User | null>(null);
+
+  const fetchBookings = useCallback(async () => {
+    if (!user) {
+      setError("You must be logged in to view your bookings.");
+      setLoading(false);
+      return;
+    }
+    
+    setLoading(true);
+    setError(null);
+
+    const { data, error: fetchError } = await supabase
+      .from('bookings')
+      .select(`
+        *,
+        salons (
+          name,
+          image
+        )
+      `)
+      .eq('user_id', user.id)
+      .order('booking_time', { ascending: false });
+
+    if (fetchError) {
+      console.error('Error fetching bookings:', fetchError);
+      setError('Could not fetch your bookings. Please try again later.');
+    } else if (data) {
+      const now = new Date();
+      const upcoming = data.filter((b) => new Date(b.booking_time) >= now);
+      const past = data.filter((b) => new Date(b.booking_time) < now);
+      setUpcomingBookings(upcoming);
+      setPastBookings(past);
+    }
+    
+    setLoading(false);
+  }, [supabase, user]);
 
   useEffect(() => {
-    const getUserAndBookings = async () => {
-      setLoading(true);
-      setError(null);
-
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-
-      if (authError || !authUser) {
-        setError("You must be logged in to view your bookings.");
-        setUser(null);
-        setLoading(false);
-        return;
-      }
-      
-      setUser(authUser);
-
-      const { data, error: fetchError } = await supabase
-        .from('bookings')
-        .select(`
-          *,
-          salons (
-            name,
-            image
-          )
-        `)
-        .eq('user_id', authUser.id)
-        .order('booking_time', { ascending: false });
-
-      if (fetchError) {
-        console.error('Error fetching bookings:', fetchError);
-        setError('Could not fetch your bookings. Please try again later.');
-      } else if (data) {
-        const now = new Date();
-        const upcoming = data.filter((b: { booking_time: string | number | Date; }) => new Date(b.booking_time) >= now);
-        const past = data.filter((b: { booking_time: string | number | Date; }) => new Date(b.booking_time) < now);
-        setUpcomingBookings(upcoming);
-        setPastBookings(past);
-      }
-      
-      setLoading(false);
-    };
-    
-    getUserAndBookings();
-  }, [supabase]);
-
+    if (!userLoading) {
+      fetchBookings();
+    }
+  }, [userLoading, fetchBookings]);
 
   const renderBookingCard = (booking: Booking) => (
     <Card key={booking.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4">
@@ -84,7 +80,7 @@ export default function BookingsPage() {
             <h3 className="font-semibold text-lg">{booking.salons?.name}</h3>
             <p className="text-muted-foreground">{booking.service_name}</p>
           </div>
-          <Badge variant={booking.status === 'Confirmed' ? 'default' : 'secondary'} className={booking.status === 'Confirmed' ? 'bg-primary' : ''}>{booking.status}</Badge>
+          <Badge variant={booking.status === 'confirmed' ? 'default' : 'secondary'} className={booking.status === 'confirmed' ? 'bg-primary' : ''}>{booking.status}</Badge>
         </div>
         <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
           <div className="flex items-center gap-1.5">
@@ -131,7 +127,7 @@ export default function BookingsPage() {
     </div>
   );
 
-  if (loading) {
+  if (userLoading || loading) {
     return (
       <main className="flex-1 p-4 sm:p-6 lg:p-8">
         <h1 className="text-3xl font-bold mb-8">My Bookings</h1>

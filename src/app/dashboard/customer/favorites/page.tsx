@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Heart, AlertTriangle } from 'lucide-react';
 import SalonCard from '@/components/salon-card';
@@ -11,70 +11,69 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import type { User } from '@supabase/supabase-js';
+import { useUser } from '@/context/UserContext';
 
 export default function FavoritesPage() {
+  const { user, loading: userLoading } = useUser();
   const [favoritedSalons, setFavoritedSalons] = useState<Salon[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
   const { toast } = useToast();
-  const [user, setUser] = useState<User | null>(null);
+
+  const fetchFavorites = useCallback(async () => {
+    if (!user) {
+      setError("You must be logged in to view your favorites.");
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    
+    const { data, error: fetchError } = await supabase
+      .from('favorites')
+      .select(`
+        created_at,
+        salons (
+          id,
+          name,
+          image,
+          imageHint,
+          location,
+          rating,
+          reviews,
+          startingPrice,
+          verified,
+          featured,
+          services:services (id, name, price, duration),
+          gallery:gallery (id, url, hint, type)
+        )
+      `)
+      .eq('user_id', user.id);
+
+    if (fetchError) {
+      console.error("Error fetching favorites:", fetchError);
+      setError("Could not load your favorite salons. Please try again.");
+    } else if (data) {
+      const salons = data.map((fav: { salons: any; }) => fav.salons).filter(Boolean) as Salon[];
+      setFavoritedSalons(salons);
+    }
+    setLoading(false);
+  }, [supabase, user]);
 
   useEffect(() => {
-    const getUserAndFavorites = async () => {
-      setLoading(true);
-      setError(null);
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-
-      if (authError || !authUser) {
-        setError("You must be logged in to view your favorites.");
-        setUser(null);
-        setLoading(false);
-        return;
-      }
-      
-      setUser(authUser);
-
-      const { data, error: fetchError } = await supabase
-        .from('favorites')
-        .select(`
-          created_at,
-          salons (
-            id,
-            name,
-            image,
-            imageHint,
-            location,
-            rating,
-            reviews,
-            startingPrice,
-            verified,
-            featured,
-            services:services (id, name, price, duration),
-            gallery:gallery (id, url, hint, type)
-          )
-        `)
-        .eq('user_id', authUser.id);
-
-      if (fetchError) {
-        console.error("Error fetching favorites:", fetchError);
-        setError("Could not load your favorite salons. Please try again.");
-      } else if (data) {
-        const salons = data.map((fav: { salons: any; }) => fav.salons).filter(Boolean) as Salon[];
-        setFavoritedSalons(salons);
-      }
-      setLoading(false);
-    };
-    getUserAndFavorites();
-  }, [supabase]);
+    if (!userLoading) {
+      fetchFavorites();
+    }
+  }, [userLoading, fetchFavorites]);
 
   const handleBookNow = (salon: Salon) => {
     console.log('Booking for salon:', salon.name);
     toast({ title: 'Booking system not implemented in this view.' });
   };
   
-  if (loading) {
+  if (userLoading || loading) {
     return (
       <main className="flex-1 p-8 bg-gradient-beauty-secondary pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

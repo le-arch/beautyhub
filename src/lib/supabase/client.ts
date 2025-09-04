@@ -3,30 +3,23 @@
 
 import { createBrowserClient } from "@supabase/ssr";
 
-let client: ReturnType<typeof createBrowserClient> | undefined;
-
 export function createClient() {
-  if (client) {
-    return client;
-  }
-
-  // Check if environment variables are available
   if (
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
     !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   ) {
-    // Return a mock client or throw an error if you want to handle this case explicitly
-    // For now, we'll return a minimal object to avoid crashing the app.
     console.error("Supabase environment variables are not set. Please check your .env file.");
-    // A mock client to prevent app crash
+    // Return a mock client to prevent app crash
     return {
         from: () => ({
             select: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
             insert: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
             update: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
             delete: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
-            filter: () => ({ data: null, error: { message: 'Supabase not configured' } }),
-            ilike: () => ({ data: null, error: { message: 'Supabase not configured' } }),
+            filter: () => ({ select: async () => ({data: null, error: { message: 'Supabase not configured' }})}),
+            ilike: () => ({ select: async () => ({data: null, error: { message: 'Supabase not configured' }})}),
+            eq: () => ({ select: async () => ({data: null, error: { message: 'Supabase not configured' }})}),
+            order: () => ({ select: async () => ({data: null, error: { message: 'Supabase not configured' }})})
         }),
         auth: {
             onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
@@ -34,14 +27,13 @@ export function createClient() {
             signInWithPassword: async () => ({ data: { user: null }, error: { message: 'Supabase not configured' } }),
             signUp: async () => ({ data: { user: null }, error: { message: 'Supabase not configured' } }),
             signOut: async () => ({ error: null }),
+            updateUser: async () => ({ data: { user: null }, error: { message: 'Supabase not configured' } }),
         },
     } as any;
   }
   
-  client = createBrowserClient(
+  return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
-
-  return client;
 }

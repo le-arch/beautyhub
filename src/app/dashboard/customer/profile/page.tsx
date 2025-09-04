@@ -11,68 +11,32 @@ import { User, Mail, Phone, MapPin, Camera, Edit, Save, Loader2, AlertTriangle }
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { createClient } from '@/lib/supabase/client';
-import type { Profile } from '@/lib/types';
-import type { User as SupabaseUser } from '@supabase/supabase-js';
+import type { Profile as ProfileType } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useUser } from '@/context/UserContext';
 
 export default function ProfilePage() {
   const { toast } = useToast();
   const supabase = createClient();
+  const { user, profile: contextProfile, loading: userLoading } = useUser();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [user, setUser] = useState<SupabaseUser | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<ProfileType | null>(contextProfile);
 
   useEffect(() => {
-    const fetchUserAndProfile = async () => {
-      setLoading(true);
-      setError(null);
-
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-
-      if (authError || !authUser) {
-        setError("You must be logged in to view your profile.");
-        setUser(null);
-        setLoading(false);
-        return;
-      }
-      
-      setUser(authUser);
-
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", authUser.id)
-        .single();
-
-      if (profileError && profileError.code !== "PGRST116") { // pgrst116 means no rows found, which is ok
-        console.error("Profile fetch error:", profileError);
-        setError("Could not load profile data. Please try again.");
-      } else {
-        setProfile(profileData);
-      }
-      setLoading(false);
-    };
-
-    fetchUserAndProfile();
-
-  }, [supabase]);
+    // Sync local state with context profile whenever it changes
+    setProfile(contextProfile);
+  }, [contextProfile]);
   
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    if (user) {
+    if (user && profile) {
       setProfile(prev => ({
-        id: user.id,
-        full_name: '',
-        avatar_url: null,
-        phone: null,
-        location: null,
-        ...prev,
+        ...prev!,
         [id]: value,
       }));
     }
@@ -89,7 +53,7 @@ export default function ProfilePage() {
       full_name: profile.full_name || user.email,
       phone: profile.phone,
       location: profile.location,
-      avatar_url: profile.avatar_url, // Let supabase auth handle avatar
+      avatar_url: profile.avatar_url,
       updated_at: new Date().toISOString(),
     };
 
@@ -110,11 +74,6 @@ export default function ProfilePage() {
         description: 'Your information has been successfully saved.',
       });
       setIsEditing(false);
-
-      if (userUpdateData?.user) {
-        setUser(userUpdateData.user);
-        setProfile(prev => ({ ...prev, ...userUpdateData.user!.user_metadata, ...profileDataToSave }));
-      }
     }
 
     setSaving(false);
@@ -147,7 +106,7 @@ export default function ProfilePage() {
     </Card>
   );
 
-  if (loading) {
+  if (userLoading) {
     return (
       <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-gradient-beauty-secondary">
         <div className="max-w-4xl mx-auto">
@@ -160,19 +119,19 @@ export default function ProfilePage() {
       </main>
     );
   }
-
-  if (error) {
-     return (
-      <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-gradient-beauty-secondary">
-        <div className="max-w-4xl mx-auto">
-            <Alert variant="destructive" className="mb-6">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-        </div>
-      </main>
-     )
+  
+  if (!user) {
+    return (
+     <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-gradient-beauty-secondary">
+       <div className="max-w-4xl mx-auto">
+           <Alert variant="destructive" className="mb-6">
+             <AlertTriangle className="h-4 w-4" />
+             <AlertTitle>Not Logged In</AlertTitle>
+             <AlertDescription>You must be logged in to view your profile.</AlertDescription>
+           </Alert>
+       </div>
+     </main>
+    )
   }
 
   return (
@@ -183,7 +142,7 @@ export default function ProfilePage() {
           <p className="text-lg text-warmgray-600">View and manage your personal details.</p>
         </div>
 
-        {user && (
+        {profile && (
               <Card className="border-purple-100 shadow-lg">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
@@ -215,11 +174,11 @@ export default function ProfilePage() {
                     <div className="relative">
                       <Avatar className="h-24 w-24 border-4 border-white shadow-md">
                         <AvatarImage
-                          src={profile?.avatar_url || user.user_metadata.avatar_url || ''}
-                          alt={profile?.full_name || ''}
+                          src={profile.avatar_url || user.user_metadata.avatar_url || ''}
+                          alt={profile.full_name || ''}
                         />
                         <AvatarFallback className="bg-gradient-to-br from-purple-100 to-pink-100 text-purple-700 text-2xl">
-                          {profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() ||
+                          {profile.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() ||
                             user.email?.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
@@ -235,7 +194,7 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <h2 className="text-2xl font-bold text-warmgray-900">
-                        {profile?.full_name || user.user_metadata.full_name || 'New User'}
+                        {profile.full_name || user.user_metadata.full_name || 'New User'}
                       </h2>
                       <p className="text-warmgray-600">{user.email}</p>
                     </div>
@@ -249,7 +208,7 @@ export default function ProfilePage() {
                       </Label>
                       <Input
                         id="full_name"
-                        value={profile?.full_name || ''}
+                        value={profile.full_name || ''}
                         onChange={handleInputChange}
                         disabled={!isEditing || saving}
                         className="bg-warmgray-50 border-purple-200 disabled:opacity-70"
@@ -276,7 +235,7 @@ export default function ProfilePage() {
                       <Input
                         id="phone"
                         type="tel"
-                        value={profile?.phone || ''}
+                        value={profile.phone || ''}
                         onChange={handleInputChange}
                         disabled={!isEditing || saving}
                         className="bg-warmgray-50 border-purple-200 disabled:opacity-70"
@@ -289,7 +248,7 @@ export default function ProfilePage() {
                       </Label>
                       <Input
                         id="location"
-                        value={profile?.location || ''}
+                        value={profile.location || ''}
                         onChange={handleInputChange}
                         disabled={!isEditing || saving}
                         className="bg-warmgray-50 border-purple-200 disabled:opacity-70"
