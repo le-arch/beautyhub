@@ -83,12 +83,35 @@ export interface Booking {
     } | null;
 }
 
-
 export interface Profile {
   id: string;
-  full_name: string;
+  updated_at?: string;
+  full_name: string | null;
   avatar_url: string | null;
   phone: string | null;
   location: string | null;
   email?: string;
+}
+
+export interface Notification {
+    id: string;
+    user_id: string;
+    created_at: string;
+    title: string;
+    description: string;
+    type: string;
+    is_read: boolean;
+}
+
+export interface UserSettings {
+    user_id: string;
+    theme: 'light' | 'dark';
+    language: string;
+    currency: string;
+    notifications: {
+        booking_updates: boolean;
+        new_messages: boolean;
+        promotions: boolean;
+    };
+    updated_at: string;
 }
