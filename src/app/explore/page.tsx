@@ -7,59 +7,37 @@ import SalonCard from '@/components/salon-card';
 import { BookingSystem } from '@/components/booking-system';
 import type { Salon } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { createClient } from '@/lib/supabase/client';
+import { mockSalons } from '@/lib/mock-data';
 
 export default function ExplorePage() {
     const [salons, setSalons] = useState<Salon[]>([]);
     const [loading, setLoading] = useState(true);
     const [isBooking, setIsBooking] = useState(false);
     const [selectedSalon, setSelectedSalon] = useState<Salon | null>(null);
-    const supabase = createClient();
 
     useEffect(() => {
-      const fetchSalons = async () => {
         setLoading(true);
-        const { data, error } = await supabase.from('salons').select(`
-          *,
-          services (*),
-          gallery (*)
-        `);
-        
-        if (error) {
-          console.error('Error fetching salons:', error);
-        } else {
-          setSalons(data as Salon[]);
-        }
-        setLoading(false);
-      };
-
-      fetchSalons();
+        setTimeout(() => {
+            setSalons(mockSalons);
+            setLoading(false);
+        }, 500);
     }, []);
 
-    const handleFilterChange = async (filters: any) => {
+    const handleFilterChange = (filters: any) => {
         setLoading(true);
-        let query = supabase.from('salons').select(`
-            *,
-            services (*),
-            gallery (*)
-        `);
-
-        if (filters.query) {
-            query = query.ilike('name', `%${filters.query}%`);
-        }
-
-        if (filters.category && filters.category !== 'All') {
-            query = query.filter('services.name', 'ilike', `%${filters.category}%`);
-        }
-        
-        const { data, error } = await query;
-        
-        if (error) {
-            console.error('Error filtering salons:', error);
-        } else {
-            setSalons(data as Salon[]);
-        }
-        setLoading(false);
+        setTimeout(() => {
+            let filteredSalons = mockSalons;
+            if (filters.query) {
+                filteredSalons = filteredSalons.filter(s => s.name.toLowerCase().includes(filters.query.toLowerCase()));
+            }
+             if (filters.category && filters.category !== 'All') {
+               filteredSalons = filteredSalons.filter(salon => 
+                    salon.services.some(service => service.name.includes(filters.category))
+                );
+            }
+            setSalons(filteredSalons);
+            setLoading(false);
+        }, 500);
     };
 
     const handleBookNow = (salon: Salon) => {

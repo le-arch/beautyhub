@@ -1,179 +1,130 @@
-import type { Salon, BlogPost, Conversation } from './types';
+
+import type { Salon, BlogPost, Conversation, Booking, Profile, User, Notification, UserSettings } from './types';
 
 export const mockSalons: Salon[] = [
   {
     id: 1,
     name: 'Amber Glow Salon',
-    image: 'https://placehold.co/600x400.png',
+    image: 'https://images.unsplash.com/photo-1594736797933-d0301ba6add9?w=400',
     imageHint: 'modern salon interior',
     location: 'Lagos, Nigeria',
     rating: 4.5,
     reviews: 120,
-    startingPrice: 50,
+    startingPrice: 10000,
     services: [
       {
-        name: 'Classic Manicure', price: 50,
-        id: 0,
-        duration: 0
+        id: 1,
+        name: 'Classic Manicure', price: 10000,
+        duration: 45
       },
       {
-        name: 'Gel Pedicure', price: 75,
-        id: 0,
-        duration: 0
+        id: 2,
+        name: 'Gel Pedicure', price: 12000,
+        duration: 60
       },
       {
-        name: 'Knotless Braids', price: 200,
-        id: 0,
-        duration: 0
+        id: 3,
+        name: 'Knotless Braids', price: 25000,
+        duration: 240
       },
     ],
     gallery: [
       {
+        id: 1,
         url: 'https://placehold.co/600x400.png', hint: 'braiding hair', type: 'image',
-        id: 0
       },
       {
+        id: 2,
         url: 'https://placehold.co/600x400.png', hint: 'manicure station', type: 'image',
-        id: 0
-      },
-      {
-        url: 'https://placehold.co/600x400.png', hint: 'pedicure chairs', type: 'image',
-        id: 0
-      },
-      {
-        url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4', hint: 'braiding timelapse', type: 'video',
-        id: 0
-      },
-      {
-        url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', hint: 'salon tour', type: 'video',
-        id: 0
       },
     ],
     verified: true,
+    featured: true,
   },
   {
     id: 2,
     name: 'Serene Spa & Beauty',
-    image: 'https://placehold.co/600x400.png',
+    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=400',
     imageHint: 'serene spa room',
     location: 'Accra, Ghana',
     rating: 5,
     reviews: 88,
-    startingPrice: 80,
+    startingPrice: 15000,
     services: [
       {
-        name: 'Deep Tissue Massage', price: 100,
-        id: 0,
-        duration: 0
+        id: 4,
+        name: 'Deep Tissue Massage', price: 20000,
+        duration: 60
       },
       {
-        name: 'Hydrating Facial', price: 80,
-        id: 0,
-        duration: 0
+        id: 5,
+        name: 'Hydrating Facial', price: 15000,
+        duration: 75
       },
       {
-        name: 'Body Scrub', price: 90,
-        id: 0,
-        duration: 0
+        id: 6,
+        name: 'Body Scrub', price: 18000,
+        duration: 50
       },
     ],
-    gallery: [
-      {
-        url: 'https://placehold.co/600x400.png', hint: 'facial treatment', type: 'image',
-        id: 0
-      },
-      {
-        url: 'https://placehold.co/600x400.png', hint: 'massage table', type: 'image',
-        id: 0
-      },
-      {
-        url: 'https://placehold.co/600x400.png', hint: 'spa products', type: 'image',
-        id: 0
-      },
-    ],
+    gallery: [],
   },
   {
     id: 3,
     name: 'Nairobi Nail Bar',
-    image: 'https://placehold.co/600x400.png',
+    image: 'https://images.unsplash.com/photo-1604654894610-df6231858918?w=400',
     imageHint: 'chic nail art',
     location: 'Nairobi, Kenya',
     rating: 4.8,
     reviews: 210,
-    startingPrice: 30,
+    startingPrice: 5000,
     services: [
       {
-        name: 'Acrylic Fill-in', price: 40,
-        id: 0,
-        duration: 0
+        id: 7,
+        name: 'Acrylic Fill-in', price: 8000,
+        duration: 90
       },
       {
-        name: 'Nail Art', price: 30,
-        id: 0,
-        duration: 0
+        id: 8,
+        name: 'Nail Art', price: 5000,
+        duration: 45
       },
       {
-        name: 'Luxury Pedicure', price: 65,
-        id: 0,
-        duration: 0
+        id: 9,
+        name: 'Luxury Pedicure', price: 10000,
+        duration: 60
       },
     ],
-    gallery: [
-      {
-        url: 'https://placehold.co/600x400.png', hint: 'nail polish collection', type: 'image',
-        id: 0
-      },
-      {
-        url: 'https://placehold.co/600x400.png', hint: 'intricate nail design', type: 'image',
-        id: 0
-      },
-      {
-        url: 'https://placehold.co/600x400.png', hint: 'client getting nails done', type: 'image',
-        id: 0
-      },
-    ],
+    gallery: [],
     featured: true,
   },
    {
     id: 4,
     name: 'Dapper Cuts Barber',
-    image: 'https://placehold.co/600x400.png',
+    image: 'https://images.unsplash.com/photo-1599351522383-faf4958b7512?w=400',
     imageHint: 'classic barbershop',
     location: 'Johannesburg, SA',
     rating: 4.9,
     reviews: 300,
-    startingPrice: 25,
+    startingPrice: 4000,
     services: [
       {
-        name: 'Haircut & Style', price: 30,
-        id: 0,
-        duration: 0
+        id: 10,
+        name: 'Haircut & Style', price: 5000,
+        duration: 45
       },
       {
-        name: 'Hot Towel Shave', price: 25,
-        id: 0,
-        duration: 0
+        id: 11,
+        name: 'Hot Towel Shave', price: 4000,
+        duration: 30
       },
       {
-        name: 'Beard Trim', price: 20,
-        id: 0,
-        duration: 0
+        id: 12,
+        name: 'Beard Trim', price: 3000,
+        duration: 20
       },
     ],
-    gallery: [
-        {
-          url: 'https://placehold.co/600x400.png', hint: 'barber cutting hair', type: 'image',
-          id: 0
-        },
-        {
-          url: 'https://placehold.co/600x400.png', hint: 'shaving cream', type: 'image',
-          id: 0
-        },
-        {
-          url: 'https://placehold.co/600x400.png', hint: 'styled haircut', type: 'image',
-          id: 0
-        },
-    ],
+    gallery: [],
     verified: true,
     featured: true,
   },
@@ -208,7 +159,7 @@ export const mockConversations: Conversation[] = [
     id: 'convo-1',
     salonId: 1,
     salonName: 'Amber Glow Salon',
-    salonAvatar: 'https://placehold.co/100x100.png',
+    salonAvatar: 'https://images.unsplash.com/photo-1594736797933-d0301ba6add9?w=100',
     lastMessage: 'Your appointment for Knotless Braids is confirmed!',
     timestamp: '2024-08-28T10:05:00Z',
     unreadCount: 1,
@@ -237,7 +188,7 @@ export const mockConversations: Conversation[] = [
     id: 'convo-2',
     salonId: 2,
     salonName: 'Serene Spa & Beauty',
-    salonAvatar: 'https://placehold.co/100x100.png',
+    salonAvatar: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=100',
     lastMessage: 'Yes, we do offer couple massages. It\'s one of our most popular packages.',
     timestamp: '2024-08-27T15:30:00Z',
     unreadCount: 0,
@@ -257,3 +208,97 @@ export const mockConversations: Conversation[] = [
     ],
   },
 ];
+
+export const mockBookings = {
+  upcoming: [
+    {
+      id: 'up1',
+      user_id: 'user-123',
+      salon_id: 1,
+      salons: mockSalons[0],
+      service_name: 'Gel Pedicure',
+      booking_time: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+      status: 'Confirmed' as const,
+      total_price: 12000,
+      deposit_paid: true,
+      notes: 'Please use a light pink color.',
+      created_at: new Date().toISOString()
+    }
+  ],
+  completed: [
+    {
+      id: 'comp1',
+      user_id: 'user-123',
+      salon_id: 3,
+      salons: mockSalons[2],
+      service_name: 'Luxury Pedicure',
+      booking_time: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      status: 'Completed' as const,
+      total_price: 10000,
+      deposit_paid: true,
+      notes: null,
+      created_at: new Date().toISOString()
+    }
+  ]
+};
+
+export const mockUser: User = {
+  id: 'user-123',
+  email: 'beauty.lover@example.com',
+  full_name: 'Beauty Lover',
+  avatar_url: 'https://i.pravatar.cc/150?u=beautylover',
+  role: 'customer'
+};
+
+export const mockProfile: Profile = {
+  id: 'user-123',
+  full_name: 'Beauty Lover',
+  avatar_url: 'https://i.pravatar.cc/150?u=beautylover',
+  email: 'beauty.lover@example.com',
+  phone: '+234 80 9876 5432',
+  location: 'Lagos, Nigeria'
+};
+
+export const mockNotifications: Notification[] = [
+    {
+        id: '1',
+        user_id: 'user-123',
+        created_at: new Date().toISOString(),
+        title: "Booking Confirmed!",
+        description: "Your appointment at Amber Glow Salon is confirmed for tomorrow.",
+        type: 'booking_confirmed',
+        is_read: false
+    },
+    {
+        id: '2',
+        user_id: 'user-123',
+        created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+        title: "New Message",
+        description: "Serene Spa & Beauty sent you a message.",
+        type: 'new_message',
+        is_read: false
+    },
+     {
+        id: '3',
+        user_id: 'user-123',
+        created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+        title: "New 5-Star Review",
+        description: "You left a glowing review for Nairobi Nail Bar.",
+        type: 'new_review',
+        is_read: true
+    }
+];
+
+
+export const mockUserSettings: UserSettings = {
+    user_id: 'user-123',
+    theme: 'light',
+    language: 'en',
+    currency: 'NGN',
+    notifications: {
+        booking_updates: true,
+        new_messages: true,
+        promotions: false,
+    },
+    updated_at: new Date().toISOString(),
+};

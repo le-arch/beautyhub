@@ -2,18 +2,28 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import Header from '../header';
-import { login } from '../auth/actions';
 import { SubmitButton } from './submit-button';
 import { PasswordInput } from '@/components/password-input';
 
 export default function LoginPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const message = searchParams.get('message');
+
+  const handleLogin = (formData: FormData) => {
+    // Simulate login and redirect
+    const email = formData.get('email') as string;
+    if (email.includes('owner')) {
+        router.push('/dashboard/owner');
+    } else {
+        router.push('/dashboard/customer');
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -24,7 +34,8 @@ export default function LoginPage() {
           <CardHeader>
             <CardTitle className="text-2xl">Login</CardTitle>
             <CardDescription>
-              Enter your email below to login to your account
+              Enter your email below to login to your account. <br/>
+              (Use "owner@test.com" for salon owner view)
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -58,7 +69,7 @@ export default function LoginPage() {
                 </div>
               )}
               <SubmitButton
-                formAction={login}
+                formAction={handleLogin}
                 className="w-full"
                 pendingText="Signing In..."
               >

@@ -1,10 +1,6 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import { UserProvider } from '@/context/UserContext';
-import type { User, Profile } from '@/lib/types';
-import { createClient } from '@/lib/supabase/client';
 import {
   SidebarProvider,
   Sidebar,
@@ -22,39 +18,13 @@ import CustomerDashboardHeader from '@/app/dashboard/customer/header';
 import { Home, Star, MessageSquare, Calendar, User as UserIcon, Settings, Sparkles, LogOut, LayoutDashboard, Search, Map } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { logout } from '@/app/auth/actions';
 
 export default function CustomerDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const supabase = createClient();
-
-  useEffect(() => {
-    const fetchUserAndProfile = async () => {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      setUser(authUser);
-
-      if (authUser) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', authUser.id)
-          .single();
-        setProfile(profileData);
-      }
-      setLoading(false);
-    };
-
-    fetchUserAndProfile();
-  }, [supabase]);
-
   return (
-    <UserProvider value={{ user, profile, loading }}>
       <SidebarProvider>
         <div className="flex min-h-screen flex-col">
           <CustomerDashboardHeader />
@@ -152,12 +122,12 @@ export default function CustomerDashboardLayout({
               <SidebarFooter>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <form action={logout} className="w-full">
-                      <Button type="submit" variant="outline" className="w-full justify-start">
+                    <Link href="/login" className='w-full'>
+                      <Button variant="outline" className="w-full justify-start">
                           <LogOut className="mr-2" />
                           Sign Out
                       </Button>
-                    </form>
+                    </Link>
                   </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarFooter>
@@ -170,6 +140,5 @@ export default function CustomerDashboardLayout({
           </div>
         </div>
       </SidebarProvider>
-    </UserProvider>
   );
 }

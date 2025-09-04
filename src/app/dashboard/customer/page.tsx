@@ -1,11 +1,10 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Search,
@@ -21,9 +20,8 @@ import SalonCard from '@/components/salon-card';
 import Link from 'next/link';
 import ImageWithFallback from '@/components/image-with-fallback';
 import type { Salon, Profile } from '@/lib/types';
-import { createClient } from '@/lib/supabase/client';
 import { useGeolocation } from '@/hooks/use-geolocation';
-import type { User } from '@supabase/supabase-js';
+import { mockSalons, mockProfile } from '@/lib/mock-data';
 
 const quickSearchCategories = [
   { name: 'Braiding', icon: '💇🏾‍♀️', color: 'from-purple-500 to-purple-600' },
@@ -37,62 +35,11 @@ const quickSearchCategories = [
 export default function CustomerHome() {
   const [searchQuery, setSearchQuery] = useState('');
   const { location: userLocation } = useGeolocation();
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [trendingSalons, setTrendingSalons] = useState<Salon[]>([]);
-  const [recentlyViewed, setRecentlyViewed] = useState<Salon[]>([]);
-  const [stats, setStats] = useState({ favorites: 0, messages: 0, bookings: 0 });
-  const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+  const [profile] = useState<Profile>(mockProfile);
+  const [trendingSalons] = useState<Salon[]>(mockSalons.slice(0, 4));
+  const [recentlyViewed] = useState<Salon[]>(mockSalons.slice(0, 1));
+  const [stats] = useState({ favorites: 2, messages: 3, bookings: 1 });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      setUser(authUser);
-
-      if (authUser) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', authUser.id)
-          .single();
-        setProfile(profileData);
-
-        const { count: favoritesCount } = await supabase
-          .from('favorites')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', authUser.id);
-
-        const { count: bookingsCount } = await supabase
-          .from('bookings')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', authUser.id)
-          .eq('status', 'Confirmed');
-
-        setStats({ favorites: favoritesCount || 0, messages: 3, bookings: bookingsCount || 0 });
-      }
-
-      const { data: salonData } = await supabase
-        .from('salons')
-        .select('*')
-        .order('rating', { ascending: false })
-        .limit(4);
-        
-      setTrendingSalons(salonData as Salon[] || []);
-      setRecentlyViewed(salonData?.slice(0, 1) as Salon[] || []);
-
-      setLoading(false);
-    };
-
-    fetchData();
-  }, [supabase]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-  
   return (
     <div className="min-h-screen pt-16">
       {/* Welcome Header */}
@@ -103,7 +50,7 @@ export default function CustomerHome() {
               <Avatar className="h-16 w-16 mr-4">
                 <AvatarImage src={profile?.avatar_url || ''} alt={profile?.full_name || 'User'} />
                 <AvatarFallback className="bg-purple-100 text-purple-600 text-lg font-semibold">
-                  {profile?.full_name?.split(' ').map(n => n[0]).join('') || user?.email?.charAt(0).toUpperCase()}
+                  {profile?.full_name?.split(' ').map(n => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
               <div className="text-left">

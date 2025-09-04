@@ -1,30 +1,19 @@
+
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { 
-  Calendar as CalendarIcon, 
-  Clock, 
   CreditCard,
-  MessageCircle,
   CheckCircle,
   ArrowRight,
   ArrowLeft,
-  User,
-  MapPin,
-  Star
 } from "lucide-react";
 import type { Salon } from '@/lib/types';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface BookingSystemProps {
@@ -45,8 +34,6 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
   const [selectedServices, setSelectedServices] = useState<SelectedService[]>([]);
   const [notes, setNotes] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [bookingId, setBookingId] = useState<string>('');
-  const supabase = createClient();
   const { toast } = useToast();
 
   const generateTimeSlots = (date: Date) => {
@@ -95,45 +82,9 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
     }
 
     setIsProcessing(true);
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-        toast({
-            variant: 'destructive',
-            title: 'Not authenticated',
-            description: 'You must be logged in to book an appointment.',
-        });
-        setIsProcessing(false);
-        return;
-    }
-
-    const bookingTime = new Date(selectedDate);
-    const [hours, minutes] = selectedTime.split(':').map(Number);
-    bookingTime.setHours(hours, minutes);
-
-    const { data, error } = await supabase.from('bookings').insert({
-        user_id: user.id,
-        salon_id: salon.id,
-        service_name: selectedServices.map(s => s.name).join(', '),
-        booking_time: bookingTime.toISOString(),
-        total_price: totalPrice,
-        deposit_paid: false,
-        notes: notes,
-        status: 'Pending'
-    }).select().single();
-
-    if (error) {
-        console.error('Booking error:', error);
-        toast({
-            variant: 'destructive',
-            title: 'Booking Failed',
-            description: 'Could not create your booking. Please try again.',
-        });
-        setIsProcessing(false);
-        return;
-    }
+    // Mock booking creation
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    setBookingId(data.id);
     setIsProcessing(false);
     setStep(4); // Move to confirm/payment step
   };
@@ -143,21 +94,10 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
     // Mock payment processing
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    const { error } = await supabase
-      .from('bookings')
-      .update({ status: 'Confirmed', deposit_paid: true })
-      .eq('id', bookingId);
-      
-    if (error) {
-      console.error('Payment confirmation error:', error);
-       toast({
-            variant: 'destructive',
-            title: 'Payment Failed',
-            description: 'Could not confirm your payment. Please contact support.',
-        });
-        setIsProcessing(false);
-        return;
-    }
+    toast({
+        title: 'Booking Confirmed!',
+        description: `Your appointment at ${salon.name} is set.`,
+    });
 
     setIsProcessing(false);
     setStep(5);
@@ -332,9 +272,6 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
               </p>
             </div>
             <div className="bg-purple-50 p-4 rounded-lg">
-              <p className="text-sm text-purple-700">
-                <strong>Booking ID:</strong> {bookingId}
-              </p>
               <p className="text-lg font-bold text-purple-700 mt-1">
                 <strong>Deposit Amount:</strong> ₦{depositAmount.toLocaleString()}
               </p>

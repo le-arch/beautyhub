@@ -1,121 +1,24 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Heart, AlertTriangle } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import SalonCard from '@/components/salon-card';
+import { mockSalons } from '@/lib/mock-data';
 import type { Salon } from '@/lib/types';
 import Link from 'next/link';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useUser } from '@/context/UserContext';
 
 export default function FavoritesPage() {
-  const { user, loading: userLoading } = useUser();
-  const [favoritedSalons, setFavoritedSalons] = useState<Salon[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
+  const [favoritedSalons] = useState<Salon[]>(mockSalons.filter(s => s.featured));
   const { toast } = useToast();
-
-  const fetchFavorites = useCallback(async () => {
-    if (!user) {
-      setError("You must be logged in to view your favorites.");
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    
-    const { data, error: fetchError } = await supabase
-      .from('favorites')
-      .select(`
-        created_at,
-        salons (
-          id,
-          name,
-          image,
-          imageHint,
-          location,
-          rating,
-          reviews,
-          startingPrice,
-          verified,
-          featured,
-          services:services (id, name, price, duration),
-          gallery:gallery (id, url, hint, type)
-        )
-      `)
-      .eq('user_id', user.id);
-
-    if (fetchError) {
-      console.error("Error fetching favorites:", fetchError);
-      setError("Could not load your favorite salons. Please try again.");
-    } else if (data) {
-      const salons = data.map((fav: { salons: any; }) => fav.salons).filter(Boolean) as Salon[];
-      setFavoritedSalons(salons);
-    }
-    setLoading(false);
-  }, [supabase, user]);
-
-  useEffect(() => {
-    if (!userLoading) {
-      fetchFavorites();
-    }
-  }, [userLoading, fetchFavorites]);
 
   const handleBookNow = (salon: Salon) => {
     console.log('Booking for salon:', salon.name);
     toast({ title: 'Booking system not implemented in this view.' });
   };
   
-  if (userLoading || loading) {
-    return (
-      <main className="flex-1 p-8 bg-gradient-beauty-secondary pt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center">
-                    <Heart className="h-6 w-6 text-purple-600 fill-current" />
-                  </div>
-                  <div>
-                    <h1 className="text-3xl font-semibold text-warmgray-900">Your Favorite Salons</h1>
-                  </div>
-              </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="space-y-4">
-                  <Skeleton className="h-48 w-full rounded-xl" />
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-10 w-full" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  if (error) {
-     return (
-        <main className="flex-1 p-8 bg-gradient-beauty-secondary pt-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <Alert variant="destructive" className="mb-8">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                </Alert>
-            </div>
-        </main>
-     );
-  }
-
   return (
     <main className="flex-1 p-8 bg-gradient-beauty-secondary pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

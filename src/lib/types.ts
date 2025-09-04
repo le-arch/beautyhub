@@ -1,6 +1,4 @@
 
-import type { User } from "@supabase/supabase-js";
-
 export interface Service {
   id: number;
   name: string;
@@ -114,4 +112,13 @@ export interface UserSettings {
         promotions: boolean;
     };
     updated_at: string;
+}
+
+// Used for mock data, not a database type
+export interface User {
+  id: string;
+  email: string;
+  full_name?: string;
+  avatar_url?: string;
+  role?: 'customer' | 'owner';
 }

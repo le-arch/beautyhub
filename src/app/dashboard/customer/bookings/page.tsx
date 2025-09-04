@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,59 +10,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import { createClient } from '@/lib/supabase/client';
+import { mockBookings } from '@/lib/mock-data';
 import type { Booking } from '@/lib/types';
-import { useUser } from '@/context/UserContext';
+
 
 export default function BookingsPage() {
-  const { user, loading: userLoading } = useUser();
-  const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
-  const [pastBookings, setPastBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
-
-  const fetchBookings = useCallback(async () => {
-    if (!user) {
-      setError("You must be logged in to view your bookings.");
-      setLoading(false);
-      return;
-    }
-    
-    setLoading(true);
-    setError(null);
-
-    const { data, error: fetchError } = await supabase
-      .from('bookings')
-      .select(`
-        *,
-        salons (
-          name,
-          image
-        )
-      `)
-      .eq('user_id', user.id)
-      .order('booking_time', { ascending: false });
-
-    if (fetchError) {
-      console.error('Error fetching bookings:', fetchError);
-      setError('Could not fetch your bookings. Please try again later.');
-    } else if (data) {
-      const now = new Date();
-      const upcoming = data.filter((b) => new Date(b.booking_time) >= now);
-      const past = data.filter((b) => new Date(b.booking_time) < now);
-      setUpcomingBookings(upcoming);
-      setPastBookings(past);
-    }
-    
-    setLoading(false);
-  }, [supabase, user]);
-
-  useEffect(() => {
-    if (!userLoading) {
-      fetchBookings();
-    }
-  }, [userLoading, fetchBookings]);
+  const [upcomingBookings] = useState<Booking[]>(mockBookings.upcoming);
+  const [pastBookings] = useState<Booking[]>(mockBookings.completed);
+  const [loading, setLoading] = useState(false);
 
   const renderBookingCard = (booking: Booking) => (
     <Card key={booking.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4">
@@ -80,7 +35,7 @@ export default function BookingsPage() {
             <h3 className="font-semibold text-lg">{booking.salons?.name}</h3>
             <p className="text-muted-foreground">{booking.service_name}</p>
           </div>
-          <Badge variant={booking.status === 'confirmed' ? 'default' : 'secondary'} className={booking.status === 'confirmed' ? 'bg-primary' : ''}>{booking.status}</Badge>
+          <Badge variant={booking.status === 'Confirmed' ? 'default' : 'secondary'} className={booking.status === 'Confirmed' ? 'bg-primary' : ''}>{booking.status}</Badge>
         </div>
         <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
           <div className="flex items-center gap-1.5">
@@ -127,7 +82,7 @@ export default function BookingsPage() {
     </div>
   );
 
-  if (userLoading || loading) {
+  if (loading) {
     return (
       <main className="flex-1 p-4 sm:p-6 lg:p-8">
         <h1 className="text-3xl font-bold mb-8">My Bookings</h1>
@@ -141,19 +96,6 @@ export default function BookingsPage() {
             <CardContent className="space-y-4">{renderSkeleton()}</CardContent>
           </Card>
         </div>
-      </main>
-    );
-  }
-
-  if (error) {
-    return (
-      <main className="flex-1 p-4 sm:p-6 lg:p-8">
-        <h1 className="text-3xl font-bold mb-8">My Bookings</h1>
-        <Alert variant="destructive" className="mb-8">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
       </main>
     );
   }

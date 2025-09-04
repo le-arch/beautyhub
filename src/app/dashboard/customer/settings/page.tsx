@@ -1,87 +1,30 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   User, 
   Bell, 
   Shield, 
   CreditCard, 
-  Globe, 
-  Moon, 
-  Sun, 
-  Camera, 
-  Key,
-  Eye,
-  EyeOff,
-  Trash2,
-  Download,
-  Calendar,
   Settings as SettingsIcon,
-  MessageCircle,
   Loader2,
   Save,
-  AlertTriangle
 } from 'lucide-react';
-import Link from 'next/link';
-import { useUser } from '@/context/UserContext';
-import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import type { Profile, UserSettings } from '@/lib/types';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import type { UserSettings } from '@/lib/types';
+import { mockUserSettings } from '@/lib/mock-data';
 
 export default function SettingsPage() {
-  const { user, profile: contextProfile, loading: userLoading } = useUser();
-  const [activeTab, setActiveTab] = useState('account');
-  const supabase = createClient();
+  const [activeTab, setActiveTab] = useState('preferences');
   const { toast } = useToast();
 
-  const [profile, setProfile] = useState<Partial<Profile>>({});
-  const [settings, setSettings] = useState<Partial<UserSettings>>({});
-  const [loading, setLoading] = useState(true);
+  const [settings, setSettings] = useState<UserSettings>(mockUserSettings);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchSettings = useCallback(async () => {
-    if (!user) return;
-    
-    setLoading(true);
-    setError(null);
-    
-    const { data, error: settingsError } = await supabase
-      .from('user_settings')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
-
-    if (settingsError && settingsError.code !== 'PGRST116') {
-      console.error('Error fetching settings:', settingsError);
-      setError('Could not load your settings.');
-    } else {
-      setSettings(data || {});
-    }
-
-    setProfile(contextProfile || {});
-    setLoading(false);
-  }, [user, contextProfile, supabase]);
-  
-  useEffect(() => {
-    if (!userLoading) {
-      fetchSettings();
-    }
-  }, [userLoading, fetchSettings]);
-
-  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProfile(prev => ({ ...prev, [e.target.id]: e.target.value }));
-  };
 
   const handleSettingsChange = (key: keyof UserSettings, value: any) => {
     setSettings(prev => ({ ...prev, [key]: value }));
@@ -98,72 +41,15 @@ export default function SettingsPage() {
   };
 
   const handleSaveChanges = async (section: 'profile' | 'preferences') => {
-    if (!user) return;
     setSaving(true);
-
-    if (section === 'profile') {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          full_name: profile.full_name,
-          phone: profile.phone,
-          location: profile.location,
-        })
-        .eq('id', user.id);
-        
-      if (profileError) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Could not save profile.' });
-      } else {
-        toast({ title: 'Profile Saved!' });
-      }
-    }
-
-    if (section === 'preferences') {
-      const { error: settingsError } = await supabase
-        .from('user_settings')
-        .upsert({ user_id: user.id, ...settings }, { onConflict: 'user_id' });
-        
-      if (settingsError) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Could not save preferences.' });
-      } else {
-        toast({ title: 'Preferences Saved!' });
-      }
-    }
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
+    toast({ title: `${section.charAt(0).toUpperCase() + section.slice(1)} Saved!` });
+
     setSaving(false);
   };
   
-  const renderSkeleton = () => (
-    <div className="space-y-8">
-      <Skeleton className="h-20 w-full" />
-      <Skeleton className="h-96 w-full" />
-    </div>
-  )
-
-  if (userLoading || loading) {
-    return (
-       <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-gradient-beauty-secondary">
-        <div className="max-w-6xl mx-auto">
-          {renderSkeleton()}
-        </div>
-      </main>
-    )
-  }
-
-  if (error) {
-    return (
-       <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-gradient-beauty-secondary">
-        <div className="max-w-6xl mx-auto">
-          <Alert variant="destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        </div>
-      </main>
-    )
-  }
-
   return (
     <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-gradient-beauty-secondary">
       <div className="max-w-6xl mx-auto">
@@ -214,47 +100,13 @@ export default function SettingsPage() {
           </TabsList>
 
           {/* Account Tab */}
-          <TabsContent value="account" className="space-y-8">
-            <Card className="border-purple-100">
-              <CardHeader>
-                <CardTitle className="text-xl text-warmgray-900 flex items-center gap-2">
-                  <User className="h-5 w-5 text-purple-600" />
-                  Profile Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="full_name">Full Name</Label>
-                    <Input 
-                      id="full_name" 
-                      value={profile.full_name || ''}
-                      onChange={handleProfileChange}
-                      className="bg-warmgray-50 border-purple-200"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input id="email" type="email" value={user?.email || ''} disabled className="bg-warmgray-200 border-purple-200" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" type="tel" value={profile.phone || ''} onChange={handleProfileChange} className="bg-warmgray-50 border-purple-200" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="location">Location</Label>
-                    <Input id="location" value={profile.location || ''} onChange={handleProfileChange} className="bg-warmgray-50 border-purple-200" />
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <Button onClick={() => handleSaveChanges('profile')} disabled={saving}>
-                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-                    Save Changes
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="account">
+              <Card className="border-purple-100">
+                  <CardHeader>
+                    <CardTitle>Account Information</CardTitle>
+                    <CardDescription>This is your public information. It can be edited on your <a href="/dashboard/customer/profile" className="text-primary underline">profile page</a>.</CardDescription>
+                  </CardHeader>
+              </Card>
           </TabsContent>
 
           {/* Preferences Tab */}
@@ -287,7 +139,7 @@ export default function SettingsPage() {
               <CardHeader><CardTitle>App Preferences</CardTitle></CardHeader>
               <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <Label>Theme</Label>
+                    <label className="font-medium text-warmgray-900">Theme</label>
                     <div className="flex gap-3">
                       <Button variant={settings.theme === 'light' ? 'default' : 'outline'} size="sm" onClick={() => handleSettingsChange('theme', 'light')}>
                         <Sun className="h-4 w-4 mr-2" /> Light
@@ -298,7 +150,7 @@ export default function SettingsPage() {
                     </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>Language</Label>
+                  <label className="font-medium text-warmgray-900">Language</label>
                   <select value={settings.language || 'en'} onChange={(e) => handleSettingsChange('language', e.target.value)} className="w-full px-3 py-2 bg-warmgray-50 border border-purple-200 rounded-md text-sm">
                     <option value="en">English</option>
                     <option value="fr">Français</option>

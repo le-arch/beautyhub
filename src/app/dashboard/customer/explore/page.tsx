@@ -1,85 +1,74 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { SearchAndFilter } from '@/components/search-and-filter';
 import SalonCard from '@/components/salon-card';
 import { BookingSystem } from '@/components/booking-system';
 import type { Salon } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { createClient } from '@/lib/supabase/client';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Frown } from 'lucide-react';
+import { mockSalons } from '@/lib/mock-data';
 
 export default function ExplorePage() {
-    const searchParams = useSearchParams();
     const [salons, setSalons] = useState<Salon[]>([]);
     const [loading, setLoading] = useState(true);
     const [isBooking, setIsBooking] = useState(false);
     const [selectedSalon, setSelectedSalon] = useState<Salon | null>(null);
-    const supabase = createClient();
-    const [error, setError] = useState<string | null>(null);
 
-    const fetchSalons = useCallback(async (filters: any = {}) => {
+    const fetchSalons = (filters: any = {}) => {
         setLoading(true);
-        setError(null);
-        let query = supabase.from('salons').select(`
-            id,
-            name,
-            image,
-            imageHint,
-            location,
-            rating,
-            reviews,
-            startingPrice,
-            verified,
-            featured,
-            services:services (id, name, price, duration),
-            gallery:gallery (id, url, hint, type)
-        `);
+        // Simulate API call
+        setTimeout(() => {
+            let filteredSalons = mockSalons;
 
-        if (filters.query) {
-            query = query.ilike('name', `%${filters.query}%`);
-        }
+            if (filters.query) {
+                filteredSalons = filteredSalons.filter(salon => 
+                    salon.name.toLowerCase().includes(filters.query.toLowerCase())
+                );
+            }
 
-        if (filters.category && filters.category !== 'All') {
-           query = query.filter('services', 'cs', `{"name":"${filters.category}"}`);
-        }
-        
-        if(filters.priceRange) {
-            query = query.gte('startingPrice', filters.priceRange[0]).lte('startingPrice', filters.priceRange[1]);
-        }
+            if (filters.category && filters.category !== 'All') {
+               filteredSalons = filteredSalons.filter(salon => 
+                    salon.services.some(service => service.name.includes(filters.category))
+                );
+            }
+            
+            if(filters.priceRange) {
+                filteredSalons = filteredSalons.filter(salon =>
+                    salon.startingPrice >= filters.priceRange[0] && salon.startingPrice <= filters.priceRange[1]
+                );
+            }
 
-        if(filters.rating) {
-            query = query.gte('rating', filters.rating[0]);
-        }
-        
-        if(filters.sortBy) {
-            const [field, direction] = filters.sortBy.split('-');
-            query = query.order(field, { ascending: direction === 'asc' });
-        } else {
-            query = query.order('rating', { ascending: false });
-        }
+            if(filters.rating) {
+                 filteredSalons = filteredSalons.filter(salon => salon.rating >= filters.rating[0]);
+            }
+            
+            if(filters.sortBy) {
+                const [field, direction] = filters.sortBy.split('-');
+                filteredSalons.sort((a, b) => {
+                    const valA = a[field as keyof Salon];
+                    const valB = b[field as keyof Salon];
+                    if (typeof valA === 'number' && typeof valB === 'number') {
+                        return direction === 'asc' ? valA - valB : valB - valA;
+                    }
+                    if (typeof valA === 'string' && typeof valB === 'string') {
+                         return direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                    }
+                    return 0;
+                });
+            } else {
+                 filteredSalons.sort((a, b) => b.rating - a.rating);
+            }
 
-        const { data, error } = await query;
-        
-        if (error) {
-            console.error('Error fetching salons:', error);
-            setError('Could not fetch salons. Please try again later.');
-        } else {
-            setSalons(data as Salon[]);
-        }
-        setLoading(false);
-    }, [supabase]);
+            setSalons(filteredSalons);
+            setLoading(false);
+        }, 500);
+    };
 
     useEffect(() => {
-        const initialFilters = {
-            query: searchParams.get('q') || '',
-            category: searchParams.get('category') || 'All'
-        };
-        fetchSalons(initialFilters);
-    }, [fetchSalons, searchParams]);
+        fetchSalons();
+    }, []);
 
 
     const handleBookNow = (salon: Salon) => {
@@ -96,13 +85,6 @@ export default function ExplorePage() {
         <>
             <main className="flex-1 p-4 sm:p-6 lg:p-8">
                 <SearchAndFilter onFiltersChange={fetchSalons} />
-
-                 {error && (
-                    <Alert variant="destructive" className="mt-8">
-                        <AlertTitle>Error</AlertTitle>
-                        <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                )}
 
                 <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                     {loading ? (

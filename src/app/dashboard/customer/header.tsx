@@ -1,7 +1,6 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Bell, Sparkles, CalendarCheck, MessageSquarePlus } from 'lucide-react';
@@ -13,45 +12,11 @@ import {
 } from "@/components/ui/popover";
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { useUser } from '@/context/UserContext';
-import { createClient } from '@/lib/supabase/client';
 import type { Notification } from '@/lib/types';
-import { Skeleton } from '@/components/ui/skeleton';
+import { mockNotifications } from '@/lib/mock-data';
 
 const CustomerDashboardHeader = () => {
-  const { user, loading: userLoading } = useUser();
-  const supabase = createClient();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loadingNotifications, setLoadingNotifications] = useState(true);
-
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      if (!user) {
-        setLoadingNotifications(false);
-        return;
-      }
-
-      setLoadingNotifications(true);
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      if (error) {
-        console.error('Error fetching notifications:', error);
-      } else {
-        setNotifications(data || []);
-      }
-      setLoadingNotifications(false);
-    };
-
-    if (!userLoading) {
-      fetchNotifications();
-    }
-  }, [user, userLoading, supabase]);
-
+  const notifications: Notification[] = mockNotifications;
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
   const getNotificationIcon = (type: string) => {
@@ -96,13 +61,7 @@ const CustomerDashboardHeader = () => {
                 </div>
                 <Separator />
                 <div className="space-y-2 p-2">
-                    {loadingNotifications ? (
-                      <div className="space-y-2 p-2">
-                        <Skeleton className="h-12 w-full" />
-                        <Skeleton className="h-12 w-full" />
-                        <Skeleton className="h-12 w-full" />
-                      </div>
-                    ) : notifications.length > 0 ? (
+                    {notifications.length > 0 ? (
                         notifications.map((notification) => (
                             <div key={notification.id} className={`flex items-start gap-3 p-2 rounded-lg ${!notification.is_read ? 'bg-primary/5' : ''}`}>
                                <div className="mt-1">{getNotificationIcon(notification.type)}</div>

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import type { Salon } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Star, Heart, Zap, CheckCircle, MessageSquare, Loader2 } from 'lucide-react';
 import ImageWithFallback from './image-with-fallback';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface SalonCardProps {
@@ -18,82 +17,23 @@ interface SalonCardProps {
 }
 
 const SalonCard = ({ salon, onBookNow }: SalonCardProps) => {
-  const [isFavorited, setIsFavorited] = useState(false);
-  const [isFavoriteLoading, setIsFavoriteLoading] = useState(true);
-  const supabase = createClient();
+  const [isFavorited, setIsFavorited] = useState(salon.featured || false);
+  const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
   const { toast } = useToast();
-
-  const checkFavoriteStatus = useCallback(async () => {
-    setIsFavoriteLoading(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setIsFavoriteLoading(false);
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from('favorites')
-      .select('salon_id')
-      .eq('user_id', user.id)
-      .eq('salon_id', salon.id)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Error checking favorite status:', error.message);
-    } else {
-      setIsFavorited(!!data);
-    }
-    setIsFavoriteLoading(false);
-  }, [supabase, salon.id]);
-
-  useEffect(() => {
-    checkFavoriteStatus();
-  }, [checkFavoriteStatus]);
-
 
   const toggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsFavoriteLoading(true);
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast({
-        variant: "destructive",
-        title: "Not logged in",
-        description: "You need to be logged in to favorite a salon.",
-      });
-      setIsFavoriteLoading(false);
-      return;
-    }
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 500));
 
-    if (isFavorited) {
-      // Remove from favorites
-      const { error } = await supabase
-        .from('favorites')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('salon_id', salon.id);
-      
-      if (error) {
-        toast({ variant: "destructive", title: "Error", description: "Could not remove from favorites." });
-      } else {
-        setIsFavorited(false);
-        toast({ title: "Removed from favorites." });
-      }
-    } else {
-      // Add to favorites
-      const { error } = await supabase
-        .from('favorites')
-        .insert({ user_id: user.id, salon_id: salon.id });
-        
-      if (error) {
-        toast({ variant: "destructive", title: "Error", description: "Could not add to favorites." });
-      } else {
-        setIsFavorited(true);
-        toast({ title: "Added to favorites!" });
-      }
-    }
+    setIsFavorited(!isFavorited);
+    toast({
+      title: !isFavorited ? "Added to favorites!" : "Removed from favorites.",
+    });
+
     setIsFavoriteLoading(false);
   };
 
@@ -142,8 +82,8 @@ const SalonCard = ({ salon, onBookNow }: SalonCardProps) => {
           </div>
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
-            {salon.specialties?.slice(0, 3).map(spec => (
-                <Badge key={spec} variant="outline" className="text-purple-600 border-purple-100 bg-purple-50">{spec}</Badge>
+            {salon.services?.slice(0, 3).map(spec => (
+                <Badge key={spec.name} variant="outline" className="text-purple-600 border-purple-100 bg-purple-50">{spec.name}</Badge>
             ))}
         </div>
       </CardContent>
