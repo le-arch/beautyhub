@@ -1,22 +1,19 @@
 
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import Header from '../header';
 import { login } from '../auth/actions';
 import { SubmitButton } from './submit-button';
 import { PasswordInput } from '@/components/password-input';
 
-export default function LoginPage({
-  searchParams,
-}: {
-  searchParams: { message: string }
-}) {
+export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const message = searchParams.get('message');
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -55,9 +52,9 @@ export default function LoginPage({
                   required
                 />
               </div>
-              {searchParams.message && (
+              {message && (
                 <div className="text-sm font-medium text-destructive">
-                    {searchParams.message}
+                    {message}
                 </div>
               )}
               <SubmitButton
