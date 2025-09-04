@@ -14,6 +14,8 @@ import {
   Settings as SettingsIcon,
   Loader2,
   Save,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { UserSettings } from '@/lib/types';
