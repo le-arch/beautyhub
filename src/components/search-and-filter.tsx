@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -26,9 +27,11 @@ import { useGeolocation } from '@/hooks/use-geolocation';
 interface SearchAndFilterProps {
   onFiltersChange?: (filters: any) => void;
   showResults?: boolean;
+  viewMode?: 'grid' | 'list';
+  onViewModeChange?: (mode: 'grid' | 'list') => void;
 }
 
-export function SearchAndFilter({ onFiltersChange, showResults = true }: SearchAndFilterProps) {
+export function SearchAndFilter({ onFiltersChange, showResults = true, viewMode = 'grid', onViewModeChange }: SearchAndFilterProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
     const [priceRange, setPriceRange] = useState([0, 50000]);
@@ -36,7 +39,6 @@ export function SearchAndFilter({ onFiltersChange, showResults = true }: SearchA
   
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState('rating');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [distance, setDistance] = useState([25]);
   const [rating, setRating] = useState([0]);
 
@@ -324,7 +326,7 @@ export function SearchAndFilter({ onFiltersChange, showResults = true }: SearchA
               <Button
                 variant={viewMode === 'grid' ? 'default' : 'ghost'}
                 size="sm"
-                onClick={() => setViewMode('grid')}
+                onClick={() => onViewModeChange?.('grid')}
                 className={`rounded-none px-3 ${
                   viewMode === 'grid' 
                     ? 'bg-purple-600 hover:bg-purple-700 text-white' 
@@ -336,7 +338,7 @@ export function SearchAndFilter({ onFiltersChange, showResults = true }: SearchA
               <Button
                 variant={viewMode === 'list' ? 'default' : 'ghost'}
                 size="sm"
-                onClick={() => setViewMode('list')}
+                onClick={() => onViewModeChange?.('list')}
                 className={`rounded-none px-3 ${
                   viewMode === 'list' 
                     ? 'bg-purple-600 hover:bg-purple-700 text-white' 
@@ -418,5 +420,3 @@ export function SearchAndFilter({ onFiltersChange, showResults = true }: SearchA
     </div>
   );
 }
-
-    

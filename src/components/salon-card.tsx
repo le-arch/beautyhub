@@ -14,9 +14,10 @@ import { useToast } from '@/hooks/use-toast';
 interface SalonCardProps {
   salon: Salon & { specialties?: string[], featured?: boolean, verified?: boolean, distance?: string, responseTime?: string };
   onBookNow: (salon: Salon) => void;
+  viewMode?: 'grid' | 'list';
 }
 
-const SalonCard = ({ salon, onBookNow }: SalonCardProps) => {
+const SalonCard = ({ salon, onBookNow, viewMode = 'grid' }: SalonCardProps) => {
   const [isFavorited, setIsFavorited] = useState(salon.featured || false);
   const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
   const { toast } = useToast();
@@ -36,6 +37,60 @@ const SalonCard = ({ salon, onBookNow }: SalonCardProps) => {
 
     setIsFavoriteLoading(false);
   };
+  
+  if (viewMode === 'list') {
+    return (
+      <Card className="group transition-all duration-300 hover:shadow-2xl flex flex-col sm:flex-row border-purple-100">
+        <div className="sm:w-1/3 relative">
+          <Link href={`/dashboard/customer/salon/${salon.id}`}>
+            <ImageWithFallback
+              src={salon.image}
+              alt={salon.name}
+              width={400}
+              height={300}
+              className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-xl sm:rounded-l-xl sm:rounded-t-none"
+              data-ai-hint={salon.imageHint}
+            />
+          </Link>
+        </div>
+        <div className="sm:w-2/3 flex flex-col">
+          <CardHeader className="p-4">
+             <div className="flex items-center justify-between">
+                 <h3 className="font-semibold text-lg text-warmgray-900 truncate group-hover:text-purple-600 transition-colors">{salon.name}</h3>
+                <div className="flex items-center gap-1">
+                  <Star className={`h-4 w-4 text-yellow-400 fill-yellow-400`} />
+                  <span className="font-medium text-warmgray-700">{salon.rating}</span>
+                </div>
+            </div>
+            <div className="mt-1 flex items-center text-sm text-warmgray-500">
+              <MapPin className="mr-1.5 h-4 w-4" />
+              <span>{salon.location}</span>
+            </div>
+          </CardHeader>
+          <CardContent className="p-4 pt-0 flex-grow">
+            <p className="text-sm text-warmgray-600 mb-3 overflow-hidden" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                Welcome to {salon.name}, where we believe in beauty with a passion. 
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+                {salon.services?.slice(0, 3).map(spec => (
+                    <Badge key={spec.name} variant="outline" className="text-purple-600 border-purple-100 bg-purple-50">{spec.name}</Badge>
+                ))}
+            </div>
+          </CardContent>
+          <CardFooter className="p-4 pt-0 flex justify-between items-center">
+            <p className="text-sm">
+              From <span className="font-bold text-purple-600">₦{salon.startingPrice.toLocaleString()}</span>
+            </p>
+            <div className="flex items-center gap-2">
+                <Button onClick={() => onBookNow(salon)} className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+                  Book Now
+                </Button>
+            </div>
+          </CardFooter>
+        </div>
+      </Card>
+    )
+  }
 
   return (
     <Card className="overflow-hidden group transition-all duration-300 hover:shadow-2xl flex flex-col border-purple-100">

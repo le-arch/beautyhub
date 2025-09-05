@@ -15,6 +15,7 @@ export default function ExplorePage() {
     const [loading, setLoading] = useState(true);
     const [isBooking, setIsBooking] = useState(false);
     const [selectedSalon, setSelectedSalon] = useState<Salon | null>(null);
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
     const fetchSalons = (filters: any = {}) => {
         setLoading(true);
@@ -84,9 +85,13 @@ export default function ExplorePage() {
     return (
         <>
             <main className="flex-1 p-4 sm:p-6 lg:p-8">
-                <SearchAndFilter onFiltersChange={fetchSalons} />
+                <SearchAndFilter 
+                    onFiltersChange={fetchSalons}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
+                />
 
-                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <div className={`mt-8 ${viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8' : 'space-y-4'}`}>
                     {loading ? (
                        Array.from({ length: 8 }).map((_, index) => (
                            <div key={index} className="space-y-4">
@@ -98,7 +103,12 @@ export default function ExplorePage() {
                        ))
                     ) : salons.length > 0 ? (
                         salons.map(salon => (
-                            <SalonCard key={salon.id} salon={salon} onBookNow={() => handleBookNow(salon)}/>
+                            <SalonCard 
+                                key={salon.id} 
+                                salon={salon} 
+                                onBookNow={() => handleBookNow(salon)}
+                                viewMode={viewMode}
+                            />
                         ))
                     ) : (
                         <div className="col-span-full text-center py-24">
