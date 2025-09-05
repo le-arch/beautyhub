@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,12 +21,14 @@ import {
   Download,
   Calendar,
   Settings as SettingsIcon,
-  MessageSquare
+  MessageSquare,
+  Loader2,
+  Save
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function OwnerSettingsPage() {
-  const [activeTab, setActiveTab] = useState('notifications');
+  const [activeTab, setActiveTab] = useState('account');
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [notifications, setNotifications] = useState({
@@ -37,6 +39,14 @@ export default function OwnerSettingsPage() {
     weeklySummary: false,
     platformUpdates: true,
   });
+  const [saving, setSaving] = useState(false);
+
+  const handleSaveChanges = async (section: string) => {
+    setSaving(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    // toast({ title: `${section} Saved!`, description: 'Your changes have been saved.' });
+    setSaving(false);
+  };
   
   return (
     <main className="flex-1 p-4 sm:p-6 lg:p-8">
@@ -59,18 +69,18 @@ export default function OwnerSettingsPage() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 gap-2 bg-white p-2 rounded-xl border border-purple-100 h-auto">
             <TabsTrigger 
-              value="notifications" 
-              className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white rounded-lg"
-            >
-              <Bell className="h-4 w-4" />
-              <span className="hidden sm:inline">Notifications</span>
-            </TabsTrigger>
-             <TabsTrigger 
               value="account" 
               className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white rounded-lg"
             >
               <User className="h-4 w-4" />
               <span className="hidden sm:inline">Account</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="notifications" 
+              className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white rounded-lg"
+            >
+              <Bell className="h-4 w-4" />
+              <span className="hidden sm:inline">Notifications</span>
             </TabsTrigger>
             <TabsTrigger 
               value="billing"
@@ -88,45 +98,35 @@ export default function OwnerSettingsPage() {
             </TabsTrigger>
           </TabsList>
 
-          {/* Notifications Tab */}
-          <TabsContent value="notifications" className="space-y-8">
-             <Card className="border-purple-100">
+          {/* Account Tab */}
+          <TabsContent value="account" className="space-y-8">
+            <Card className="border-purple-100">
               <CardHeader>
                 <CardTitle className="text-xl text-warmgray-900 flex items-center gap-2">
-                  <Bell className="h-5 w-5 text-purple-600" />
-                  Notification Preferences
+                  <User className="h-5 w-5 text-purple-600" />
+                  Account Owner
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  {[
-                    { key: 'newBookings', label: 'New Bookings', description: 'Notify me when a customer makes a new booking.' },
-                    { key: 'bookingCancellations', label: 'Booking Cancellations', description: 'Notify me when a customer cancels a booking.' },
-                    { key: 'newMessages', label: 'New Messages', description: 'Get alerts for new messages from customers.' },
-                    { key: 'newReviews', label: 'New Reviews', description: 'Notify me when a customer leaves a review.' },
-                    { key: 'weeklySummary', label: 'Weekly Summary', description: 'Receive a weekly performance report via email.' },
-                    { key: 'platformUpdates', label: 'Platform Updates', description: 'Get emails about new features and updates.' }
-                  ].map((item) => (
-                    <div key={item.key} className="flex items-start justify-between py-3">
-                      <div className="flex-1">
-                        <p className="font-medium text-warmgray-900">{item.label}</p>
-                        <p className="text-sm text-warmgray-600">{item.description}</p>
-                      </div>
-                      <Switch
-                        checked={notifications[item.key as keyof typeof notifications]}
-                        onCheckedChange={(checked) =>
-                          setNotifications(prev => ({ ...prev, [item.key]: checked }))
-                        }
-                      />
-                    </div>
-                  ))}
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="owner-name">Full Name</Label>
+                    <Input id="owner-name" defaultValue="Salon Owner" className="bg-warmgray-50 border-purple-200" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="owner-email">Email Address</Label>
+                    <Input id="owner-email" type="email" defaultValue="owner@amberglow.com" disabled className="bg-warmgray-200 border-purple-200" />
+                  </div>
+                </div>
+                 <div className="flex justify-end mt-6">
+                  <Button onClick={() => handleSaveChanges('Account Details')} disabled={saving}>
+                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                    Save Account Details
+                  </Button>
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
 
-          {/* Account Tab */}
-          <TabsContent value="account" className="space-y-8">
             <Card className="border-purple-100">
               <CardHeader>
                 <CardTitle className="text-xl text-warmgray-900 flex items-center gap-2">
@@ -181,6 +181,49 @@ export default function OwnerSettingsPage() {
               </CardContent>
             </Card>
           </TabsContent>
+          
+          {/* Notifications Tab */}
+          <TabsContent value="notifications" className="space-y-8">
+             <Card className="border-purple-100">
+              <CardHeader>
+                <CardTitle className="text-xl text-warmgray-900 flex items-center gap-2">
+                  <Bell className="h-5 w-5 text-purple-600" />
+                  Notification Preferences
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  {[
+                    { key: 'newBookings', label: 'New Bookings', description: 'Notify me when a customer makes a new booking.' },
+                    { key: 'bookingCancellations', label: 'Booking Cancellations', description: 'Notify me when a customer cancels a booking.' },
+                    { key: 'newMessages', label: 'New Messages', description: 'Get alerts for new messages from customers.' },
+                    { key: 'newReviews', label: 'New Reviews', description: 'Notify me when a customer leaves a review.' },
+                    { key: 'weeklySummary', label: 'Weekly Summary', description: 'Receive a weekly performance report via email.' },
+                    { key: 'platformUpdates', label: 'Platform Updates', description: 'Get emails about new features and updates.' }
+                  ].map((item) => (
+                    <div key={item.key} className="flex items-start justify-between py-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-warmgray-900">{item.label}</p>
+                        <p className="text-sm text-warmgray-600">{item.description}</p>
+                      </div>
+                      <Switch
+                        checked={notifications[item.key as keyof typeof notifications]}
+                        onCheckedChange={(checked) =>
+                          setNotifications(prev => ({ ...prev, [item.key]: checked }))
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-end mt-6">
+                  <Button onClick={() => handleSaveChanges('Notifications')} disabled={saving}>
+                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                    Save Notifications
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Billing Tab */}
           <TabsContent value="billing" className="space-y-8">
@@ -191,9 +234,36 @@ export default function OwnerSettingsPage() {
               <CardContent>
                 <div className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg">
                     <p className="font-semibold text-warmgray-900 text-lg">Premium Plan</p>
-                    <p className="text-warmgray-600 mb-4">You have access to all features.</p>
+                    <p className="text-warmgray-600 mb-4">You have access to all features, including analytics and priority support.</p>
                     <p className="text-2xl font-bold text-purple-700">₦25,000 <span className="text-base font-normal text-warmgray-600">/ month</span></p>
-                    <Button className="mt-4 w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white">Manage Subscription</Button>
+                    <div className="flex flex-wrap gap-3 mt-4">
+                      <Button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">Manage Subscription</Button>
+                      <Button variant="ghost" className="text-purple-600 hover:text-purple-700">Switch Plan</Button>
+                    </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-purple-100">
+              <CardHeader>
+                <CardTitle>Payment History</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">Monthly Subscription</p>
+                      <p className="text-sm text-warmgray-500">Invoice #12346 - Aug 1, 2024</p>
+                    </div>
+                    <p className="font-semibold text-warmgray-800">₦25,000</p>
+                  </div>
+                  <Separator/>
+                   <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">Monthly Subscription</p>
+                      <p className="text-sm text-warmgray-500">Invoice #12345 - Jul 1, 2024</p>
+                    </div>
+                    <p className="font-semibold text-warmgray-800">₦25,000</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -209,22 +279,24 @@ export default function OwnerSettingsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div className="p-4 bg-purple-50 rounded-lg">
-                    <p className="text-sm text-warmgray-700 mb-3">
-                      Download your salon data, including booking history, customer messages, and service performance.
-                    </p>
-                    <div className="flex flex-wrap gap-3">
-                      <Button variant="outline" size="sm" className="border-purple-200 text-purple-600 hover:bg-purple-50">
-                        <Download className="h-4 w-4 mr-2" />
-                        Download All Data
-                      </Button>
-                      <Button variant="destructive" size="sm">
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete Account
-                      </Button>
-                    </div>
-                  </div>
+                <div className="p-4 bg-purple-50 rounded-lg">
+                  <p className="text-sm text-warmgray-700 mb-3">
+                    Download your salon data, including booking history, customer messages, and service performance.
+                  </p>
+                  <Button variant="outline" size="sm" className="border-purple-200 text-purple-600 hover:bg-purple-50">
+                    <Download className="h-4 w-4 mr-2" />
+                    Download All Data as CSV
+                  </Button>
+                </div>
+                 <div className="p-4 bg-red-50 rounded-lg border border-red-100">
+                  <h4 className="font-semibold text-red-800">Delete Account & Data</h4>
+                  <p className="text-sm text-red-700 my-3">
+                    This action is irreversible. It will permanently delete your salon profile, all associated data, and your owner account.
+                  </p>
+                  <Button variant="destructive" size="sm">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Request Account Deletion
+                  </Button>
                 </div>
               </CardContent>
             </Card>

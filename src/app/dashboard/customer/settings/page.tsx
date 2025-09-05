@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -16,10 +16,19 @@ import {
   Save,
   Sun,
   Moon,
+  Trash2,
+  Download,
+  Key,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { UserSettings } from '@/lib/types';
 import { mockUserSettings } from '@/lib/mock-data';
+import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import Link from 'next/link';
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('preferences');
@@ -42,13 +51,18 @@ export default function SettingsPage() {
     }));
   };
 
-  const handleSaveChanges = async (section: 'profile' | 'preferences') => {
-    setSaving(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    toast({ title: `${section.charAt(0).toUpperCase() + section.slice(1)} Saved!` });
+  useEffect(() => {
+    if (settings.theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [settings.theme]);
 
+  const handleSaveChanges = async (section: string) => {
+    setSaving(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    toast({ title: `${section.charAt(0).toUpperCase() + section.slice(1)} Saved!`, description: 'Your changes have been saved.' });
     setSaving(false);
   };
   
@@ -82,7 +96,7 @@ export default function SettingsPage() {
               value="preferences"
               className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white rounded-lg"
             >
-              <Bell className="h-4 w-4" />
+              <SettingsIcon className="h-4 w-4" />
               <span className="hidden sm:inline">Preferences</span>
             </TabsTrigger>
             <TabsTrigger 
@@ -106,8 +120,13 @@ export default function SettingsPage() {
               <Card className="border-purple-100">
                   <CardHeader>
                     <CardTitle>Account Information</CardTitle>
-                    <CardDescription>This is your public information. It can be edited on your <a href="/dashboard/customer/profile" className="text-primary underline">profile page</a>.</CardDescription>
+                    <CardDescription>Your personal information is managed on your profile page. Click the button below to make changes.</CardDescription>
                   </CardHeader>
+                  <CardContent>
+                    <Button asChild>
+                      <Link href="/dashboard/customer/profile">Go to Profile</Link>
+                    </Button>
+                  </CardContent>
               </Card>
           </TabsContent>
 
@@ -162,11 +181,109 @@ export default function SettingsPage() {
             </Card>
 
             <div className="flex justify-end">
-              <Button onClick={() => handleSaveChanges('preferences')} disabled={saving}>
+              <Button onClick={() => handleSaveChanges('Preferences')} disabled={saving}>
                 {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
                 Save Preferences
               </Button>
             </div>
+          </TabsContent>
+
+          {/* Privacy Tab */}
+          <TabsContent value="privacy" className="space-y-8">
+            <Card className="border-purple-100">
+              <CardHeader>
+                <CardTitle>Privacy Settings</CardTitle>
+                <CardDescription>Control how your information is used and seen by others.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-start justify-between py-3">
+                  <div>
+                    <p className="font-medium text-warmgray-900">Public Profile</p>
+                    <p className="text-sm text-warmgray-600">Allow salons to see your name and profile picture when you book.</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                <Separator />
+                <div className="flex items-start justify-between py-3">
+                  <div>
+                    <p className="font-medium text-warmgray-900">Data Sharing</p>
+                    <p className="text-sm text-warmgray-600">Allow BeautyHub to use your anonymized data for analytics.</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                 <Separator />
+                <div className="space-y-3">
+                  <p className="font-medium text-warmgray-900">Manage Your Data</p>
+                  <div className="flex flex-wrap gap-3">
+                    <Button variant="outline" className="border-purple-200 text-purple-600 hover:bg-purple-50">
+                      <Download className="h-4 w-4 mr-2" /> Download My Data
+                    </Button>
+                     <Button variant="destructive">
+                      <Trash2 className="h-4 w-4 mr-2" /> Delete My Account
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+              <CardHeader className="border-t pt-6">
+                <Button onClick={() => handleSaveChanges('Privacy settings')} disabled={saving}>
+                  {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                  Save Privacy Settings
+                </Button>
+              </CardHeader>
+            </Card>
+          </TabsContent>
+
+          {/* Billing Tab */}
+          <TabsContent value="billing" className="space-y-8">
+            <Card className="border-purple-100">
+              <CardHeader>
+                <CardTitle>Payment Methods</CardTitle>
+                <CardDescription>Manage your saved cards for quick and easy checkout.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="p-4 border rounded-lg flex items-center justify-between bg-purple-50">
+                    <div className="flex items-center gap-4">
+                      <CreditCard className="h-8 w-8 text-purple-600" />
+                      <div>
+                        <p className="font-medium">Visa ending in 1234</p>
+                        <p className="text-sm text-warmgray-500">Expires 12/25</p>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">Remove</Button>
+                  </div>
+                  <Button variant="outline" className="w-full border-purple-200 text-purple-600 hover:bg-purple-50">
+                    Add New Payment Method
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-purple-100">
+              <CardHeader>
+                <CardTitle>Transaction History</CardTitle>
+                <CardDescription>A record of your deposits and payments on BeautyHub.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">Deposit for Amber Glow Salon</p>
+                      <p className="text-sm text-warmgray-500">Aug 13, 2024</p>
+                    </div>
+                    <p className="font-semibold text-warmgray-800">- ₦3,000</p>
+                  </div>
+                   <Separator />
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">Deposit for Nairobi Nail Bar</p>
+                      <p className="text-sm text-warmgray-500">Jul 28, 2024</p>
+                    </div>
+                    <p className="font-semibold text-warmgray-800">- ₦1,500</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
