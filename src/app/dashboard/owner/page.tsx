@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -104,7 +105,7 @@ export default function SalonDashboard() {
                 className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                 asChild
               >
-                <Link href="#">
+                <Link href="/dashboard/owner/profile">
                     <Settings className="h-4 w-4 mr-2" />
                     Manage Profile
                 </Link>
@@ -189,6 +190,24 @@ export default function SalonDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Upgrade Plan */}
+            <Card className="border-2 border-gradient-to-r from-purple-200 to-pink-200 bg-gradient-to-br from-purple-50 to-pink-50">
+              <CardContent className="p-6">
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full mb-4">
+                    <Crown className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-warmgray-900 mb-2">Upgrade to Premium</h3>
+                  <p className="text-sm text-warmgray-600 mb-4">
+                    Get 3x more visibility and unlock advanced features like detailed analytics and priority support.
+                  </p>
+                  <Button asChild className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
+                    <Link href="/dashboard/owner/settings">Upgrade Now</Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Performance Chart */}
             <Card className="border-purple-100">
               <CardHeader>
@@ -240,7 +259,7 @@ export default function SalonDashboard() {
                     asChild
                     className="text-purple-600 hover:text-purple-700"
                   >
-                    <Link href="#">
+                    <Link href="/dashboard/owner/messages">
                         View All
                         <ChevronRight className="h-4 w-4 ml-1" />
                     </Link>
@@ -279,24 +298,6 @@ export default function SalonDashboard() {
 
           {/* Right Column */}
           <div className="space-y-6">
-            {/* Upgrade Plan */}
-            <Card className="border-2 border-gradient-to-r from-purple-200 to-pink-200 bg-gradient-to-br from-purple-50 to-pink-50">
-              <CardContent className="p-6">
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full mb-4">
-                    <Crown className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-warmgray-900 mb-2">Upgrade to Premium</h3>
-                  <p className="text-sm text-warmgray-600 mb-4">
-                    Get 3x more visibility and unlock advanced features
-                  </p>
-                  <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
-                    Upgrade Now
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Upcoming Bookings */}
             <Card className="border-purple-100">
               <CardHeader>
@@ -361,7 +362,7 @@ export default function SalonDashboard() {
                     className="w-full justify-start border-purple-200 text-purple-600 hover:bg-purple-50"
                     asChild
                   >
-                    <Link href="#">
+                    <Link href="/dashboard/owner/analytics">
                         <BarChart3 className="h-4 w-4 mr-2" />
                         View Analytics
                     </Link>

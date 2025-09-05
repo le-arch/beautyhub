@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,9 +18,13 @@ import {
   Info,
   Calendar,
   CheckCircle,
+  Paperclip,
+  Mic
 } from 'lucide-react';
 import { mockConversations } from '@/lib/mock-data';
 import type { Conversation, Message } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
+
 
 const ConversationTimestamp = ({ timestamp }: { timestamp: string }) => {
   const [formattedTime, setFormattedTime] = useState('');
@@ -40,6 +45,8 @@ export default function MessagesPage() {
   const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
   const [selectedConversation, setSelectedConversation] = useState<Conversation>(conversations[0]);
   const [newMessage, setNewMessage] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const handleSendMessage = () => {
     if (newMessage.trim() === '') return;
@@ -66,6 +73,28 @@ export default function MessagesPage() {
 
     setNewMessage('');
   };
+  
+  const handleAttachmentClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      toast({
+        title: 'File Selected',
+        description: `${file.name} is ready to be sent.`,
+      });
+      // In a real app, you'd handle the file upload here.
+    }
+  };
+  
+  const handleVoiceNote = () => {
+     toast({
+        title: 'Voice Note',
+        description: `Voice recording feature is not yet implemented.`,
+      });
+  }
 
   return (
     <main className="flex-1 p-4 sm:p-6 lg:p-8">
@@ -160,8 +189,8 @@ export default function MessagesPage() {
                     ))}
                   </div>
                 </ScrollArea>
-                <div className="p-4 border-t">
-                  <div className="relative">
+                <div className="p-4 border-t bg-background">
+                  <div className="relative flex items-center gap-2">
                     <Input 
                       placeholder="Type your message..." 
                       className="pr-12"
@@ -169,13 +198,22 @@ export default function MessagesPage() {
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                     />
-                    <Button 
-                      size="icon" 
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-                      onClick={handleSendMessage}
-                    >
-                      <Send className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center">
+                       <Button variant="ghost" size="icon" onClick={handleAttachmentClick}>
+                        <Paperclip className="h-5 w-5 text-muted-foreground" />
+                      </Button>
+                      <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+                      <Button variant="ghost" size="icon" onClick={handleVoiceNote}>
+                        <Mic className="h-5 w-5 text-muted-foreground" />
+                      </Button>
+                      <Button 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={handleSendMessage}
+                      >
+                        <Send className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </>

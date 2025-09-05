@@ -26,11 +26,10 @@ import {
   Save
 } from 'lucide-react';
 import Link from 'next/link';
+import { PasswordInput } from '@/components/password-input';
 
 export default function OwnerSettingsPage() {
   const [activeTab, setActiveTab] = useState('account');
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
   const [notifications, setNotifications] = useState({
     newBookings: true,
     bookingCancellations: true,
@@ -106,6 +105,7 @@ export default function OwnerSettingsPage() {
                   <User className="h-5 w-5 text-purple-600" />
                   Account Owner
                 </CardTitle>
+                <CardDescription>Manage your personal login information.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -138,38 +138,20 @@ export default function OwnerSettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="current-password">Current Password</Label>
-                    <div className="relative">
-                      <Input 
-                        id="current-password" 
-                        type={showCurrentPassword ? "text" : "password"}
-                        className="bg-warmgray-50 border-purple-200 pr-10"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-warmgray-500"
-                      >
-                        {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
+                    <PasswordInput
+                        id="current-password"
+                        autoComplete="current-password"
+                        className="bg-warmgray-50 border-purple-200"
+                    />
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="new-password">New Password</Label>
-                    <div className="relative">
-                      <Input 
-                        id="new-password" 
-                        type={showNewPassword ? "text" : "password"}
-                        className="bg-warmgray-50 border-purple-200 pr-10"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-warmgray-500"
-                      >
-                        {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
+                    <PasswordInput
+                        id="new-password"
+                        autoComplete="new-password"
+                        className="bg-warmgray-50 border-purple-200"
+                    />
                   </div>
                 </div>
                 
