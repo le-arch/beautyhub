@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -11,12 +11,10 @@ import Header from '../header'
 import { SubmitButton } from '../login/submit-button'
 import { PasswordInput } from '@/components/password-input'
 
-export default function SignupPage({
-  searchParams,
-}: {
-  searchParams: { message: string }
-}) {
+export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const message = searchParams.get('message');
 
   const handleSignup = (formData: FormData) => {
     // Simulate signup and redirect
@@ -70,9 +68,9 @@ export default function SignupPage({
                         </div>
                       </RadioGroup>
                     </div>
-                    {searchParams?.message && (
+                    {message && (
                         <div className="text-sm font-medium text-destructive">
-                            {searchParams.message}
+                            {message}
                         </div>
                     )}
 
@@ -82,7 +80,7 @@ export default function SignupPage({
                     pendingText="Signing Up..."
                   >
                     Sign Up
-                  </SubmitButton>
+                  </Button>
               </div>
             </form>
             <div className="mt-4 text-center text-sm">
