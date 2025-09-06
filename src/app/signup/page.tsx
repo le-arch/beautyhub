@@ -14,7 +14,7 @@ import { PasswordInput } from '@/components/password-input'
 export default function SignupPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const message = searchParams.get('message');
+  const message = searchParams?.get('message');
 
   const handleSignup = (formData: FormData) => {
     // Simulate signup and redirect
