@@ -3,13 +3,17 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Bell, Sparkles, CalendarCheck, MessageSquarePlus } from 'lucide-react';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { Bell, Sparkles, CalendarCheck, MessageSquarePlus, Menu } from 'lucide-react';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import type { Notification } from '@/lib/types';
@@ -36,7 +40,24 @@ const CustomerDashboardHeader = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-7xl items-center justify-between">
         <div className="flex items-center gap-4">
-          <SidebarTrigger />
+           <Sheet>
+            <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                    <Menu className="h-6 w-6" />
+                    <span className="sr-only">Toggle Menu</span>
+                </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-64 p-4">
+                 <nav className="flex flex-col gap-2">
+                    <Link href="/dashboard/customer">
+                    <Button variant="ghost" className="w-full justify-start gap-2">
+                        Home
+                    </Button>
+                    </Link>
+                    {/* Add other nav links here for mobile */}
+                </nav>
+            </SheetContent>
+           </Sheet>
           <Link href="/" className="flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold text-foreground">

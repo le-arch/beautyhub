@@ -80,7 +80,7 @@ export default function SignupPage() {
                     pendingText="Signing Up..."
                   >
                     Sign Up
-                  </Button>
+                  </SubmitButton>
               </div>
             </form>
             <div className="mt-4 text-center text-sm">

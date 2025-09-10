@@ -34,8 +34,7 @@ export default function LoginPage() {
           <CardHeader>
             <CardTitle className="text-2xl">Login</CardTitle>
             <CardDescription>
-              Enter your email below to login to your account. <br/>
-              (Use "owner@test.com" for salon owner view)
+
             </CardDescription>
           </CardHeader>
           <CardContent>
