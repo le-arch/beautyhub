@@ -12,7 +12,6 @@ import {
     ImageIcon,
     BarChart3,
     Settings,
-    Building,
     Map,
     Plus,
     LogOut
@@ -35,7 +34,6 @@ const salonNav = [
 ];
 
 const settingsNav = [
-    { href: '/dashboard/owner/profile', icon: Building, label: 'Salon Profile' },
     { href: '/dashboard/owner/settings', icon: Settings, label: 'Settings' },
 ];
 

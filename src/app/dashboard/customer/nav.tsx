@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Home, Star, MessageSquare, Calendar, User as UserIcon, Settings, Sparkles, LogOut, LayoutDashboard, Search, Map } from 'lucide-react';
+import { Home, Star, MessageSquare, Calendar, Settings, Sparkles, LogOut, LayoutDashboard, Search, Map } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { logout } from '@/app/auth/actions';
 
@@ -19,7 +19,6 @@ const navItems = [
 ];
 
 const accountItems = [
-    { href: '/dashboard/customer/profile', icon: UserIcon, label: 'Profile' },
     { href: '/dashboard/customer/settings', icon: Settings, label: 'Settings' },
 ];
 
