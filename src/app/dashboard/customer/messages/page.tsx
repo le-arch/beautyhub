@@ -43,13 +43,13 @@ const ConversationTimestamp = ({ timestamp }: { timestamp: string }) => {
 
 export default function MessagesPage() {
   const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
-  const [selectedConversation, setSelectedConversation] = useState<Conversation>(conversations[0]);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(conversations.length > 0 ? conversations[0] : null);
   const [newMessage, setNewMessage] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const handleSendMessage = () => {
-    if (newMessage.trim() === '') return;
+    if (newMessage.trim() === '' || !selectedConversation) return;
 
     const message: Message = {
       id: `msg-${Date.now()}`,
@@ -114,7 +114,7 @@ export default function MessagesPage() {
                 {conversations.sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).map(convo => (
                   <div
                     key={convo.id}
-                    className={`p-4 cursor-pointer hover:bg-muted ${selectedConversation.id === convo.id ? 'bg-muted' : ''}`}
+                    className={`p-4 cursor-pointer hover:bg-muted ${selectedConversation?.id === convo.id ? 'bg-muted' : ''}`}
                     onClick={() => setSelectedConversation(convo)}
                   >
                     <div className="flex items-center gap-4">
