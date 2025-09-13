@@ -1,4 +1,6 @@
 
+'use client';
+
 import Header from '@/app/header';
 import Footer from '@/components/footer';
 import FeaturedCategories from '@/components/featured-categories';
