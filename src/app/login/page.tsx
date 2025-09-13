@@ -9,21 +9,11 @@ import { Input } from '@/components/ui/input';
 import Header from '../header';
 import { SubmitButton } from './submit-button';
 import { PasswordInput } from '@/components/password-input';
+import { login } from '@/app/auth/actions';
 
 export default function LoginPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const message = searchParams.get('message');
-
-  const handleLogin = (formData: FormData) => {
-    // Simulate login and redirect
-    const email = formData.get('email') as string;
-    if (email.includes('owner')) {
-        router.push('/dashboard/owner');
-    } else {
-        router.push('/dashboard/customer');
-    }
-  };
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -34,7 +24,7 @@ export default function LoginPage() {
           <CardHeader>
             <CardTitle className="text-2xl">Login</CardTitle>
             <CardDescription>
-
+              Enter your credentials to access your dashboard.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -68,7 +58,7 @@ export default function LoginPage() {
                 </div>
               )}
               <SubmitButton
-                formAction={handleLogin}
+                formAction={login}
                 className="w-full"
                 pendingText="Signing In..."
               >

@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import type { Notification } from '@/lib/types';
 import { mockNotifications } from '@/lib/mock-data';
+import { CustomerNav } from './nav';
 
 const CustomerDashboardHeader = () => {
   const notifications: Notification[] = mockNotifications;
@@ -48,20 +49,13 @@ const CustomerDashboardHeader = () => {
                 </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-4">
-                 <nav className="flex flex-col gap-2">
-                    <Link href="/dashboard/customer">
-                    <Button variant="ghost" className="w-full justify-start gap-2">
-                        Home
-                    </Button>
-                    </Link>
-                    {/* Add other nav links here for mobile */}
-                </nav>
+                 <CustomerNav />
             </SheetContent>
            </Sheet>
           <Link href="/" className="flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold text-foreground">
-              BeautyHub
+              SalonFind Africa
             </span>
           </Link>
         </div>

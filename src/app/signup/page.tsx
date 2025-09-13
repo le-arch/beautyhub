@@ -10,16 +10,11 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import Header from '../header'
 import { SubmitButton } from '../login/submit-button'
 import { PasswordInput } from '@/components/password-input'
+import { signup } from '@/app/auth/actions';
 
 export default function SignupPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const message = searchParams.get('message');
-
-  const handleSignup = (formData: FormData) => {
-    // Simulate signup and redirect
-     router.push('/login?message=Check email to continue sign in process');
-  };
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -75,7 +70,7 @@ export default function SignupPage() {
                     )}
 
                   <SubmitButton
-                    formAction={handleSignup}
+                    formAction={signup}
                     className="w-full"
                     pendingText="Signing Up..."
                   >

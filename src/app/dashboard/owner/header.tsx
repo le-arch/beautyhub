@@ -1,13 +1,19 @@
 
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Bell, Sparkles, CalendarCheck, MessageSquarePlus, User, LogOut } from 'lucide-react';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { Bell, Sparkles, CalendarCheck, MessageSquarePlus, User, LogOut, Menu } from 'lucide-react';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -19,6 +25,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { OwnerNav } from './nav';
 
 
 const notifications = [
@@ -49,11 +56,21 @@ const OwnerDashboardHeader = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-7xl items-center justify-between">
         <div className="flex items-center gap-4">
-          <SidebarTrigger />
+          <Sheet>
+            <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                    <Menu className="h-6 w-6" />
+                    <span className="sr-only">Toggle Menu</span>
+                </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-64 p-4">
+                 <OwnerNav />
+            </SheetContent>
+           </Sheet>
           <Link href="/" className="flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold text-foreground">
-              BeautyHub
+              SalonFind Africa
             </span>
           </Link>
         </div>
@@ -118,13 +135,13 @@ const OwnerDashboardHeader = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                    <Link href="/dashboard/owner/settings">
-                    <User className="mr-2 h-4 w-4" />
+                    <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/">
+                  <Link href="/login">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
                   </Link>
