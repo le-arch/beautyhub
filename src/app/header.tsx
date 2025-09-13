@@ -48,12 +48,6 @@ const Header = () => {
               {link.label}
             </Link>
           ))}
-           <Link
-              href="/owner"
-              className="transition-colors hover:text-primary"
-            >
-              For Salon Owners
-            </Link>
         </nav>
         <div className="hidden md:flex items-center gap-4">
           {isLoggedIn ? (
@@ -61,14 +55,9 @@ const Header = () => {
                 <Link href={dashboardHref}>Dashboard</Link>
              </Button>
           ) : (
-            <>
-              <Button variant="ghost" asChild>
-                <Link href="/login">Log In</Link>
-              </Button>
-              <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
-                <Link href="/signup">Sign Up</Link>
-              </Button>
-            </>
+            <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
+              <Link href="/signup">Join</Link>
+            </Button>
           )}
         </div>
         <div className="md:hidden">
@@ -95,12 +84,6 @@ const Header = () => {
                         {link.label}
                     </Link>
                     ))}
-                     <Link
-                      href="/owner"
-                      className="text-lg font-medium transition-colors hover:text-primary"
-                    >
-                      For Salon Owners
-                    </Link>
                 </nav>
                 <div className="flex flex-col gap-4">
                     {isLoggedIn ? (
@@ -108,14 +91,9 @@ const Header = () => {
                           <Link href={dashboardHref}>Dashboard</Link>
                         </Button>
                     ) : (
-                    <>
-                      <Button variant="ghost" asChild>
-                          <Link href="/login">Log In</Link>
-                      </Button>
                       <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
-                        <Link href="/signup">Sign Up</Link>
+                        <Link href="/signup">Join</Link>
                       </Button>
-                    </>
                   )}
                 </div>
               </div>
