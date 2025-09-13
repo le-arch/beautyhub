@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -24,6 +25,7 @@ import {
   Plus
 } from 'lucide-react';
 import Link from 'next/link';
+import { useGeolocation } from '@/hooks/use-geolocation';
 
 const mockAnalytics = {
   profileViews: 1247,
@@ -75,6 +77,7 @@ const upcomingBookings = [
 export default function SalonDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const user = { name: 'Salon Owner' };
+  const { location: userLocation, error: locationError } = useGeolocation();
 
   return (
     <div className="min-h-screen bg-gradient-beauty-secondary pt-16">

@@ -87,26 +87,9 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70"></div>
       </div>
 
-     <div className="relative z-10 flex-1 flex flex-col justify-center">
-        <div className="text-center text-white max-w-4xl mx-auto px-4">
-             <div className="mb-6">
-                <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30 mb-4 text-sm font-medium">
-                ✨ Discover African Beauty Excellence
-                </Badge>
-                <h1 className="text-4xl md:text-6xl mb-4 text-white font-semibold tracking-tight">
-                Find the Perfect Salon for Your Style
-                </h1>
-                <p className="text-lg md:text-xl mb-6 text-purple-100 font-medium max-w-2xl mx-auto">
-                Connect with top-rated beauty professionals and discover the best salons near you.
-                </p>
-                {userLocation && (
-                <p className="text-base text-purple-200 mb-6">
-                    📍 Near {userLocation.city}
-                </p>
-                )}
-            </div>
-
-            <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-white/20">
+     <div className="relative z-10 flex-1 flex flex-col justify-between pt-24 pb-12">
+        <div className="w-full max-w-4xl mx-auto px-4">
+             <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-white/20">
             <div className="flex flex-col lg:flex-row gap-4 mb-4">
                 {/* Location Input */}
                 <div className="flex-1">
@@ -181,8 +164,27 @@ export default function HeroSection() {
             </div>
             </div>
         </div>
+        
+        <div className="text-center text-white max-w-4xl mx-auto px-4 mt-8">
+             <div className="mb-6">
+                <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30 mb-4 text-sm font-medium">
+                ✨ Discover African Beauty Excellence
+                </Badge>
+                <h1 className="text-4xl md:text-6xl mb-4 text-white font-semibold tracking-tight">
+                Find the Perfect Salon for Your Style
+                </h1>
+                <p className="text-lg md:text-xl mb-6 text-purple-100 font-medium max-w-2xl mx-auto">
+                Connect with top-rated beauty professionals and discover the best salons near you.
+                </p>
+                {userLocation && (
+                <p className="text-base text-purple-200 mb-6">
+                    📍 Near {userLocation.city}
+                </p>
+                )}
+            </div>
+        </div>
 
-        <div className="w-full max-w-5xl mx-auto mt-8">
+        <div className="w-full max-w-5xl mx-auto mt-auto">
             <Carousel
                 opts={{
                     align: "start",

@@ -5,7 +5,7 @@ import { OwnerNav } from './nav';
 
 
 export const metadata: Metadata = {
-  title: 'Salon Owner Dashboard - SalonFind Africa',
+  title: 'Salon Owner Dashboard - BeautyHub',
   description: 'Manage your salon, bookings, and services.',
 };
 

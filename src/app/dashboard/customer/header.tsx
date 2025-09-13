@@ -60,7 +60,7 @@ const CustomerDashboardHeader = () => {
           <Link href="/" className="flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold text-foreground">
-              SalonFind Africa
+              BeautyHub
             </span>
           </Link>
         </div>

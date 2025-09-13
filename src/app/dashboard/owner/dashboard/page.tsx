@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -19,9 +20,11 @@ import {
   Settings,
   Crown,
   ChevronRight,
-  Plus
+  Plus,
+  MapPin
 } from 'lucide-react';
 import Link from 'next/link';
+import { useGeolocation } from '@/hooks/use-geolocation';
 
 const mockAnalytics = {
   profileViews: 1247,
@@ -72,6 +75,7 @@ const upcomingBookings = [
 
 export default function SalonDashboard() {
   const user = { name: 'Salon Owner' };
+  const { location: userLocation, error: locationError } = useGeolocation();
 
   return (
     <div className="min-h-screen bg-gradient-beauty-secondary pt-16">
@@ -83,9 +87,10 @@ export default function SalonDashboard() {
               <h1 className="text-3xl font-semibold text-warmgray-900 mb-2">
                 Welcome back, {user?.name}! 👋
               </h1>
-              <p className="text-lg text-warmgray-600">
-                Here's what's happening with your salon today
-              </p>
+              <div className="flex items-center gap-2 text-warmgray-600">
+                <MapPin className="h-4 w-4" />
+                <span>{userLocation ? `${userLocation.city}, ${userLocation.country}` : (locationError ||'Detecting location...')}</span>
+              </div>
             </div>
             <div className="flex gap-3">
               <Button 
