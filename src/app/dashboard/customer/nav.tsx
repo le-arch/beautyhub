@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Home, Star, MessageSquare, Calendar, User as UserIcon, Settings, Sparkles, LogOut, LayoutDashboard, Search, Map } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { logout } from '@/app/auth/actions';
 
 const navItems = [
     { href: '/dashboard/customer', icon: Home, label: 'Home' },
@@ -52,12 +53,12 @@ export function CustomerNav() {
                         </Link>
                     );
                 })}
-                <Link href="/login" className="w-full">
+                 <form action={logout}>
                     <Button variant="outline" className="w-full justify-start gap-2">
                         <LogOut />
                         Sign Out
                     </Button>
-                </Link>
+                </form>
             </div>
         </div>
     );
