@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -14,10 +15,24 @@ import type { Booking } from '@/lib/types';
 import { Calendar } from '@/components/ui/calendar';
 import { parseISO, isSameDay, format } from 'date-fns';
 import { ClientTime } from '@/components/client-time';
+import { BookingSystem } from '@/components/booking-system';
+import { useSearchParams } from 'next/navigation';
+import { mockSalons } from '@/lib/mock-data';
+import type { Salon } from '@/lib/types';
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState(mockBookings);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const searchParams = useSearchParams();
+  const bookingSalonId = searchParams.get('book');
+  const salonToBook = bookingSalonId ? mockSalons.find(s => s.id === parseInt(bookingSalonId)) : null;
+
+  const addBooking = (newBooking: Booking) => {
+    setBookings(prev => ({
+      ...prev,
+      upcoming: [newBooking, ...prev.upcoming]
+    }));
+  };
 
   const upcomingBookings = bookings.upcoming.sort((a,b) => new Date(a.booking_time).getTime() - new Date(b.booking_time).getTime());
   const pastBookings = bookings.completed.sort((a,b) => new Date(b.booking_time).getTime() - new Date(a.booking_time).getTime());
@@ -77,6 +92,7 @@ export default function BookingsPage() {
   );
 
   return (
+    <>
     <main className="flex-1 p-4 sm:p-6 lg:p-8">
        <div className="max-w-7xl mx-auto">
         <div className="mb-6">
@@ -192,5 +208,7 @@ export default function BookingsPage() {
         </div>
       </div>
     </main>
+    {salonToBook && <BookingSystem salon={salonToBook} onBookingComplete={addBooking} />}
+    </>
   );
 }

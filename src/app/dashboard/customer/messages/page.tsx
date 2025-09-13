@@ -24,22 +24,8 @@ import {
 import { mockConversations } from '@/lib/mock-data';
 import type { Conversation, Message } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { ClientTime } from '@/components/client-time';
 
-
-const ConversationTimestamp = ({ timestamp }: { timestamp: string }) => {
-  const [formattedTime, setFormattedTime] = useState('');
-
-  useEffect(() => {
-    setFormattedTime(
-      new Date(timestamp).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    );
-  }, [timestamp]);
-
-  return <p className="text-xs text-muted-foreground">{formattedTime}</p>;
-};
 
 export default function MessagesPage() {
   const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
@@ -125,7 +111,7 @@ export default function MessagesPage() {
                       <div className="flex-1">
                         <div className="flex justify-between items-center">
                           <h3 className="font-semibold">{convo.salonName}</h3>
-                          <ConversationTimestamp timestamp={convo.timestamp} />
+                          <ClientTime date={convo.timestamp} format="p" className="text-xs text-muted-foreground" />
                         </div>
                         <div className="flex justify-between items-start">
                           <p className="text-sm text-muted-foreground truncate max-w-[150px]">{convo.lastMessage}</p>
@@ -183,7 +169,7 @@ export default function MessagesPage() {
                               <p className="text-sm">{message.text}</p>
                             </div>
                           )}
-                           <ConversationTimestamp timestamp={message.timestamp} />
+                           <ClientTime date={message.timestamp} format="p" className="text-xs text-muted-foreground" />
                         </div>
                       </div>
                     ))}

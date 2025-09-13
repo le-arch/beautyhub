@@ -1,7 +1,9 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { SearchAndFilter } from '@/components/search-and-filter';
 import SalonCard from '@/components/salon-card';
 import { BookingSystem } from '@/components/booking-system';
@@ -16,6 +18,7 @@ export default function ExplorePage() {
     const [isBooking, setIsBooking] = useState(false);
     const [selectedSalon, setSelectedSalon] = useState<Salon | null>(null);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+    const router = useRouter();
 
     const fetchSalons = (filters: any = {}) => {
         setLoading(true);
@@ -73,8 +76,8 @@ export default function ExplorePage() {
 
 
     const handleBookNow = (salon: Salon) => {
-        setSelectedSalon(salon);
-        setIsBooking(true);
+        // Instead of opening modal directly, navigate to bookings page with a query param
+        router.push(`/dashboard/customer/bookings?book=${salon.id}`);
     };
 
     const handleCloseBooking = () => {

@@ -13,15 +13,19 @@ import {
   ArrowRight,
   ArrowLeft,
   X,
-  Loader2
+  Loader2,
+  Check
 } from "lucide-react";
-import type { Salon } from '@/lib/types';
+import type { Salon, Booking, Message, Conversation } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
 
 interface BookingSystemProps {
   salon: Salon;
   onClose?: () => void;
+  onBookingComplete?: (booking: Booking) => void;
+  onMessageUpdate?: (conversationId: string, message: Message) => void;
 }
 
 interface SelectedService {
@@ -30,7 +34,7 @@ interface SelectedService {
   price: number;
 }
 
-export function BookingSystem({ salon, onClose }: BookingSystemProps) {
+export function BookingSystem({ salon, onClose, onBookingComplete, onMessageUpdate }: BookingSystemProps) {
   const [step, setStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string>('');
@@ -38,6 +42,7 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
   const [notes, setNotes] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const generateTimeSlots = (date: Date) => {
     const slots = [];
@@ -85,16 +90,14 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
     }
 
     setIsProcessing(true);
-    // Mock booking creation
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     setIsProcessing(false);
-    setStep(4); // Move to confirm/payment step
+    setStep(4);
   };
 
   const handlePayment = async () => {
     setIsProcessing(true);
-    // Mock payment processing
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     toast({
@@ -102,9 +105,62 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
         description: `Your appointment at ${salon.name} is set.`,
     });
 
+    const bookingTime = new Date(selectedDate!);
+    const [hours, minutes] = selectedTime.split(':');
+    bookingTime.setHours(parseInt(hours), parseInt(minutes));
+
+    // Create a new booking object
+    const newBooking: Booking = {
+      id: `booking-${Date.now()}`,
+      created_at: new Date().toISOString(),
+      user_id: 'user-123',
+      salon_id: salon.id,
+      service_name: selectedServices.map(s => s.name).join(', '),
+      booking_time: bookingTime.toISOString(),
+      total_price: totalPrice,
+      deposit_paid: true,
+      notes: notes,
+      status: 'Confirmed',
+      salons: {
+        name: salon.name,
+        image: salon.image
+      }
+    };
+
+    // Create a new message object
+    const newMessage: Message = {
+      id: `msg-${Date.now()}`,
+      sender: 'salon',
+      text: `Your appointment for ${newBooking.service_name} is confirmed.`,
+      timestamp: new Date().toISOString(),
+      type: 'booking',
+      bookingDetails: {
+        service: newBooking.service_name,
+        date: format(new Date(newBooking.booking_time), 'PPP'),
+        time: format(new Date(newBooking.booking_time), 'p'),
+      },
+    };
+
+    if (onBookingComplete) {
+      onBookingComplete(newBooking);
+    }
+
+    // This is a mock implementation. In a real app you'd get the conversation from a context or store.
+    const conversationId = `convo-${salon.id}`;
+    if (onMessageUpdate) {
+        onMessageUpdate(conversationId, newMessage);
+    }
+    
     setIsProcessing(false);
     setStep(5);
   };
+
+  const effectiveOnClose = () => {
+    if (onClose) {
+        onClose();
+    }
+    router.replace('/dashboard/customer/bookings', undefined);
+  }
 
   const renderStepContent = () => {
     switch (step) {
@@ -133,7 +189,7 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
                               ? 'bg-purple-600 border-purple-600' 
                               : 'border-warmgray-300'
                           }`}>
-                            {isSelected && <CheckCircle className="h-3 w-3 text-white" />}
+                            {isSelected && <Check className="h-3 w-3 text-white" />}
                           </div>
                           <div>
                             <h4 className="font-medium text-warmgray-900">{service.name}</h4>
@@ -305,7 +361,7 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button
-                onClick={onClose}
+                onClick={effectiveOnClose}
                 variant="outline"
                 className="border-purple-200 text-purple-600 hover:bg-purple-50"
               >
@@ -349,7 +405,7 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
                 at {salon.name}
               </p>
             </div>
-            <Button variant="ghost" size="icon" onClick={onClose}>
+            <Button variant="ghost" size="icon" onClick={effectiveOnClose}>
                 <span className="sr-only">Close</span>
                  <X />
             </Button>
@@ -367,7 +423,7 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
                             ? 'bg-purple-600 text-white' 
                             : 'bg-warmgray-200 text-warmgray-600'
                         }`}>
-                        {step > index + 1 ? <CheckCircle className="h-4 w-4" /> : index + 1}
+                        {step > index + 1 ? <Check className="h-4 w-4" /> : index + 1}
                         </div>
                         {index < stepTitles.length - 1 && (
                         <div className={`flex-1 h-1 mx-2 ${
