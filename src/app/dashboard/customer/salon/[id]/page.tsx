@@ -37,6 +37,7 @@ import {
   Globe,
   Users,
   Calendar,
+  Play,
 } from 'lucide-react';
 import Link from 'next/link';
 import ImageWithFallback from '@/components/image-with-fallback';
@@ -74,15 +75,16 @@ const mockReviews = [
   }
 ];
 
-const mockGalleryImages = [
-  'https://images.unsplash.com/photo-1594736797933-d0301ba6add9?w=400',
-  'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400',
-  'https://images.unsplash.com/photo-1616683693504-3ea7eb1d4c0e?w=400',
-  'https://images.unsplash.com/photo-1595475207225-428b62bda831?w=400',
-  'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400',
-  'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400'
+const mockGalleryItems = [
+  { type: 'image', url: 'https://images.unsplash.com/photo-1594736797933-d0301ba6add9?w=400' },
+  { type: 'image', url: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400' },
+  { type: 'video', url: 'https://placehold.co/400x400/e0e0e0/333?text=Video+1' },
+  { type: 'image', url: 'https://images.unsplash.com/photo-1616683693504-3ea7eb1d4c0e?w=400' },
+  { type: 'video', url: 'https://placehold.co/400x400/d0d0d0/333?text=Video+2' },
+  { type: 'image', url: 'https://images.unsplash.com/photo-1595475207225-428b62bda831?w=400' },
+  { type: 'image', url: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400' },
+  { type: 'image', url: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400' }
 ];
-
 
 export default function SalonProfilePage() {
   const params = useParams();
@@ -92,6 +94,7 @@ export default function SalonProfilePage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('overview');
   const [isBooking, setIsBooking] = useState(false);
+  const [galleryFilter, setGalleryFilter] = useState<'all' | 'photos' | 'videos'>('all');
 
   if (!salon) {
     return (
@@ -104,12 +107,19 @@ export default function SalonProfilePage() {
   const averageRating = mockReviews.reduce((acc, review) => acc + review.rating, 0) / mockReviews.length;
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % mockGalleryImages.length);
+    setCurrentImageIndex((prev) => (prev + 1) % mockGalleryItems.length);
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + mockGalleryImages.length) % mockGalleryImages.length);
+    setCurrentImageIndex((prev) => (prev - 1 + mockGalleryItems.length) % mockGalleryItems.length);
   };
+
+  const filteredGallery = mockGalleryItems.filter(item => {
+    if (galleryFilter === 'all') return true;
+    if (galleryFilter === 'photos') return item.type === 'image';
+    if (galleryFilter === 'videos') return item.type === 'video';
+    return true;
+  });
   
   return (
     <>
@@ -139,7 +149,7 @@ export default function SalonProfilePage() {
                 {/* Image Gallery */}
                 <div className="relative h-80 bg-warmgray-100">
                   <ImageWithFallback
-                    src={mockGalleryImages[currentImageIndex]}
+                    src={mockGalleryItems[currentImageIndex].url}
                     alt={`${salon.name} gallery`}
                     layout="fill"
                     objectFit="cover"
@@ -147,7 +157,7 @@ export default function SalonProfilePage() {
                   />
                   
                   {/* Gallery Navigation */}
-                  {mockGalleryImages.length > 1 && (
+                  {mockGalleryItems.length > 1 && (
                     <>
                       <button
                         onClick={prevImage}
@@ -164,7 +174,7 @@ export default function SalonProfilePage() {
                       
                       {/* Image Indicators */}
                       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                        {mockGalleryImages.map((_, index) => (
+                        {mockGalleryItems.map((_, index) => (
                           <button
                             key={index}
                             onClick={() => setCurrentImageIndex(index)}
@@ -209,7 +219,7 @@ export default function SalonProfilePage() {
                     )}
                     <Badge className="bg-purple-100 text-purple-700 border-purple-200">
                       <ImageIcon className="h-3 w-3 mr-1" />
-                      {mockGalleryImages.length} Photos
+                      {mockGalleryItems.length} Photos
                     </Badge>
                   </div>
                 </div>
@@ -537,25 +547,34 @@ export default function SalonProfilePage() {
               <TabsContent value="gallery" className="mt-6">
                 <Card className="border-purple-100">
                   <CardHeader>
-                    <CardTitle>Photo Gallery</CardTitle>
+                    <CardTitle>Photo & Video Gallery</CardTitle>
                     <p className="text-warmgray-600">
                       Discover our work and salon atmosphere
                     </p>
                   </CardHeader>
                   <CardContent>
+                    <div className="flex justify-center gap-2 mb-6">
+                      <Button variant={galleryFilter === 'all' ? 'default' : 'outline'} onClick={() => setGalleryFilter('all')}>All</Button>
+                      <Button variant={galleryFilter === 'photos' ? 'default' : 'outline'} onClick={() => setGalleryFilter('photos')}>Photos</Button>
+                      <Button variant={galleryFilter === 'videos' ? 'default' : 'outline'} onClick={() => setGalleryFilter('videos')}>Videos</Button>
+                    </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {mockGalleryImages.map((image, index) => (
+                      {filteredGallery.map((item, index) => (
                         <div 
                           key={index}
-                          className="relative aspect-square bg-warmgray-100 rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform"
-                          onClick={() => setCurrentImageIndex(index)}
+                          className="relative aspect-square bg-warmgray-100 rounded-lg overflow-hidden cursor-pointer group"
                         >
                           <ImageWithFallback
-                            src={image}
-                            alt={`Gallery image ${index + 1}`}
+                            src={item.url}
+                            alt={`Gallery item ${index + 1}`}
                             layout="fill"
                             objectFit="cover"
                           />
+                          {item.type === 'video' && (
+                             <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                               <Play className="h-10 w-10 text-white fill-white" />
+                             </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -678,3 +697,5 @@ export default function SalonProfilePage() {
     </>
   );
 }
+
+    
