@@ -13,6 +13,7 @@ import { mockBookings } from '@/lib/mock-data';
 import type { Booking } from '@/lib/types';
 import { Calendar } from '@/components/ui/calendar';
 import { parseISO, isSameDay, format } from 'date-fns';
+import { ClientTime } from '@/components/client-time';
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState(mockBookings);
@@ -54,7 +55,7 @@ export default function BookingsPage() {
             </div>
             <div className="flex items-center gap-1.5">
               <Clock className="h-4 w-4" />
-              <span>{format(parseISO(booking.booking_time), 'p')}</span>
+              <ClientTime date={booking.booking_time} format="p" />
             </div>
           </div>
         </div>
@@ -168,7 +169,9 @@ export default function BookingsPage() {
                                                 <p className="text-sm text-warmgray-600">{booking.service_name}</p>
                                             </div>
                                             <div className="text-right">
-                                                <p className="text-sm font-medium text-purple-600">{format(parseISO(booking.booking_time), 'p')}</p>
+                                                <p className="text-sm font-medium text-purple-600">
+                                                  <ClientTime date={booking.booking_time} format="p" />
+                                                </p>
                                                 <Badge variant={booking.status === 'Confirmed' ? "default" : "outline"} className={booking.status === 'Confirmed' ? "bg-primary" : ""}>
                                                 {booking.status}
                                                 </Badge>
