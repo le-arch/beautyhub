@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Bell, Sparkles, CalendarCheck, MessageSquarePlus, User, LogOut, Menu } from 'lucide-react';
+import { Bell, Sparkles, CalendarCheck, MessageSquarePlus, User, LogOut, Menu, Settings } from 'lucide-react';
 import {
   Popover,
   PopoverContent,
