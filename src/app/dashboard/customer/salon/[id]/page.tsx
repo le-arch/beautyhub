@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -11,6 +12,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
+import { BookingSystem } from '@/components/booking-system';
+import type { Salon } from '@/lib/types';
 import { 
   Star,
   MapPin,
@@ -88,6 +91,7 @@ export default function SalonProfilePage() {
   const [isFavorited, setIsFavorited] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('overview');
+  const [isBooking, setIsBooking] = useState(false);
 
   if (!salon) {
     return (
@@ -108,6 +112,7 @@ export default function SalonProfilePage() {
   };
   
   return (
+    <>
     <main className="bg-gradient-beauty-secondary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Navigation */}
@@ -406,7 +411,7 @@ export default function SalonProfilePage() {
                             <div className="flex items-center gap-4 text-sm text-warmgray-500">
                               <span className="flex items-center gap-1">
                                 <Clock className="h-3 w-3" />
-                                60 mins
+                                {service.duration} mins
                               </span>
                             </div>
                           </div>
@@ -414,10 +419,10 @@ export default function SalonProfilePage() {
                             <p className="text-xl font-semibold text-purple-600">₦{service.price.toLocaleString()}</p>
                             <Button 
                               size="sm"
-                              asChild
+                              onClick={() => setIsBooking(true)}
                               className="mt-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                             >
-                              <Link href="/dashboard/customer/bookings">Book Now</Link>
+                              Book Now
                             </Button>
                           </div>
                         </div>
@@ -577,13 +582,11 @@ export default function SalonProfilePage() {
                 
                 <div className="space-y-3">
                   <Button 
-                    asChild
+                    onClick={() => setIsBooking(true)}
                     className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                   >
-                    <Link href="/dashboard/customer/bookings">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      Book Appointment
-                    </Link>
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Book Appointment
                   </Button>
                   
                   <Button 
@@ -671,5 +674,7 @@ export default function SalonProfilePage() {
         </div>
       </div>
     </main>
+    {isBooking && <BookingSystem salon={salon} onClose={() => setIsBooking(false)} />}
+    </>
   );
 }

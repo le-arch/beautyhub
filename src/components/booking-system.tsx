@@ -12,9 +12,12 @@ import {
   CheckCircle,
   ArrowRight,
   ArrowLeft,
+  X,
+  Loader2
 } from "lucide-react";
 import type { Salon } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 
 interface BookingSystemProps {
   salon: Salon;
@@ -134,6 +137,7 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
                           </div>
                           <div>
                             <h4 className="font-medium text-warmgray-900">{service.name}</h4>
+                            <p className="text-xs text-warmgray-500">{service.duration} mins</p>
                           </div>
                         </div>
                         <div className="text-right ml-4">
@@ -168,7 +172,7 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
                   mode="single"
                   selected={selectedDate}
                   onSelect={setSelectedDate}
-                  disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1)) || date.getDay() === 0}
+                  disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1))}
                   className="rounded-md border border-purple-200"
                 />
               </div>
@@ -176,7 +180,7 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
             {selectedDate && (
               <div>
                 <h4 className="font-medium text-warmgray-900 mb-3">
-                  Available times for {selectedDate.toLocaleDateString()}
+                  Available times for {format(selectedDate, 'PPP')}
                 </h4>
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                   {timeSlots.map((slot) => (
@@ -222,7 +226,7 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
                 </div>
                 <div className="flex justify-between">
                   <span>Date:</span>
-                  <span>{selectedDate?.toLocaleDateString()}</span>
+                  <span>{selectedDate ? format(selectedDate, 'PPP') : 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Time:</span>
@@ -347,7 +351,7 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
             </div>
             <Button variant="ghost" size="icon" onClick={onClose}>
                 <span className="sr-only">Close</span>
-                 X
+                 <X />
             </Button>
           </div>
         </CardHeader>
@@ -409,6 +413,7 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
                     disabled={!canProceed() || isProcessing}
                     className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                 >
+                    {isProcessing ? <Loader2 className="animate-spin mr-2" /> : null}
                     {isProcessing ? 'Creating...' : 'Create Booking'}
                 </Button>
                 )}
@@ -420,6 +425,7 @@ export function BookingSystem({ salon, onClose }: BookingSystemProps) {
                     className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white"
                 >
                     <CreditCard className="h-4 w-4 mr-2" />
+                    {isProcessing ? <Loader2 className="animate-spin mr-2" /> : null}
                     {isProcessing ? 'Processing...' : `Pay Deposit ₦${depositAmount.toLocaleString()}`}
                 </Button>
                 )}

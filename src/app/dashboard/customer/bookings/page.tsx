@@ -5,19 +5,28 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Star, AlertTriangle } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Star, AlertTriangle, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { mockBookings } from '@/lib/mock-data';
 import type { Booking } from '@/lib/types';
-
+import { Calendar } from '@/components/ui/calendar';
+import { parseISO, isSameDay, format } from 'date-fns';
 
 export default function BookingsPage() {
-  const [upcomingBookings] = useState<Booking[]>(mockBookings.upcoming);
-  const [pastBookings] = useState<Booking[]>(mockBookings.completed);
-  const [loading, setLoading] = useState(false);
+  const allBookings = [...mockBookings.upcoming, ...mockBookings.completed];
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+
+  const upcomingBookings = mockBookings.upcoming.sort((a,b) => new Date(a.booking_time).getTime() - new Date(b.booking_time).getTime());
+  const pastBookings = mockBookings.completed.sort((a,b) => new Date(b.booking_time).getTime() - new Date(a.booking_time).getTime());
+
+  const bookedDays = allBookings.map(booking => parseISO(booking.booking_time));
+  
+  const selectedDayBookings = selectedDate 
+    ? allBookings.filter(booking => isSameDay(parseISO(booking.booking_time), selectedDate))
+    : [];
 
   const renderBookingCard = (booking: Booking) => (
     <Card key={booking.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4">
@@ -39,7 +48,7 @@ export default function BookingsPage() {
         </div>
         <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
           <div className="flex items-center gap-1.5">
-            <Calendar className="h-4 w-4" />
+            <CalendarIcon className="h-4 w-4" />
             <span>{new Date(booking.booking_time).toLocaleDateString()}</span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -64,83 +73,97 @@ export default function BookingsPage() {
     </Card>
   );
 
-  const renderSkeleton = () => (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4">
-      <Skeleton className="w-full sm:w-24 h-32 sm:h-24 rounded-lg" />
-      <div className="flex-1 space-y-2">
-        <Skeleton className="h-6 w-3/4" />
-        <Skeleton className="h-4 w-1/2" />
-        <div className="flex gap-4">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-4 w-24" />
-        </div>
-      </div>
-      <div className="flex sm:flex-col gap-2 self-stretch sm:self-center">
-        <Skeleton className="h-8 w-24" />
-        <Skeleton className="h-8 w-24" />
-      </div>
-    </div>
-  );
-
-  if (loading) {
-    return (
-      <main className="flex-1 p-4 sm:p-6 lg:p-8">
-        <h1 className="text-3xl font-bold mb-8">My Bookings</h1>
-        <div className="space-y-8">
-          <Card>
-            <CardHeader><CardTitle className="text-2xl">Upcoming Appointments</CardTitle></CardHeader>
-            <CardContent className="space-y-4">{renderSkeleton()}{renderSkeleton()}</CardContent>
-          </Card>
-          <Card>
-            <CardHeader><CardTitle className="text-2xl">Past Appointments</CardTitle></CardHeader>
-            <CardContent className="space-y-4">{renderSkeleton()}</CardContent>
-          </Card>
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main className="flex-1 p-4 sm:p-6 lg:p-8">
       <h1 className="text-3xl font-bold mb-8">My Bookings</h1>
       
-      <div className="space-y-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Upcoming Appointments</CardTitle>
-            <CardDescription>Your scheduled appointments will appear here.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {upcomingBookings.length > 0 ? (
-                <div className="space-y-4">
-                {upcomingBookings.map(renderBookingCard)}
-              </div>
-            ) : (
-              <div className="text-center py-12 border-2 border-dashed rounded-lg">
-                <h3 className="text-lg font-medium text-muted-foreground">You have no upcoming appointments.</h3>
-                <Button className="mt-4" asChild>
-                  <Link href="/dashboard/customer/explore">Book a Service</Link>
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Upcoming Appointments</CardTitle>
+              <CardDescription>Your scheduled appointments will appear here.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {upcomingBookings.length > 0 ? (
+                  <div className="space-y-4">
+                  {upcomingBookings.map(renderBookingCard)}
+                </div>
+              ) : (
+                <div className="text-center py-12 border-2 border-dashed rounded-lg">
+                  <h3 className="text-lg font-medium text-muted-foreground">You have no upcoming appointments.</h3>
+                  <Button className="mt-4" asChild>
+                    <Link href="/dashboard/customer/explore">Book a Service</Link>
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Past Appointments</CardTitle>
-              <CardDescription>Review your past visits and book again.</CardDescription>
-          </CardHeader>
-          <CardContent>
-              {pastBookings.length > 0 ? (
-                <div className="space-y-4">
-                {pastBookings.map(renderBookingCard)}
-              </div>
-            ) : (
-              <p className="text-center text-muted-foreground py-12">Your past appointments will appear here.</p>
-            )}
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Past Appointments</CardTitle>
+                <CardDescription>Review your past visits and book again.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                {pastBookings.length > 0 ? (
+                  <div className="space-y-4">
+                  {pastBookings.map(renderBookingCard)}
+                </div>
+              ) : (
+                <p className="text-center text-muted-foreground py-12">Your past appointments will appear here.</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+        <div className="lg:col-span-1 space-y-6">
+            <Card className="border-purple-100">
+                <CardHeader>
+                    <CardTitle>Booking Calendar</CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col items-center">
+                    <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={setSelectedDate}
+                        modifiers={{ booked: bookedDays }}
+                        modifiersClassNames={{
+                            booked: 'bg-purple-500 text-white rounded-full'
+                        }}
+                        className="rounded-md border p-4"
+                    />
+                    <div className="space-y-4 w-full mt-6">
+                        <h3 className="font-semibold text-warmgray-900 text-lg">
+                           Appointments for {selectedDate ? format(selectedDate, 'PPP') : '...'}
+                        </h3>
+                        {selectedDayBookings.length > 0 ? (
+                            <div className="space-y-4">
+                                {selectedDayBookings.map(booking => (
+                                    <div key={booking.id} className="flex items-start gap-4 p-4 bg-purple-50 rounded-lg">
+                                        <Image src={booking.salons?.image || ''} alt={booking.salons?.name || ''} width={40} height={40} className="h-10 w-10 rounded-lg object-cover" />
+                                        <div className="flex-1">
+                                            <h4 className="font-semibold text-warmgray-800">{booking.salons?.name}</h4>
+                                            <p className="text-sm text-warmgray-600">{booking.service_name}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-sm font-medium text-purple-600">{format(parseISO(booking.booking_time), 'p')}</p>
+                                            <Badge variant={booking.status === 'Confirmed' ? "default" : "outline"} className={booking.status === 'Confirmed' ? "bg-primary" : ""}>
+                                              {booking.status}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-12 border-2 border-dashed rounded-lg">
+                                <Users className="h-8 w-8 mx-auto text-warmgray-400 mb-2"/>
+                                <p className="text-warmgray-500">No appointments for this day.</p>
+                            </div>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
       </div>
     </main>
   );
