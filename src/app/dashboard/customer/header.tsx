@@ -12,6 +12,8 @@ import {
 import {
   Sheet,
   SheetContent,
+  SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Badge } from '@/components/ui/badge';
@@ -49,6 +51,9 @@ const CustomerDashboardHeader = () => {
                 </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-4">
+                <SheetHeader>
+                    <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                </SheetHeader>
                  <CustomerNav />
             </SheetContent>
            </Sheet>
