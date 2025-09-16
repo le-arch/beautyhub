@@ -38,7 +38,7 @@ export default function OwnerPage() {
                 </CardHeader>
                 <CardContent>
                     <Button size="lg" asChild>
-                        <Link href="/explore">Explore Salons</Link>
+                        <Link href="/signup">Explore Salons</Link>
                     </Button>
                 </CardContent>
             </Card>

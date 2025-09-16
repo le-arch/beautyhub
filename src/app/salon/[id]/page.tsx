@@ -142,7 +142,7 @@ export default function PublicSalonProfilePage() {
             asChild
             className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 -ml-3"
           >
-            <Link href="/explore">
+            <Link href="/">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Salons
             </Link>
