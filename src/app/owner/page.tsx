@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Sparkles, User, Building } from 'lucide-react';
@@ -37,7 +38,7 @@ export default function OwnerPage() {
                 </CardHeader>
                 <CardContent>
                     <Button size="lg" asChild>
-                        <Link href="/signup">Explore Salons</Link>
+                        <Link href="/explore">Explore Salons</Link>
                     </Button>
                 </CardContent>
             </Card>

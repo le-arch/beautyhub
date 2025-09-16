@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from '@/components/ui/sheet';
 import { Menu, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -34,7 +34,7 @@ const Header = () => {
       <div className="container flex h-16 max-w-7xl items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <Sparkles className="h-6 w-6 text-primary" />
-          <span className="font-headline text-2xl font-bold text-foreground">
+          <span className="font-bold text-xl text-foreground">
             BeautyHub
           </span>
         </Link>
@@ -55,8 +55,8 @@ const Header = () => {
                 <Link href={dashboardHref}>Dashboard</Link>
              </Button>
           ) : (
-            <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
-              <Link href="/signup">Join</Link>
+            <Button asChild>
+              <Link href="/owner">Join</Link>
             </Button>
           )}
         </div>
@@ -68,11 +68,13 @@ const Header = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
-               <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
+              <SheetHeader>
+                <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
+              </SheetHeader>
               <div className="flex flex-col gap-6 p-6">
                 <Link href="/" className="flex items-center gap-2">
                     <Sparkles className="h-6 w-6 text-primary" />
-                    <span className="font-headline text-xl font-bold">BeautyHub</span>
+                    <span className="font-bold text-xl">BeautyHub</span>
                 </Link>
                 <nav className="flex flex-col gap-4">
                     {navLinks.map((link) => (
@@ -91,8 +93,8 @@ const Header = () => {
                           <Link href={dashboardHref}>Dashboard</Link>
                         </Button>
                     ) : (
-                      <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
-                        <Link href="/signup">Join</Link>
+                      <Button asChild>
+                        <Link href="/owner">Join</Link>
                       </Button>
                   )}
                 </div>

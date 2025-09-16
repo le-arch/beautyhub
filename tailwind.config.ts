@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -86,26 +87,30 @@ export default {
         'warmgray-700': '#44403c',
         'warmgray-800': '#292524',
         'warmgray-900': '#1c1917',
-        'purple-50': '#faf5ff',
-        'purple-100': '#f3e8ff',
-        'purple-200': '#e9d5ff',
-        'purple-300': '#d8b4fe',
-        'purple-400': '#c084fc',
-        'purple-500': '#a855f7',
-        'purple-600': '#8b5a9f',
-        'purple-700': '#7e22ce',
-        'purple-800': '#6b21a8',
-        'purple-900': '#581c87',
-        'pink-50': '#fdf2f8',
-        'pink-100': '#fce7f3',
-        'pink-200': '#fbcfe8',
-        'pink-300': '#f9a8d4',
-        'pink-400': '#f472b6',
-        'pink-500': '#ec4899',
-        'pink-600': '#d13d63',
-        'pink-700': '#be185d',
-        'pink-800': '#9d174d',
-        'pink-900': '#831843',
+        'purple': {
+            '50': '#faf5ff',
+            '100': '#f3e8ff',
+            '200': '#e9d5ff',
+            '300': '#d8b4fe',
+            '400': '#c084fc',
+            '500': '#a855f7',
+            '600': '#8b5a9f',
+            '700': '#7e22ce',
+            '800': '#6b21a8',
+            '900': '#581c87'
+        },
+        'pink': {
+            '50': '#fdf2f8',
+            '100': '#fce7f3',
+            '200': '#fbcfe8',
+            '300': '#f9a8d4',
+            '400': '#f472b6',
+            '500': '#ec4899',
+            '600': '#d13d63',
+            '700': '#be185d',
+            '800': '#9d174d',
+            '900': '#831843'
+        },
         'indigo-600': '#4f46e5',
         'rose-400': '#fb7185',
         'rose-600': '#e11d48',
@@ -123,7 +128,6 @@ export default {
         'gray-600': '#4b5563',
         'gray-700': '#374151',
         'gray-900': '#111827',
-
       },
       borderRadius: {
         lg: '12px',
