@@ -10,6 +10,7 @@ import { MapPin, Star, Heart, Zap, CheckCircle, MessageSquare, Loader2 } from 'l
 import ImageWithFallback from './image-with-fallback';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import { usePathname } from 'next/navigation';
 
 interface SalonCardProps {
   salon: Salon & { specialties?: string[], featured?: boolean, verified?: boolean, distance?: string, responseTime?: string };
@@ -21,6 +22,10 @@ const SalonCard = ({ salon, onBookNow, viewMode = 'grid' }: SalonCardProps) => {
   const [isFavorited, setIsFavorited] = useState(salon.featured || false);
   const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
   const { toast } = useToast();
+  const pathname = usePathname();
+
+  const isDashboard = pathname.startsWith('/dashboard');
+  const profileLink = isDashboard ? `/dashboard/customer/salon/${salon.id}` : `/salon/${salon.id}`;
 
   const toggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -42,7 +47,7 @@ const SalonCard = ({ salon, onBookNow, viewMode = 'grid' }: SalonCardProps) => {
     return (
       <Card className="group transition-all duration-300 hover:shadow-2xl flex flex-col sm:flex-row border-purple-100">
         <div className="sm:w-1/3 relative">
-          <Link href={`/dashboard/customer/salon/${salon.id}`}>
+          <Link href={profileLink}>
             <ImageWithFallback
               src={salon.image}
               alt={salon.name}
@@ -95,7 +100,7 @@ const SalonCard = ({ salon, onBookNow, viewMode = 'grid' }: SalonCardProps) => {
   return (
     <Card className="overflow-hidden group transition-all duration-300 hover:shadow-2xl flex flex-col border-purple-100">
       <CardHeader className="p-0 relative">
-        <Link href={`/dashboard/customer/salon/${salon.id}`}>
+        <Link href={profileLink}>
           <ImageWithFallback
             src={salon.image}
             alt={salon.name}

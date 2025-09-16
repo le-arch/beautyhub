@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react';
 
 const navLinks = [
   { href: '/', label: 'Home' },
-  { href: '/dashboard/customer/explore', label: 'Explore Salons' },
+  { href: '/explore', label: 'Explore Salons' },
   { href: '/#blog', label: 'Beauty Tips' },
 ];
 
@@ -56,7 +56,7 @@ const Header = () => {
              </Button>
           ) : (
             <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
-              <Link href="/signup">Join</Link>
+              <Link href="/owner">Join</Link>
             </Button>
           )}
         </div>
@@ -92,7 +92,7 @@ const Header = () => {
                         </Button>
                     ) : (
                       <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
-                        <Link href="/signup">Join</Link>
+                        <Link href="/owner">Join</Link>
                       </Button>
                   )}
                 </div>
