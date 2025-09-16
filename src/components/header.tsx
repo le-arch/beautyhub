@@ -2,12 +2,11 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Menu, Sparkles } from 'lucide-react';
-import type { User } from '@supabase/supabase-js';
-import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { useState, useEffect } from 'react';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -16,26 +15,19 @@ const navLinks = [
 ];
 
 const Header = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const supabase = createClient();
+  const pathname = usePathname();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    const fetchUser = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
+    // This simulates checking login state. In a real app, this would be more robust.
+    if (pathname.includes('/dashboard')) {
+        setIsLoggedIn(true);
+    } else {
+        setIsLoggedIn(false);
     }
-    fetchUser();
+  }, [pathname]);
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [supabase.auth]);
-
-  const dashboardHref = user?.user_metadata?.role === 'owner' ? '/dashboard/owner' : '/dashboard/customer';
+  const dashboardHref = '/dashboard/customer';
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -56,27 +48,16 @@ const Header = () => {
               {link.label}
             </Link>
           ))}
-           <Link
-              href="/owner"
-              className="transition-colors hover:text-primary"
-            >
-              For Salon Owners
-            </Link>
         </nav>
         <div className="hidden md:flex items-center gap-4">
-          {user ? (
+          {isLoggedIn ? (
              <Button asChild>
                 <Link href={dashboardHref}>Dashboard</Link>
              </Button>
           ) : (
-            <>
-              <Button variant="ghost" asChild>
-                <Link href="/login">Log In</Link>
-              </Button>
-              <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
-                <Link href="/signup">Sign Up</Link>
-              </Button>
-            </>
+            <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
+              <Link href="/signup">Join</Link>
+            </Button>
           )}
         </div>
         <div className="md:hidden">
@@ -103,27 +84,16 @@ const Header = () => {
                         {link.label}
                     </Link>
                     ))}
-                     <Link
-                      href="/owner"
-                      className="text-lg font-medium transition-colors hover:text-primary"
-                    >
-                      For Salon Owners
-                    </Link>
                 </nav>
                 <div className="flex flex-col gap-4">
-                    {user ? (
+                    {isLoggedIn ? (
                         <Button asChild>
                           <Link href={dashboardHref}>Dashboard</Link>
                         </Button>
                     ) : (
-                    <>
-                      <Button variant="ghost" asChild>
-                          <Link href="/login">Log In</Link>
-                      </Button>
                       <Button style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} asChild>
-                        <Link href="/signup">Sign Up</Link>
+                        <Link href="/signup">Join</Link>
                       </Button>
-                    </>
                   )}
                 </div>
               </div>
